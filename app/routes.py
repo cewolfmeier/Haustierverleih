@@ -39,26 +39,23 @@ def admin_required(f):
 def login():
     """Login-Seite"""
     if request.method == 'POST':
+        # -- FORM VALIDATION -- #
         username = request.form.get('Username')
         password = request.form.get('Password')
-        # check if at least one required field is not filled
+        # check required fields
         if username == "" or password == "":
             flash("Bitte gib deine Anmeldedaten ein.", 'error')
+        # -- DATABASE HANDLING -- #
+        username = username.lower()
         user = db.session.scalar(
             sa.select(Users).where(Users.username == username)
         )
+        # -- LOGIN HANDLING -- #
         if user is None or not user.check_password(password):
             flash("Die Anmeldedaten stimmen nicht überein", 'error')
         else:
-            flash(
-                "Anmeldung erfolgreich.", 
-                'success'
-            )
-            session['current_user'] = {
-                'user_id':user.user_id,
-                'username' : user.username,
-                'role' : user.role.role,
-                }
+            user.login()
+            flash("Anmeldung erfolgreich.", 'success')
             return redirect(url_for('index'))
     return render_template('auth/login.html', current_user=None)
 
@@ -70,32 +67,34 @@ def register():
             sa.select(Roles).where(Roles.role == 'user')
         )
     if request.method == 'POST':
+        # -- FORM VALIDATION -- #
         username = request.form.get('Username')
         password = request.form.get('Password')
         password_repeat = request.form.get('Password-Repeat')
-        # check if at least one required field is not filled
+        # check required fields
         if username == "" or password == "" or password_repeat == "":
             flash("Netter Versuch, so klappt das aber nicht.", 'error')
         elif password != password:
             flash("Die Passworteingabe stimmt nicht überein", 'error')
+        # -- DATABASE HANDLING -- #
         else:
-            new_user = Users(username = username, role_id = role_user.role_id)
-            new_user.set_password(password)
-            db.session.add(new_user)
-            db.session.commit()
-            flash(
-                "Glückwunsch! Du bist jetzt registriert.", 
-                'success'
-            )
+            username = username.lower()
             user = db.session.scalar(
-                sa.select(Users).where(Users.username == username)
+            sa.select(Users).where(Users.username == username)
             )
-            session['current_user'] = {
-                'user_id':user.user_id,
-                'username' : user.username,
-                'role' : user.role.role,
-                }
-            return redirect(url_for('index'))
+            if user is None:
+                user = Users(username=username, role_id=role_user.role_id)
+                user.set_password(password)
+                db.session.add(user)
+                db.session.commit()
+                user.login()
+                flash("Glückwunsch! Du bist jetzt registriert.", 'success')
+                return redirect(url_for('index'))
+            else: 
+                flash(
+                    'Diesen Benutzer gibt es bereits, bitte wähle einen anderen Benutzernamen.',
+                    'error'
+                    )
     return render_template('auth/register.html', current_user=None)
 
 
@@ -138,7 +137,7 @@ def edit_pet(pet_id):
     pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
     filename = None
     if request.method == 'POST':
-        current_image = pet.image
+        # -- FORM VALIDATION -- #
         name = request.form.get('Name')
         description = request.form.get('Beschreibung')
         animal_type_id = request.form.get('Tierart')
@@ -151,20 +150,24 @@ def edit_pet(pet_id):
                     image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 else:
                     flash("Das Bild konnte nicht hochgeladen werden.", "warning")
-        # check if at least one required field is not filled
+        # check required fields
         if name == "" or description == "":
             flash(
                 "Einige Daten wurden nicht korrekt übertragen. Bitte erneut versuchen.", 
                 "error",
                 )
+        # -- DATABASE HANDLING -- #
         else:
-            pet.name = name
-            pet.description = description
-            pet.animal_type_id = animal_type_id
+            pet.from_dict(
+                {
+                    "name" : name,
+                    "description" : description,
+                    "animal_type_id" : animal_type_id,
+                }
+            )
             if filename is not None:
+                pet.delete_image(app.config['UPLOAD_FOLDER'])
                 pet.image = filename
-                if current_image is not None:
-                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], current_image))
             db.session.commit()
             flash(
                 "Glückwunsch! Deine Änderungen wurde erfolgreich gespeichert.", 
@@ -192,8 +195,7 @@ def delete_pet(pet_id):
     elif pet.owner_id != session['current_user']['user_id']:
         flash("Du kannst nur deine eigenen Haustiere löschen.", 'error')
         abort(400)
-    if pet.image is not None:
-        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], pet.image))
+    pet.delete_image(app.config['UPLOAD_FOLDER'])
     db.session.delete(pet)
     db.session.commit()
     flash("Das Haustier wurde erfolgreich gelöscht.", 'success')
@@ -266,6 +268,7 @@ def new_pet():
     filename = None
     animal_types = db.session.scalars(sa.select(AnimalTypes)).all()
     if request.method == 'POST':
+        # -- FORM VALIDATION -- #
         name = request.form.get('Name')
         description = request.form.get('Beschreibung')
         animal_type = request.form.get('Tierart')
@@ -283,14 +286,15 @@ def new_pet():
             flash(
                 "Einige Daten wurden nicht korrekt übertragen. Bitte erneut versuchen.",
                 "error")
+        # -- DATABASE HANDLING -- #
         else:
             pet = Pets(
                 name = name, 
                 description = description,
                 animal_type_id = animal_type,
-                owner_id = session['current_user']['user_id'])
-            if filename is not None:
-                pet.image = filename
+                owner_id = session['current_user']['user_id'],
+                image = filename
+                )
             db.session.add(pet)
             db.session.commit()
             flash(
@@ -363,8 +367,7 @@ def delete_user(user_id):
         abort(400)
     pets = db.session.scalars(sa.select(Pets).where(Pets.owner_id == user_id))
     for pet in pets:
-        if pet.image is not None:
-            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], pet.image))
+        pet.delete_image(app.config['UPLOAD_FOLDER'])
     db.session.delete(user)
     db.session.commit()
     flash("Der Benutzer wurde erfolgreich gelöscht.", 'success')
