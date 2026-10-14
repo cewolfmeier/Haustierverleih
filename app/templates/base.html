@@ -15,7 +15,12 @@
                     </a>
                     <ul class="navigation">
                         {% if current_user != None %}
-                        <li>Moin {{current_user["username"]}}!</li>
+                        <li>
+                            Moin {{current_user["username"]}}!
+                        </li>
+                        <li class="button">
+                            <a href="{{ url_for('admin.get_edit_user', user_id=current_user['user_id']) }}">Profil bearbeiten</a>
+                        </li>
                         {% if current_user['role'] == 'admin' %}
                         <li class="button">
                             <a href="{{ url_for('admin.admin') }}">Admin-Bereich</a>
