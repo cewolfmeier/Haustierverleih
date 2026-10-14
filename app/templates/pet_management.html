@@ -5,7 +5,7 @@
 <div class="main-content">
     <p>
         <strong>Deine eigenen Haustiere ({{owned_pets_counter}})</strong>
-        <a class="button-form" href="{{ url_for('main.get_new_pet') }}">+ Neues Haustier anlegen</a>
+        <a class="button" href="{{ url_for('main.get_new_pet') }}">+ Neues Haustier anlegen</a>
     </p>
     <table>
         <thead>
@@ -23,14 +23,18 @@
                 <td>{{ pet.animal_type.animal_type }}</td>
                 <td>{% if pet.borrower_id != None %}nicht {% endif %}verfügbar</td>
                 <td>
-                    <a class="button-table" href="{{ url_for('main.get_edit_pet', pet_id=pet.pet_id) }}">Bearbeiten</a> 
-                    <a class="button-table" href="{{ url_for('main.delete_pet', pet_id=pet.pet_id) }}">Löschen</a>
-                    <a class="button-table" href="{{ url_for('main.pet', pet_id=pet.pet_id) }}">Details</a>
+                    <div>
+                        <a class="button" href="{{ url_for('main.get_edit_pet', pet_id=pet.pet_id) }}">Bearbeiten</a> 
+                        <a class="button" href="{{ url_for('main.delete_pet', pet_id=pet.pet_id) }}">Löschen</a>
+                        <a class="button" href="{{ url_for('main.pet', pet_id=pet.pet_id) }}">Details</a>
+                    </div>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    </div>
+    <div class="main-content">
     <p>
         <strong>
             Deine ausgeliehenen Haustiere ({{borrowed_pets_counter}})
@@ -51,7 +55,11 @@
             <td>{{ pet.name }}</td>
             <td>{{ pet.animal_type }}</td>
             <td>{{ pet.owned }}</td>
-            <td><a class="button-table" href="{{ url_for('main.pet', pet_id=pet.pet_id) }}">Details</a></td>
+            <td>
+                <div>
+                    <a class="button" href="{{ url_for('main.pet', pet_id=pet.pet_id) }}">Details</a>
+                </div>
+            </td>
             </tr>
             {% endfor %}
         </tbody>

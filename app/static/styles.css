@@ -55,14 +55,21 @@ a {
 
 table{
     border-collapse: collapse;
-    border-radius: 10px;
+    border-bottom-width: 1px;
+}
+
+thead {
     border-style: solid;
+    border-width: 0;
+    border-bottom-width: 1px;
 }
 
 th, td {
-  padding: 10px;
-  border-style: solid;
-  border-color: rgb(0 0 0 / 20%);
+    text-align: left;
+    padding: 10px;
+    border-style: solid;
+    border-width: 0;
+    border-bottom-width: 1px;
 }
 
 /* classes */
@@ -90,15 +97,20 @@ th, td {
 }
 
 .main-content {
+    width: 98%;
+    padding: 20px;
+    margin: 1%;
     display: flex;
     flex-flow: column nowrap;
     justify-content: space-between;
     align-items: stretch;
+    border-radius: 15px;
+    background: #c5dcaf9a;
 }
 .content-main {
     margin: 40px 50px;
     padding: 20px;
-    width: -moz-available;
+    width: 98%;
     background: rgba(92, 184, 212, 0.384);
     display: flex;
     flex-flow: column nowrap;
@@ -230,12 +242,25 @@ th, td {
 .detail {
     margin: 50px;
     padding: 30px 10px;
+    width: -moz-available;
     display: flex;
-    flex-flow: column wrap;
+    flex-flow: row wrap;
     justify-content: center;
     border-radius: 15px;
     list-style-type: none;
-    background: rgb(0 0 0 / 20%);
+    background: #c5dcaf9a;
+}
+
+.detail img {
+    margin: 10px;
+    height: 300px;
+    border-radius: 5%;
+}
+
+.detail-info {
+    margin: 10px;
+    flex-flow: column wrap;
+    align-content: end;
 }
 
 .thumbnail {
@@ -257,7 +282,8 @@ th, td {
 }
 
 .description {
-    color:#9c9c9c
+    color:#9c9c9c;
+    font-style: italic;
 }
 
 .success {

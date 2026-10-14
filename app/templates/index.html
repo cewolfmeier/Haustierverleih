@@ -9,7 +9,7 @@
     {% for pet in pets %}
     <a href="{{url_for('main.pet', pet_id=pet.pet_id)}}">
     <li class="shadow">
-        {% if pet.image != None %}
+        {% if pet.image %}
         <img class="thumbnail" src="{{ url_for('static', filename='images/user_uploads/'+pet.image)}}" alt="">
         {% else %}
         <img class="thumbnail" src="{{ url_for('static', filename='images/logo-thumbnail.png')}}" alt="">

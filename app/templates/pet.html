@@ -2,24 +2,25 @@
 
 {% block content %}
 <a href="{{ url_for('main.index') }}">zurück</a>
-<div class="detail">
-    {% if pet['image'] != None %}
-    <img class="thumbnail" src="{{ url_for('static', filename='images/user_uploads/'+pet.image)}}" alt="">
+<h2>{{ pet.name }}</h2>
+<div class="detail shadow">
+    {% if pet.image %}
+    <img src="{{ url_for('static', filename='images/user_uploads/'+pet.image)}}" alt="">
+    {% else %}
+    <img src="{{ url_for('static', filename='images/logo-thumbnail.png')}}" alt="">
     {% endif %}
-    <h2>{{ pet.name }}</h2>
-    <p>{{ pet.description }}</p>
-    <ul>
-        <li>Tierart: {{ pet.animal_type }}</li>
-        <li>Besitzer: {{ pet.owned }}</li>
-        <li>Verfügbarkeit: {% if pet.borrower_id != None %}nicht {% endif %}verfügbar</li>
-    </ul>
-    {% if current_user['user_id'] == pet.owner_id%}
-    <a class="button-form" href="{{ url_for('main.get_edit_pet', pet_id=pet.pet_id) }}">Tier bearbeiten</a>
-    {% elif pet.borrower_id == None %}
-    <a class="button-form" href="{{ url_for('main.borrow_pet', pet_id=pet.pet_id) }}">Tier ausleihen</a>
-    {% elif pet.borrower_id == current_user['user_id'] %}
-    <a class="button-form" href="{{ url_for('main.return_pet', pet_id=pet.pet_id) }}">Tier zurückgeben</a>
-    {% endif %}
+    <div class="detail-info">
+        <div class="description">{{ pet.description }}</div>
+        <div>Besitzer: {{ pet.owned }}</div>
+        <div>Tierart: {{ pet.animal_type }}</div>
+        {% if current_user['user_id'] == pet.owner_id%}
+        <a class="button shadow" href="{{ url_for('main.get_edit_pet', pet_id=pet.pet_id) }}">Tier bearbeiten</a>
+        {% elif pet.borrower_id == None %}
+        <a class="button shadow" href="{{ url_for('main.borrow_pet', pet_id=pet.pet_id) }}">Tier ausleihen</a>
+        {% elif pet.borrower_id == current_user['user_id'] %}
+        <a class="button shadow" href="{{ url_for('main.return_pet', pet_id=pet.pet_id) }}">Tier zurückgeben</a>
+        {% endif %}
+    </div>
 </div>
 
 {% endblock %}
