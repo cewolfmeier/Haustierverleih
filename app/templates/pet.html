@@ -4,21 +4,21 @@
 <a href="{{ url_for('index') }}">zurück</a>
 <div class="detail">
     {% if pet['image'] != None %}
-    <img class="thumbnail" src="{{ url_for('static', filename='images/user_uploads/'+pet['image'])}}" alt="">
+    <img class="thumbnail" src="{{ url_for('static', filename='images/user_uploads/'+pet.image)}}" alt="">
     {% endif %}
-    <h2>{{ pet["name"] }}</h2>
-    <p>{{ pet["description"] }}</p>
+    <h2>{{ pet.name }}</h2>
+    <p>{{ pet.description }}</p>
     <ul>
-        <li>Tierart: {{ pet["animal_type"] }}</li>
-        <li>Besitzer: {{ pet["username"] }}</li>
-        <li>Verfügbarkeit: {% if pet["borrower_id"] != None %}nicht {% endif %}verfügbar</li>
+        <li>Tierart: {{ pet.animal_type.animal_type }}</li>
+        <li>Besitzer: {{ pet.owned.username }}</li>
+        <li>Verfügbarkeit: {% if pet.borrower_id != None %}nicht {% endif %}verfügbar</li>
     </ul>
-    {% if current_user['user_id'] == pet['owner_id']%}
-    <a class="button-form" href="{{ url_for('edit_pet', pet_id=pet['pet_id']) }}">Tier bearbeiten</a>
-    {% elif pet['borrower_id'] == None %}
-    <a class="button-form" href="{{ url_for('borrow_pet', pet_id=pet['pet_id']) }}">Tier ausleihen</a>
-    {% elif pet['borrower_id'] == current_user['user_id'] %}
-    <a class="button-form" href="{{ url_for('return_pet', pet_id=pet['pet_id']) }}">Tier zurückgeben</a>
+    {% if current_user['user_id'] == pet.owner_id%}
+    <a class="button-form" href="{{ url_for('edit_pet', pet_id=pet.pet_id) }}">Tier bearbeiten</a>
+    {% elif pet.borrower_id == None %}
+    <a class="button-form" href="{{ url_for('borrow_pet', pet_id=pet.pet_id) }}">Tier ausleihen</a>
+    {% elif pet.borrower_id == current_user['user_id'] %}
+    <a class="button-form" href="{{ url_for('return_pet', pet_id=pet.pet_id) }}">Tier zurückgeben</a>
     {% endif %}
 </div>
 

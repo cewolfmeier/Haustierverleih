@@ -135,18 +135,19 @@ def index():
 @login_required
 def pet(pet_id):
     """Zeigt die Details eines Tieres an"""
-    pet = None
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute(f'''SELECT * 
-                FROM pets
-                INNER JOIN animal_types 
-                    ON pets.animal_type_id = animal_types.animal_type_id
-                INNER JOIN users
-                        ON pets.owner_id = users.user_id
-                WHERE pets.pet_id = {pet_id}''')
-    pet = cursor.fetchone()
-    connection.close()
+    #pet = None
+    #connection = get_db_connection()
+    #cursor = connection.cursor(dictionary=True)
+    #cursor.execute(f'''SELECT * 
+    #            FROM pets
+    #            INNER JOIN animal_types 
+    #                ON pets.animal_type_id = animal_types.animal_type_id
+    #            INNER JOIN users
+    #                    ON pets.owner_id = users.user_id
+    #            WHERE pets.pet_id = {pet_id}''')
+    #pet = cursor.fetchone()
+    #connection.close()
+    pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
     if pet is None:
         abort(404)
     return render_template('pet.html', pet=pet, current_user=session['current_user'])
