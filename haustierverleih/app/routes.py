@@ -1,5 +1,5 @@
 from app import app
-from flask import url_for, render_template
+from flask import render_template
 import mysql.connector
 from config import Config
 
