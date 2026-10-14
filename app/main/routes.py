@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for, flash, session, abort
+from flask import render_template, redirect, request, url_for, flash, session, abort, current_app
 from werkzeug.utils import secure_filename
 from functools import wraps
 import uuid
@@ -12,7 +12,7 @@ from app.main import bp
 # This function was taken from the official Flask documentation
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in bp.config['ALLOWED_EXTENSIONS']
+           filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
 
 # This decorator was taken from the official Flask documentation
@@ -62,6 +62,8 @@ def pet(pet_id):
 def get_edit_pet(pet_id):
     animal_types = db.session.scalars(sa.select(AnimalTypes)).all()
     pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
+    if pet is None or animal_types is None:
+        abort(404)
     return render_template(
         'edit_pet.html',
         pet=pet,
@@ -74,48 +76,44 @@ def get_edit_pet(pet_id):
 def post_edit_pet(pet_id):
     animal_types = db.session.scalars(sa.select(AnimalTypes)).all()
     pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
-    filename = None
-    if request.method == 'POST':
-        # -- FORM VALIDATION -- #
-        name = request.form.get('Name')
-        description = request.form.get('Beschreibung')
-        animal_type_id = request.form.get('Tierart')
-        if 'image' in request.files:
-            image = request.files['image']
-            if image.filename != "":
-                if image and allowed_file(image.filename):
-                    filename = secure_filename(image.filename)
-                    filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
-                    image.save(os.path.join(bp.config['UPLOAD_FOLDER'], filename))
-                else:
-                    flash("Das Bild konnte nicht hochgeladen werden.", "warning")
-        # check required fields
-        if name == "" or description == "":
-            flash(
-                "Einige Daten wurden nicht korrekt übertragen. Bitte erneut versuchen.", 
-                "error",
-                )
-        # -- DATABASE HANDLING -- #
-        else:
-            pet.from_dict(
-                {
-                    "name" : name,
-                    "description" : description,
-                    "animal_type_id" : animal_type_id,
-                }
-            )
-            if filename is not None:
-                pet.delete_image(bp.config['UPLOAD_FOLDER'])
-                pet.image = filename
-            db.session.commit()
-            flash(
-                "Glückwunsch! Deine Änderungen wurde erfolgreich gespeichert.", 
-                "success"
-                )
-            return redirect(url_for('main.pet', pet_id=pet_id))
     if pet is None or animal_types is None:
         abort(404)
-    redirect(url_for('main.get_pet_edit', pet_id=pet_id))
+    filename = None
+    # -- FORM VALIDATION -- #
+    name = request.form.get('Name')
+    description = request.form.get('Beschreibung')
+    animal_type_id = request.form.get('Tierart')
+    if 'image' in request.files:
+        image = request.files['image']
+        if image.filename != "":
+            if image and allowed_file(image.filename):
+                filename = secure_filename(image.filename)
+                filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
+                image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+            else:
+                flash("Das Bild konnte nicht hochgeladen werden.", "warning")
+    # check required fields
+    if name == "" or description == "":
+        flash(
+            "Einige Daten wurden nicht korrekt übertragen. Bitte erneut versuchen.", 
+            "error",
+            )
+    # -- DATABASE HANDLING -- #
+    else:
+        pet.from_dict(
+            {
+                "name" : name,
+                "description" : description,
+                "animal_type_id" : animal_type_id,
+            }
+        )
+        if filename is not None:
+            pet.delete_image(current_app.config['UPLOAD_FOLDER'])
+            pet.image = filename
+        db.session.commit()
+        flash("Deine Änderungen wurde erfolgreich gespeichert.", "success")
+        return redirect(url_for('main.pet', pet_id=pet_id))
+    return redirect(url_for('main.get_pet_edit', pet_id=pet_id))
 
 
 @bp.route("/pet/<int:pet_id>/delete")
@@ -194,13 +192,21 @@ def pet_management():
         current_user=session['current_user'],
         )
 
-
-@bp.route("/pet/new", methods=['GET', 'POST'])
+@bp.get("/pet/new")
 @login_required
-def new_pet():
-    """Seite zum Anlegen neuer Tiere"""
-    filename = None
+def get_new_pet():
     animal_types = db.session.scalars(sa.select(AnimalTypes)).all()
+    return render_template(
+        'new_pet.html', 
+        animal_types=animal_types, 
+        current_user=session['current_user'],
+        )
+
+
+@bp.post("/pet/new")
+@login_required
+def post_new_pet():
+    filename = None
     if request.method == 'POST':
         # -- FORM VALIDATION -- #
         name = request.form.get('Name')
@@ -212,7 +218,7 @@ def new_pet():
                 if image and allowed_file(image.filename):
                     filename = secure_filename(image.filename)
                     filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
-                    image.save(os.path.join(bp.config['UPLOAD_FOLDER'], filename))
+                    image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
                 else:
                     flash("Das Bild konnte nicht hochgeladen werden.", "warning")
         # check if at least one required field is not filled
@@ -236,8 +242,5 @@ def new_pet():
                 'success'
             )
             return redirect(url_for('main.pet_management'))
-    return render_template(
-        'add_pet.html', 
-        animal_types=animal_types, 
-        current_user=session['current_user'],
-        )
+        return redirect(url_for('main.get_new_pet'))  
+    
