@@ -105,7 +105,7 @@ class Pets(db.Model):
         )
 
     def __repr__(self):
-        return '<Pet {}>'.format(self.name)
+        return self.name
     
     def add_image(self, image, directory=None):
         self.image = image
