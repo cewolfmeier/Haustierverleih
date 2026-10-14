@@ -1,0 +1,55 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+<h1>Benutzerverwaltung</h1>
+<div>
+    <p>
+        <strong>Registrierte Benutzer</strong>
+    </p>
+    <table>
+        <thead>
+            <tr>
+                <th>Benutzername</th>
+                <th>Rolle</th>
+                <th>Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{user["username"]}}</td>
+                <td>{{user["role"]}}</td>
+                <td>
+                    <a class="button-table" href="{{ url_for('delete_user', user_id=user['user_id']) }}">Löschen</a>
+                    <a class="button-table" href="{{ url_for('edit_user', user_id=user['user_id']) }}">Bearbeiten</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div>
+    <p>
+        <strong>Tierarten</strong>
+        <a class="button-form" href="{{url_for('new_animal_type')}}">+ Neue Tierart anlegen</a>
+    </p>
+    <table>
+        <thead>
+            <tr>
+                <th>Tierart</th>
+                <th>Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for type in animal_types %}
+            <tr>
+                <td>{{type["animal_type"]}}</td>
+                <td>
+                    <a class="button-table" href="{{ url_for('edit_animal_type', animal_type_id=type['animal_type_id']) }}">Bearbeiten</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

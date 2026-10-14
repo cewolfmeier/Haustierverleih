@@ -17,13 +17,23 @@
                         {% if current_user != None %}
                         <li>Moin {{current_user["username"]}}!</li>
                         {% if current_user['role'] == 'admin' %}
-                        <li class="button"><a href="{{ url_for('admin') }}">Admin-Bereich</a></li>
+                        <li class="button">
+                            <a href="{{ url_for('admin') }}">Admin-Bereich</a>
+                        </li>
                         {% endif %}
-                        <li class="button"><a href="{{ url_for('pet_management') }}">Tierverwaltung</a></li>
-                        <li class="button"><a href="{{ url_for('logout') }}">Ausloggen</a></li>
+                        <li class="button">
+                            <a href="{{ url_for('pet_management') }}">Tierverwaltung</a>
+                        </li>
+                        <li class="button">
+                            <a href="{{ url_for('logout') }}">Ausloggen</a>
+                        </li>
                         {% else %}
-                        <li class="button"><a href="{{ url_for('register') }}">Registrieren</a></li>
-                        <li class="button"><a href="{{ url_for('login') }}">Einloggen</a></li>
+                        <li class="button">
+                            <a href="{{ url_for('register') }}">Registrieren</a>
+                        </li>
+                        <li class="button">
+                            <a href="{{ url_for('login') }}">Einloggen</a>
+                        </li>
                         {% endif %}
                     </ul> 
                 </nav>

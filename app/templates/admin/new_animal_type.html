@@ -1,0 +1,10 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+<form action="{{url_for('new_animal_type')}}" method="post">
+    <h1>Neue Tierart anlegen</h1>
+    <label for="name">Bezeichnung</label>
+    <input type="text" name="Name" id="name" required>
+    <input class="button-form" type="submit" value="Tierart anlegen">
+</form>
+{% endblock %}

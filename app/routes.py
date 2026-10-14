@@ -5,7 +5,7 @@ from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 
-
+# ---- DECORATORS AND GLOBAL FUNCTIONS ---- #
 def get_db_connection(): 
     connection = mysql.connector.connect( 
         host="localhost", 
@@ -34,29 +34,8 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-
-@app.route("/")
-@app.route("/index")
-@login_required
-def index():
-    """Startseite mit Liste aller Tiere"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute(f'''SELECT *
-                    FROM pets
-                    INNER JOIN animal_types 
-                       ON pets.animal_type_id = animal_types.animal_type_id
-                    INNER JOIN users ON pets.owner_id = user_id
-                   ''')
-    pets = cursor.fetchall()
-    connection.close()
-    return render_template(
-        'index.html', 
-        pets=pets, 
-        current_user=session['current_user'],
-        )
-
-
+# ---- ROUTES ---- #
+# --- AUTHENTICATION --- #
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     """Login-Seite"""
@@ -130,36 +109,27 @@ def logout():
     return redirect(url_for('login', next=request.url))
 
 
-@app.route("/admin")
+# --- MAIN --- #
+@app.route("/")
+@app.route("/index")
 @login_required
-@admin_required
-def admin():
-    """Admin-Bereich"""
+def index():
+    """Startseite mit Liste aller Tiere"""
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
     cursor.execute(f'''SELECT *
-                    FROM users
-                    INNER JOIN roles 
-                       ON users.role_id = roles.role_id
+                    FROM pets
+                    INNER JOIN animal_types 
+                       ON pets.animal_type_id = animal_types.animal_type_id
+                    INNER JOIN users ON pets.owner_id = user_id
                    ''')
-    users = cursor.fetchall()
+    pets = cursor.fetchall()
     connection.close()
-    return render_template('admin.html', users=users, current_user=session['current_user'])
-
-
-@app.route("/edit_user")
-@login_required
-def edit_user():
-    """Bearbeiten eines Benutzers"""
-    return render_template('edit_user.html')
-
-
-@app.route("/delete_user")
-@login_required
-def delete_user():
-    """Leer; wird zum Löschen eines Benutzers benötigt"""
-    pass
-
+    return render_template(
+        'index.html', 
+        pets=pets, 
+        current_user=session['current_user'],
+        )
 
 @app.route("/pet/<int:pet_id>")
 @login_required
@@ -356,6 +326,100 @@ def new_pet():
         )
 
 
+# --- ADMINISTRATION --- #
+@app.route("/admin")
+@login_required
+@admin_required
+def admin():
+    """Admin-Bereich"""
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''SELECT * FROM animal_types''')
+    animal_types = cursor.fetchall()
+    cursor.execute(f'''SELECT *
+                    FROM users
+                    INNER JOIN roles 
+                       ON users.role_id = roles.role_id
+                   ''')
+    users = cursor.fetchall()
+    connection.close()
+    return render_template(
+        'admin/admin.html', 
+        users=users, 
+        current_user=session['current_user'],
+        animal_types=animal_types,
+        )
+
+
+@app.route("/admin/user/<int:user_id>/edit", methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_user(user_id):
+    """Bearbeiten eines Benutzers"""
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''SELECT * FROM users
+                   WHERE user_id = %s''',
+                   (user_id,))
+    user = cursor.fetchone()
+    cursor.execute('''SELECT * FROM roles''')
+    roles = cursor.fetchall()
+    if request.method == 'POST':
+        role_id = request.form.get('roles')
+        # check if at least one required field is not filled
+        if role_id == "":
+            flash("Erwischt, du Schlauberger!")
+        else:
+            cursor.execute('''
+                   UPDATE users 
+                   SET role_id = %s
+                   WHERE user_id = %s''', 
+                   (role_id, user_id)) 
+            connection.commit() 
+            connection.close()
+            flash(
+                "Der Benutzer wurde erfolgreich aktualisiert.", 
+                'success'
+            )
+            return redirect(url_for('admin'))
+    connection.close()
+    return render_template(
+        'admin/edit_user.html', 
+        user=user,
+        roles= roles,
+        current_user=session['current_user'],
+        )
+
+
+@app.route("/admin/user/<int:user_id>/delete", methods=['GET', 'POST'])
+@login_required
+@admin_required
+def delete_user(user_id):
+    """Leer; wird zum Löschen eines Benutzers benötigt"""
+    return redirect(url_for('admin'))
+
+
+@app.route("/admin/animal_type/new", methods=['GET', 'POST'])
+@login_required
+@admin_required
+def new_animal_type():
+    """Route für neue Tierarten"""
+    return render_template(
+        'admin/new_animal_type.html',
+        current_user=session['current_user'],)
+
+
+@app.route("/admin/animal_type/<int:animal_type_id>/edit", methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_animal_type(animal_type_id):
+    """Route für die Bearbeitung von Tierarten"""
+    return render_template(
+        'admin/edit_animal_type.html',
+        current_user=session['current_user'],)
+
+
+# --- ERRORS --- #
 @app.errorhandler(404)
 def page_not_found(error):
     """Behandelt die 404 Fehler"""
