@@ -22,18 +22,18 @@
                 {% endif %}
             </ul> 
         </nav>
-        {% with messages = get_flashed_messages() %}
+        <div class="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
             {% endfor %}
         {% endif %}
         {% endwith %}
-        <div class="content">
         {% block content %}{% endblock %}
-        </div>
         <footer>
             Haustierverleih 2025
         </footer>
+        </div>
     </body> 
 </html>

@@ -1,13 +1,9 @@
 {% extends 'base.html' %} 
 
 {% block content %}
-{% if pet == None %}
+{% if pet != None %}
 <div>
-    Es wurde kein Haustier gefunden.
-</div>
-{% else %}
-<h1>Haustier {{ pet['name'] }} bearbeiten</h1>
-<div>
+    <h1>Haustier {{ pet['name'] }} bearbeiten</h1>
     <form action="{{url_for('edit_pet', pet_id=pet['pet_id'])}}" method="post">
         <label for="pet_name">Name</label>
         <input type="text" name="Name" id="pet_name" value="{{ pet['name']}}" required>
@@ -19,7 +15,7 @@
             <option value="{{ type['animal_type_id'] }}" {% if pet['animal_type_id']==type['animal_type_id'] %}selected{% endif %}>{{ type['animal_type'] }}</option>
             {% endfor %}
         </select>
-        <input type="submit" value="Speichern">
+        <input class="button-form" type="submit" value="Speichern">
     </form>
 </div>
 {% endif %}
