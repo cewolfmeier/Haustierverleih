@@ -6,6 +6,33 @@ current_user = {
     "user_id": 1,
     "username": "root"
 }
+ROLES = [
+    {
+        "role_id": 1,
+        "role": 'admin'
+    },
+    {
+        "role_id": 2,
+        "role": 'user'
+    },
+]
+USERS = [
+    {
+        "user_id": 1,
+        "username": "root",
+        "role_id": 1
+    },
+    {
+        "user_id": 2,
+        "username": "herbert",
+        "role_id": 2
+    },
+    {
+        "user_id": 3,
+        "username": "herta",
+        "role_id": 2
+    }
+]
 pets = [
     {
         "pet_id": 1,
@@ -85,7 +112,7 @@ TEMPLATE_LOWER = """
 @app.route("/index")
 def index():
     """Startseite mit Liste aller Tiere"""
-    return render_template('index.html', pets=pets)
+    return render_template('index.html', pets=pets, current_user=current_user)
 
 
 @app.route("/login")
@@ -111,8 +138,12 @@ def logout():
 @app.route("/admin")
 def admin():
     """Admin-Bereich"""
-    content = """"""
-    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
+    users = USERS
+    for user in users:
+        for role in ROLES:
+            if user["role_id"] == role["role_id"]:
+                user["role"] = role["role"]
+    return render_template('admin.html', users=users, current_user=current_user)
 
 
 @app.route("/edit_user")
