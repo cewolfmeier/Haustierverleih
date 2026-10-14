@@ -212,6 +212,8 @@ def pet_management():
                     FROM pets
                     INNER JOIN animal_types 
                        ON pets.animal_type_id = animal_types.animal_type_id
+                   INNER JOIN users
+                        ON pets.owner_id = users.user_id
                    WHERE pets.borrower_id = %s''',(current_user['user_id'],)
                    )
     borrowed_pets = cursor.fetchall()
@@ -250,7 +252,10 @@ def new_pet():
                            (name, description, animal_type, current_user['user_id'])) 
             connection.commit() 
             connection.close()
-            flash("Glückwunsch! Dein Haustier wurde erfolgreich gespeichert.", 'success')
+            flash(
+                "Glückwunsch! Dein Haustier wurde erfolgreich gespeichert.", 
+                'success'
+            )
             return redirect(url_for('pet_management'))
     connection.close()
     return render_template(
