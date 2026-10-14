@@ -202,6 +202,8 @@ def delete_pet(pet_id):
     elif pet.owner_id != session['current_user']['user_id']:
         flash("Du kannst nur deine eigenen Haustiere löschen.", 'error')
         abort(400)
+    if pet.image is not None:
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], pet.image))
     db.session.delete(pet)
     db.session.commit()
     flash("Das Haustier wurde erfolgreich gelöscht.", 'success')
@@ -272,10 +274,7 @@ def pet_management():
 def new_pet():
     """Seite zum Anlegen neuer Tiere"""
     filename = None
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('''SELECT * FROM animal_types''')
-    animal_types = cursor.fetchall()
+    animal_types = db.session.scalars(sa.select(Animal_Types)).all()
     if request.method == 'POST':
         name = request.form.get('Name')
         description = request.form.get('Beschreibung')
@@ -294,22 +293,20 @@ def new_pet():
                 "Einige Daten wurden nicht korrekt übertragen. Bitte erneut versuchen.",
                 "error")
         else:
-            values= [name, description, animal_type, session['current_user']['user_id']]
-            if not filename is None:
-                values.append(filename)
-            values = tuple(values)
-            cursor.execute(f'''
-                           INSERT INTO pets 
-                           (name, description, animal_type_id, owner_id {', image' if not filename is None else ''}) 
-                           VALUES (%s, %s, %s, %s{', %s' if not filename is None else ''})''', values) 
-            connection.commit() 
-            connection.close()
+            pet = Pets(
+                name = name, 
+                description = description,
+                animal_type_id = animal_type,
+                owner_id = session['current_user']['user_id'])
+            if filename is not None:
+                pet.image = filename
+            db.session.add(pet)
+            db.session.commit()
             flash(
                 "Glückwunsch! Dein Haustier wurde erfolgreich gespeichert.", 
                 'success'
             )
             return redirect(url_for('pet_management'))
-    connection.close()
     return render_template(
         'add_pet.html', 
         animal_types=animal_types, 

@@ -10,7 +10,7 @@
     <label for="animal_type">Tierart</label>
     <select name="Tierart" id="animal_type">
         {% for type in animal_types %}
-        <option value="{{ type['animal_type_id'] }}">{{ type['animal_type'] }}</option>
+        <option value="{{ type.animal_type_id }}">{{ type.animal_type }}</option>
         {% endfor %}
     </select>
     <label for="image">Foto-Upload</label>
