@@ -64,6 +64,10 @@ footer {
     flex-flow: column nowrap;
     align-items: center;
 }
+.content form{
+    display: flex;
+    flex-flow: column nowrap;
+}
 
 .content-list {
     margin: 50px;
