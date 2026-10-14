@@ -23,10 +23,11 @@ def index():
     """Startseite mit Liste aller Tiere"""
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute(f'''SELECT * 
+    cursor.execute(f'''SELECT *
                     FROM pets
                     INNER JOIN animal_types 
                        ON pets.animal_type_id = animal_types.animal_type_id
+                    INNER JOIN users ON pets.owner_id = user_id
                    ''')
     pets = cursor.fetchall()
     connection.close()
@@ -84,8 +85,7 @@ def delete_user():
 def pet(pet_id):
     """Zeigt die Details eines Tieres an"""
     pet = None
-    if pet_id.isdecimal(): 
-        pet_id = int(pet_id)
+    if pet_id.isdecimal():
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
         cursor.execute(f'''SELECT * 
@@ -93,9 +93,7 @@ def pet(pet_id):
                     INNER JOIN animal_types 
                        ON pets.animal_type_id = animal_types.animal_type_id
                     WHERE pets.pet_id = {pet_id}''')
-        result = cursor.fetchall()
-        if len(result) == 1:
-            pet = result
+        pet = cursor.fetchone()
         connection.close()
     return render_template('pet.html', pet=pet, current_user=current_user)
 
@@ -104,8 +102,7 @@ def pet(pet_id):
 def edit_pet(pet_id: int):
     """Seite zum Bearbeiten eines Tieres"""
     pet = None
-    if pet_id.isdecimal(): 
-        pet_id = int(pet_id)
+    if pet_id.isdecimal():
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
         cursor.execute(f'''SELECT * 
@@ -113,10 +110,7 @@ def edit_pet(pet_id: int):
                     INNER JOIN animal_types 
                        ON pets.animal_type_id = animal_types.animal_type_id
                     WHERE pets.pet_id = {pet_id}''')
-        result = cursor.fetchall()
-        if len(result) == 1:
-            pet = result
-        connection.close()
+        pet = cursor.fetchone()
     return render_template('edit_pet.html', pet=pet, current_user=current_user)
 
 
@@ -180,4 +174,4 @@ def new_pet():
 @app.errorhandler(404)
 def page_not_found(error):
     """Behandelt die 404 Fehler"""
-    return render_template('errors/404.html'), 404
+    return render_template('errors/404.html', current_user=current_user), 404
