@@ -5,6 +5,3 @@ __pycache__
 user_uploads
 boot.sh
 docker-compose.yml
-Dockerfile
-nginx.conf
-data
