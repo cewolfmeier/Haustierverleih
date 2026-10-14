@@ -1,6 +1,5 @@
 from app import app
 from flask import render_template, redirect, request, url_for, flash, session, abort
-import mysql.connector
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
@@ -11,15 +10,6 @@ from app import db
 from app.models import Roles, Users, AnimalTypes, Pets
 
 # ---- DECORATORS AND GLOBAL FUNCTIONS ---- #
-def get_db_connection(): 
-    connection = mysql.connector.connect( 
-        host="localhost", 
-        user=app.config['DATABASE_USER'], 
-        password=app.config['DATABASE_PASSWORD'], 
-        database="haustierverleih" 
-        ) 
-    return connection
-
 # This function was taken from the official Flask documentation
 def allowed_file(filename):
     return '.' in filename and \
@@ -58,7 +48,7 @@ def login():
         user = db.session.scalar(
             sa.select(Users).where(Users.username == username)
         )
-        if user is None or not check_password_hash(user.password_hash, password):
+        if user is None or not user.check_password(password):
             flash("Die Anmeldedaten stimmen nicht überein", 'error')
         else:
             flash(
