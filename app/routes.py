@@ -1,6 +1,5 @@
 from app import app
 from flask import render_template, redirect, request, url_for, flash, session, abort
-from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
 import uuid
@@ -137,14 +136,15 @@ def edit_pet(pet_id):
     """Seite zum Bearbeiten eines Tieres"""
     animal_types = db.session.scalars(sa.select(AnimalTypes)).all()
     pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
+    filename = None
     if request.method == 'POST':
         current_image = pet.image
-        print(current_image)
         name = request.form.get('Name')
         description = request.form.get('Beschreibung')
         animal_type_id = request.form.get('Tierart')
         if 'image' in request.files:
             image = request.files['image']
+            print(image)
             if image and allowed_file(image.filename):
                 filename = secure_filename(image.filename)
                 filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
@@ -163,13 +163,13 @@ def edit_pet(pet_id):
             pet.animal_type_id = animal_type_id
             if filename is not None:
                 pet.image = filename
+                if current_image is not None:
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], current_image))
             db.session.commit()
             flash(
                 "Glückwunsch! Deine Änderungen wurde erfolgreich gespeichert.", 
                 "success"
                 )
-            if current_image is not None:
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], current_image))
             return redirect(url_for('pet', pet_id=pet_id))
     if pet is None or animal_types is None:
         abort(404)
@@ -275,8 +275,6 @@ def new_pet():
                 filename = secure_filename(image.filename)
                 filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
                 image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            else:
-                flash('Das Bild konnte nicht hochgeladen werden.', 'warning')
         # check if at least one required field is not filled
         if name == "" or description == "" or animal_type == "":
             flash(
