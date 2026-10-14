@@ -8,15 +8,15 @@
 <h2>Registrierte Haustiere</h2>
 <ul class="content-list">
     {% for pet in pets %}
-    <a href="{{url_for('pet', pet_id=pet['pet_id'])}}">
+    <a href="{{url_for('pet', pet_id=pet.pet_id)}}">
     <li>
-        {% if pet['image'] != None %}
-        <img class="thumbnail" src="{{ url_for('static', filename='images/user_uploads/'+pet['image'])}}" alt="">
+        {% if pet.image != None %}
+        <img class="thumbnail" src="{{ url_for('static', filename='images/user_uploads/'+pet.image)}}" alt="">
         {% endif %}
-        <h2>{{ pet["name"] }} ({{ pet["animal_type"] }})</h2>
-        <br>{{ pet["description"] }}
-        <br>Besitzer: {{ pet["username"] }}
-        <br>{% if pet["borrower_id"] == None %}Aktuell{% else %}Nicht{% endif %} verfügbar   
+        <h2>{{ pet.name }} ({{ pet.animal_type.animal_type }})</h2>
+        <br>{{ pet.description }}
+        <br>Besitzer: {{ pet.owned.username }}
+        <br>{% if pet.borrower_id == None %}Aktuell{% else %}Nicht{% endif %} verfügbar   
     </li>
     </a>
     {% endfor %}
