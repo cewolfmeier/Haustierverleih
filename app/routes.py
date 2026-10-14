@@ -249,25 +249,12 @@ def return_pet(pet_id):
 @login_required
 def pet_management():
     """Verwaltung eigener und geliehener Tiere"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('''SELECT * 
-                    FROM pets
-                    INNER JOIN animal_types 
-                       ON pets.animal_type_id = animal_types.animal_type_id
-                   WHERE pets.owner_id = %s''',(session['current_user']['user_id'],)
-                   )
-    owned_pets = cursor.fetchall()
-    cursor.execute('''SELECT * 
-                    FROM pets
-                    INNER JOIN animal_types 
-                       ON pets.animal_type_id = animal_types.animal_type_id
-                   INNER JOIN users
-                        ON pets.owner_id = users.user_id
-                   WHERE pets.borrower_id = %s''',(session['current_user']['user_id'],)
-                   )
-    borrowed_pets = cursor.fetchall()
-    connection.close()
+    owned_pets = db.session.scalars(
+        sa.select(Pets).where(Pets.owner_id == session['current_user']['user_id'])
+        ).all()
+    borrowed_pets = db.session.scalars(
+        sa.select(Pets).where(Pets.borrower_id == session['current_user']['user_id'])
+        ).all()
     owned_pets_counter = len(owned_pets)
     borrowed_pets_counter = len(borrowed_pets)
     return render_template(
