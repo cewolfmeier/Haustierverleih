@@ -14,14 +14,14 @@
             <ul class="navigation">
                 {% if current_user != None %}
                 <li>Moin {{current_user["username"]}}!</li>
-                <li><a href="{{ url_for('logout') }}" class="button">Ausloggen</a></li>
+                <li class="button"><a href="{{ url_for('logout') }}">Ausloggen</a></li>
                 {% else %}
-                <li><a href="{{ url_for('register') }}" class="button">Registrieren</a></li>
-                <li><a href="{{ url_for('login') }}" class="button">Einloggen</a></li>
+                <li class="button"><a href="{{ url_for('register') }}">Registrieren</a></li>
+                <li class="button"><a href="{{ url_for('login') }}">Einloggen</a></li>
                 {% endif %}
             </ul> 
         </nav>
-        <div>
+        <div class="content">
         {% block content %}{% endblock %}
         </div>
         <footer>
