@@ -89,6 +89,8 @@ def pet(pet_id):
                 FROM pets
                 INNER JOIN animal_types 
                     ON pets.animal_type_id = animal_types.animal_type_id
+                INNER JOIN users
+                        ON pets.owner_id = users.user_id
                 WHERE pets.pet_id = {pet_id}''')
     pet = cursor.fetchone()
     connection.close()
