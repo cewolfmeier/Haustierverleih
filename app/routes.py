@@ -6,6 +6,9 @@ from werkzeug.utils import secure_filename
 from functools import wraps
 import uuid
 import os
+import sqlalchemy as sa
+from app import db
+from app.models import Roles, Users, Animal_Types, Pets
 
 # ---- DECORATORS AND GLOBAL FUNCTIONS ---- #
 def get_db_connection(): 
@@ -54,20 +57,21 @@ def login():
         # check if at least one required field is not filled
         if username == "" or password == "":
             flash("Bitte gib deine Anmeldedaten ein.", 'error')
-        cursor.execute(f'''SELECT *
-                    FROM users
-                    INNER JOIN roles ON roles.role_id = users.role_id
-                    WHERE username = %s
-                   ''', (username,))
-        user = cursor.fetchone()
-        if user is None or not check_password_hash(user['password_hash'], password):
+        user = db.session.scalar(
+            sa.select(Users).where(Users.username == username)
+        )
+        if user is None or not check_password_hash(user.password_hash, password):
             flash("Die Anmeldedaten stimmen nicht überein", 'error')
         else:
             flash(
                 "Anmeldung erfolgreich.", 
                 'success'
             )
-            session['current_user'] = user
+            session['current_user'] = {
+                'user_id':user.user_id,
+                'username' : user.username,
+                'role' : user.role.role,
+                }
             return redirect(url_for('index'))
     connection.close()
     return render_template('auth/login.html', current_user=None)
