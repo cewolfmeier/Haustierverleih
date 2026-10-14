@@ -1,14 +1,14 @@
 {% extends 'base.html' %} 
 
 {% block content %}
-<div class="content-list">
+<div class="content">
     <h1>Haustierverleih</h1>
     <p>Registrierte Haustiere</p>
-    <ul>
+    <ul class="content-list">
         {% for pet in pets %}
         <li>
             <h2>{{ pet["name"] }} ({{ pet["animal_type"] }})</h2>
-            {{ pet["description"] }}
+            <br>{{ pet["description"] }}
             <br>Besitzer: {{ pet["owner_id"] }}
             <br>{% if pet["borrower_id"] == None %}Aktuell{% else %}Nicht{% endif %} verfügbar
         </li>

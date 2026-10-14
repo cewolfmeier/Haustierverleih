@@ -1,12 +1,17 @@
 /* global tag definition */
-body {
-    margin: 0px;
-    padding: 0px;
-    /*background-color: #a8aa8;
-    color: bisque; */
+* {
+    margin: 0;
+    padding: 0;
 }
+html, body {
+    height: 100%;
+}
+body {
+    background-color: #5cb8d4;
+}
+
 nav {
-    background: rgba(26, 25, 25);
+    background-color: #c5dcaf;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -16,10 +21,14 @@ a {
 }
 
 footer {
+    position:absolute;
+    bottom: 0;
+    width: 100%;
+    height: 2em;
     margin: 50px 0px 10px 0px;
     text-align: center;
-    background: rgba(26, 25, 25);
-    color: white;
+    background-color: #c5dcaf;
+
 }
 
 /* classes */
@@ -27,7 +36,6 @@ footer {
 .navigation {
     /*margin: 0px;
     padding: 5px;*/
-    color: white;
     display: flex;
     justify-content: center;
     border-radius: 5px;
@@ -36,14 +44,32 @@ footer {
 }
 
 /* content section */
+.content {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+}
+
 .content-list {
     margin: 50px;
     padding: 30px 10px;
-    background-image: url(static/root+color+grab.webp);
     display: flex;
-    flex-flow: column wrap;
+    flex-flow: row wrap;
     justify-content: center;
     align-items: center;
+    border-radius: 15px;
+    list-style-type: none;
+}
+.content-list li{
+    width: 200px;
+    height: 300px;
+    margin: 10px;
+    padding: 18px 15px;
+    background: rgba(0, 0, 0, 0.616);
+    color: bisque;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
     border-radius: 15px;
 }
  /* tag definition*/
