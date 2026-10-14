@@ -57,10 +57,21 @@ def pet(pet_id):
     return render_template('pet.html', pet=pet, current_user=session['current_user'])
 
 
-@bp.route("/pet/<int:pet_id>/edit", methods=['GET', 'POST'])
+@bp.get("/pet/<int:pet_id>/edit")
 @login_required
-def edit_pet(pet_id):
-    """Seite zum Bearbeiten eines Tieres"""
+def get_edit_pet(pet_id):
+    animal_types = db.session.scalars(sa.select(AnimalTypes)).all()
+    pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
+    return render_template(
+        'edit_pet.html',
+        pet=pet,
+        animal_types=animal_types, 
+        current_user=session['current_user'],
+        )
+
+@bp.post("/pet/<int:pet_id>/edit")
+@login_required
+def post_edit_pet(pet_id):
     animal_types = db.session.scalars(sa.select(AnimalTypes)).all()
     pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
     filename = None
@@ -104,12 +115,7 @@ def edit_pet(pet_id):
             return redirect(url_for('main.pet', pet_id=pet_id))
     if pet is None or animal_types is None:
         abort(404)
-    return render_template(
-        'edit_pet.html',
-        pet=pet,
-        animal_types=animal_types, 
-        current_user=session['current_user'],
-        )
+    redirect(url_for('main.get_pet_edit', pet_id=pet_id))
 
 
 @bp.route("/pet/<int:pet_id>/delete")

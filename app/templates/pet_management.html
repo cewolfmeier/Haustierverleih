@@ -23,7 +23,7 @@
                 <td>{{ pet.animal_type.animal_type }}</td>
                 <td>{% if pet.borrower_id != None %}nicht {% endif %}verfügbar</td>
                 <td>
-                    <a class="button-table" href="{{ url_for('main.edit_pet', pet_id=pet.pet_id) }}">Bearbeiten</a> 
+                    <a class="button-table" href="{{ url_for('main.get_edit_pet', pet_id=pet.pet_id) }}">Bearbeiten</a> 
                     <a class="button-table" href="{{ url_for('main.delete_pet', pet_id=pet.pet_id) }}">Löschen</a>
                     <a class="button-table" href="{{ url_for('main.pet', pet_id=pet.pet_id) }}">Details</a>
                 </td>
