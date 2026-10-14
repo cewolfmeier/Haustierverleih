@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for, flash, session, abort
+from flask import render_template, redirect, request, url_for, flash, session, abort, current_app
 from functools import wraps
 import sqlalchemy as sa
 from app import db
@@ -82,7 +82,7 @@ def delete_user(user_id):
         abort(400)
     pets = db.session.scalars(sa.select(Pets).where(Pets.owner_id == user_id))
     for pet in pets:
-        pet.delete_image(bp.config['UPLOAD_FOLDER'])
+        pet.delete_image(current_app.config['UPLOAD_FOLDER'])
     db.session.delete(user)
     db.session.commit()
     flash("Der Benutzer wurde erfolgreich gelöscht.", 'success')
