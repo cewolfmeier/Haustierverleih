@@ -108,7 +108,7 @@ def edit_pet(pet_id):
         animal_type_id = request.form.get('Tierart')
         # check if at least one required field is not filled
         if name == "" or description == "":
-            flash("Erwischt, du Schlauberger!")
+            flash("Erwischt, du Schlauberger!", "error")
         else:
             cursor.execute('''
                            UPDATE pets 
@@ -123,17 +123,19 @@ def edit_pet(pet_id):
                             )) 
             connection.commit() 
             connection.close()
-            flash("Glückwunsch! Deine Änderungen wurde erfolgreich gespeichert.")
+            flash(
+                "Glückwunsch! Deine Änderungen wurde erfolgreich gespeichert.", 
+                "success"
+                )
             return redirect(url_for('pet', pet_id=pet_id))
-    else:
-        pet = None
-        cursor.execute('''SELECT * 
-                    FROM pets
-                    INNER JOIN animal_types 
-                    ON pets.animal_type_id = animal_types.animal_type_id
-                    WHERE pets.pet_id = %s
-                    AND pets.owner_id = %s''', (pet_id, current_user['user_id']))
-        pet = cursor.fetchone()
+    pet = None
+    cursor.execute('''SELECT * 
+                FROM pets
+                INNER JOIN animal_types 
+                ON pets.animal_type_id = animal_types.animal_type_id
+                WHERE pets.pet_id = %s
+                AND pets.owner_id = %s''', (pet_id, current_user['user_id']))
+    pet = cursor.fetchone()
     connection.close()
     return render_template(
         'edit_pet.html',
@@ -155,7 +157,7 @@ def delete_pet(pet_id):
                    ''', (pet_id, current_user['user_id'],))
     connection.commit()
     connection.close()
-    flash("Das Haustier wurde erfolgreich gelöscht.")
+    flash("Das Haustier wurde erfolgreich gelöscht.", 'success')
     return redirect(url_for('pet_management'))
 
 
@@ -174,7 +176,7 @@ def borrow_pet(pet_id):
                     ))
     connection.commit()
     connection.close()
-    flash("Du leihst jetzt dieses Haustier aus.")
+    flash("Du leihst jetzt dieses Haustier aus.", 'success')
     return redirect(url_for('pet', pet_id=pet_id))
 
 
@@ -190,7 +192,7 @@ def return_pet(pet_id):
                    (pet_id,))
     connection.commit()
     connection.close()
-    flash("Du hast das Haustier erfolgreich zurückgegeben.")
+    flash("Du hast das Haustier erfolgreich zurückgegeben.", 'success')
     return redirect(url_for('pet', pet_id=pet_id))
 
 
@@ -241,14 +243,21 @@ def new_pet():
         if name == "" or description == "":
             flash("Erwischt, du Schlauberger!")
         else:
-            cursor.execute('INSERT INTO pets (name, description, animal_type_id, owner_id) VALUES (%s, %s, %s, %s)', 
+            cursor.execute('''
+                           INSERT INTO pets 
+                           (name, description, animal_type_id, owner_id) 
+                           VALUES (%s, %s, %s, %s)''', 
                            (name, description, animal_type, current_user['user_id'])) 
             connection.commit() 
             connection.close()
-            flash("Glückwunsch! Dein Haustier wurde erfolgreich gespeichert.")
+            flash("Glückwunsch! Dein Haustier wurde erfolgreich gespeichert.", 'success')
             return redirect(url_for('pet_management'))
     connection.close()
-    return render_template('add_pet.html', animal_types=animal_types, current_user=current_user)
+    return render_template(
+        'add_pet.html', 
+        animal_types=animal_types, 
+        current_user=current_user,
+        )
 
 
 @app.errorhandler(404)
