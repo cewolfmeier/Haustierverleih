@@ -53,6 +53,19 @@ class Users(db.Model):
                 'username' : username,
                 'role' : self.role.role,
                 }
+        
+    def from_dict(self, data, new=False):
+        """Method to set the attributes with data
+        provided by an import file or a validated form"""
+        for field in [
+            "user_id",
+            "username",  
+            "role_id", 
+            ]:
+            if field in data:
+                setattr(self, field, data[field])
+        if new:
+            pass
 
 
 class AnimalTypes(db.Model):

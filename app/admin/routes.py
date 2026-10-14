@@ -42,12 +42,16 @@ def admin():
 # --- USER ADMINISTRATION --- #
 @bp.get("/admin/user/<int:user_id>/edit")
 @login_required
-@admin_required
 def get_edit_user(user_id):
     user = db.session.scalar(sa.select(Users).where(Users.user_id == user_id))
     roles = db.session.scalars(sa.select(Roles)).all()
     if user is None:
         abort(404)
+    if (
+        user.user_id != session['current_user']['user_id'] 
+        and session['current_user']['role'] != "admin"
+        ):
+        abort(403)
     return render_template(
         'admin/edit_user.html', 
         user=user,
@@ -57,26 +61,37 @@ def get_edit_user(user_id):
 
 @bp.post("/admin/user/<int:user_id>/edit")
 @login_required
-@admin_required
 def post_edit_user(user_id):
     user = db.session.scalar(sa.select(Users).where(Users.user_id == user_id))
     if user is None:
         abort(404)
+    if (
+        user.user_id != session['current_user']['user_id'] 
+        and session['current_user']['role'] != "admin"
+        ):
+        abort(403)
     # -- FORM VALIDATION -- #
-    role_id = request.form.get('roles')
-    role = db.session.scalar(sa.select(Roles).where(Roles.role_id == role_id))
-    # check if at least one required field is not filled
-    if role is None:
-        flash("Ungültige Eingabe!", 'error')
+    if user.user_id == session['current_user']['user_id']:
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        new_password_repeat = request.form.get('new_password_repeat')
+        if user.check_password(current_password) and new_password == new_password_repeat:
+            user.set_password(new_password)
     else:
-        user.role_id = role_id
-        db.session.commit()
-        flash(
-            "Der Benutzer wurde erfolgreich aktualisiert.", 
-            'success'
-        )
-        return redirect(url_for('admin.admin'))
-    return redirect(url_for('admin.get_edit_user', user_id=user_id))
+        role_id = request.form.get('roles')
+        role = db.session.scalar(sa.select(Roles).where(Roles.role_id == role_id))
+        # check if at least one required field is not filled
+        if role is None:
+            flash("Ungültige Eingabe!", 'error')
+            return redirect(url_for('admin.get_edit_user', user_id=user_id))
+        else:
+            user.role_id = role_id
+    db.session.commit()
+    flash(
+        "Der Benutzer wurde erfolgreich aktualisiert.", 
+        'success'
+    )
+    return redirect(url_for('admin.admin'))
 
 
 @bp.route("/admin/user/<int:user_id>/delete")
