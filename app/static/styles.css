@@ -76,8 +76,6 @@ th, td {
 }
 
 .navigation li{
-    margin: 5px;
-    padding: 10px 12px;
     text-align: center;
     display: inline-block;
 }
@@ -210,13 +208,16 @@ th, td {
 }
 
 .button {
-    margin: 5px;
-    padding: 10px 12px;
     background: rgb(0 0 0 / 5%);
     display: inline-block;
     color: #163944;
     border: none;
     border-radius: 5px;
+}
+
+.button a{
+    margin: 10px;
+    padding: 10px 12px;
 }
 
 .button:hover {
