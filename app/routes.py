@@ -1,8 +1,9 @@
 from app import app
-from flask import render_template, redirect, request, url_for, flash
+from flask import render_template, redirect, request, url_for, flash, session
 import mysql.connector
 from config import Config
 from werkzeug.security import generate_password_hash
+from functools import wraps
 
 def get_db_connection(): 
     connection = mysql.connector.connect( 
@@ -13,13 +14,20 @@ def get_db_connection():
         ) 
     return connection
 
-current_user = {
-    "user_id": 1,
-    "username": "root"
-}
+current_user = None
+
+# This decorator was taken from the official Flask documentation
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not 'username' in session:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
 
 @app.route("/")
 @app.route("/index")
+@login_required
 def index():
     """Startseite mit Liste aller Tiere"""
     connection = get_db_connection()
@@ -41,7 +49,7 @@ def login():
     return render_template('auth/login.html', current_user=current_user)
 
 
-@app.route("/register")
+@app.route("/register", methods=['GET', 'POST'])
 def register():
     """Seite zur Account-Erstellung"""
     connection = get_db_connection()
@@ -56,30 +64,35 @@ def register():
         # check if at least one required field is not filled
         if username == "" or password == "" or password_repeat == "":
             flash("Netter Versuch, so klappt das aber nicht.", 'error')
+        elif password != password:
+            flash("Die Passworteingabe stimmt nicht überein", 'error')
         else:
             cursor.execute('''
                            INSERT INTO users 
-                           (username, passoword, role_id) 
-                           VALUES (%s, %s, %s, %s)''', 
-                           (username, generate_password_hash(password), role_id_user)) 
+                           (username, password_hash, role_id) 
+                           VALUES (%s, %s, %s)''', 
+                           (username, generate_password_hash(password), role_id_user['role_id'])) 
             connection.commit() 
             connection.close()
             flash(
-                "Glückwunsch! Dein Haustier wurde erfolgreich gespeichert.", 
+                "Glückwunsch! Du bist jetzt registriert.", 
                 'success'
             )
-            return redirect(url_for('pet_management'))
+            session['username'] = username
+            return redirect(url_for('index'))
     connection.close()
     return render_template('auth/register.html', current_user=current_user)
 
 
 @app.route("/logout")
+@login_required
 def logout():
     """Leer; wird für den Logout benötigt"""
     pass
 
 
 @app.route("/admin")
+@login_required
 def admin():
     """Admin-Bereich"""
     connection = get_db_connection()
@@ -95,18 +108,21 @@ def admin():
 
 
 @app.route("/edit_user")
+@login_required
 def edit_user():
     """Bearbeiten eines Benutzers"""
     return render_template('edit_user.html')
 
 
 @app.route("/delete_user")
+@login_required
 def delete_user():
     """Leer; wird zum Löschen eines Benutzers benötigt"""
     pass
 
 
 @app.route("/pet/<int:pet_id>")
+@login_required
 def pet(pet_id):
     """Zeigt die Details eines Tieres an"""
     pet = None
@@ -125,6 +141,7 @@ def pet(pet_id):
 
 
 @app.route("/pet/<int:pet_id>/edit", methods=['GET', 'POST'])
+@login_required
 def edit_pet(pet_id):
     """Seite zum Bearbeiten eines Tieres"""
     connection = get_db_connection()
@@ -175,6 +192,7 @@ def edit_pet(pet_id):
 
 
 @app.route("/pet/<int:pet_id>/delete")
+@login_required
 def delete_pet(pet_id):
     """Leer; wird zum Löschen eines Tieres benötigt"""
     connection = get_db_connection()
@@ -191,6 +209,7 @@ def delete_pet(pet_id):
 
 
 @app.route("/pet/<int:pet_id>/borrow")
+@login_required
 def borrow_pet(pet_id):
     """Leer; wird für das Ausleihen benötigt"""
     connection = get_db_connection()
@@ -210,6 +229,7 @@ def borrow_pet(pet_id):
 
 
 @app.route("/pet/<int:pet_id>/return")
+@login_required
 def return_pet(pet_id):
     """Leer; wird für das Zurückgeben benötigt"""
     connection = get_db_connection()
@@ -226,6 +246,7 @@ def return_pet(pet_id):
 
 
 @app.route("/pet-management")
+@login_required
 def pet_management():
     """Verwaltung eigener und geliehener Tiere"""
     connection = get_db_connection()
@@ -260,6 +281,7 @@ def pet_management():
 
 
 @app.route("/pet/new", methods=['GET', 'POST'])
+@login_required
 def new_pet():
     """Seite zum Anlegen neuer Tiere"""
     connection = get_db_connection()
