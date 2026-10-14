@@ -2,6 +2,10 @@ from app import app
 from flask import url_for
 from markupsafe import escape, Markup
 
+current_user = {
+    "user_id": 1,
+    "username": "root"
+}
 pets = [
     {
         "pet_id": 1,
@@ -16,7 +20,7 @@ pets = [
         "name": "Blacky",
         "description": "Eine kleine schwarze Katze",
         "animal_type": "cat",
-        "owner_id": 2,
+        "owner_id": 1,
         "borrower_id": None,
     },
     {
@@ -24,7 +28,7 @@ pets = [
         "name": "Mauzi",
         "description": "Eine Katze",
         "animal_type": "cat",
-        "owner_id": 3,
+        "owner_id": 1,
         "borrower_id": None,
     },
     {
@@ -32,7 +36,7 @@ pets = [
         "name": "Maggy the Dog",
         "description": "Es ist Maggy!",
         "animal_type": "dog",
-        "owner_id": 4,
+        "owner_id": 1,
         "borrower_id": None,
     },
     {
@@ -40,7 +44,7 @@ pets = [
         "name": "Keks",
         "description": "Bitte nicht essen",
         "animal_type": "dog",
-        "owner_id": 5,
+        "owner_id": 1,
         "borrower_id": None,
     },
     {
@@ -48,7 +52,7 @@ pets = [
         "name": "Schmackes",
         "description": "Geht ab wie Schmidts Katze",
         "animal_type": "dog",
-        "owner_id": 6,
+        "owner_id": 2,
         "borrower_id": 1,
     },
     {
@@ -56,8 +60,8 @@ pets = [
         "name": "Herr von Bödefeld",
         "description": "Hat mehr Klasse als du je haben wirst",
         "animal_type": "cat",
-        "owner_id": 1,
-        "borrower_id": 2,
+        "owner_id": 2,
+        "borrower_id": 1,
     },
 ]
 
@@ -203,7 +207,67 @@ def return_pet(pet_id: int):
 @app.route("/pet-management")
 def pet_management():
     """Verwaltung eigener und geliehener Tiere"""
-    content = """"""
+    owned_pets = ""
+    owned_pets_counter = 0
+    borrowed_pets = ""
+    borrowed_pets_counter = 0
+    for pet in pets:
+        if pet["owner_id"] == current_user["user_id"]:
+            owned_pets += f"""
+            <tr>
+            <td>{escape(pet["name"])}</td>
+            <td>{pet["animal_type"]}</td>
+            <td>{"" if pet["borrower_id"] is None else "nicht "}verfügbar</td>
+            <td><a href="{url_for("edit_pet", pet_id=pet["pet_id"])}">Bearbeiten</a> <a href="{url_for("pet", pet_id=pet["pet_id"])}">Details</a></td>
+            </tr>
+            """
+            owned_pets_counter += 1
+        elif pet["borrower_id"] == current_user["user_id"]:
+            borrowed_pets += f"""
+            <tr>
+            <td>{escape(pet["name"])}</td>
+            <td>{pet["animal_type"]}</td>
+            <td>{pet["owner_id"]}</td>
+            <td><a href="{url_for("pet", pet_id=pet["pet_id"])}">Details</a></td>
+            </tr>
+            """
+            borrowed_pets_counter += 1
+    content = f"""
+    <h1>Tierverwaltung</h1>
+    <div>
+        <p>Deine eigenen Haustiere ({owned_pets_counter})</p>
+        <a href="{url_for("new_pet")}">+ Neues Haustier anlegen</a>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Tierart</th>
+                    <th>Verfügbarkeit</th>
+                    <th>Aktionen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {owned_pets}
+            </tbody>
+        </table>
+    </div>
+    <div>
+    <p>Deine ausgeliehenen Haustiere ({borrowed_pets_counter})</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Tierart</th>
+                    <th>Verfügbarkeit</th>
+                    <th>Aktionen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {borrowed_pets}
+            </tbody>
+        </table>
+    </div>
+"""
     return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
 
