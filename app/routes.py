@@ -2,8 +2,9 @@ from app import app
 from flask import render_template, redirect, request, url_for, flash, session
 import mysql.connector
 from config import Config
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+
 
 def get_db_connection(): 
     connection = mysql.connector.connect( 
@@ -14,16 +15,16 @@ def get_db_connection():
         ) 
     return connection
 
-current_user = None
 
 # This decorator was taken from the official Flask documentation
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not 'username' in session:
+        if not 'current_user' in session:
             return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
+
 
 @app.route("/")
 @app.route("/index")
@@ -40,13 +41,40 @@ def index():
                    ''')
     pets = cursor.fetchall()
     connection.close()
-    return render_template('index.html', pets=pets, current_user=current_user)
+    return render_template(
+        'index.html', 
+        pets=pets, 
+        current_user=session['current_user'],
+        )
 
 
-@app.route("/login")
+@app.route("/login", methods=['GET', 'POST'])
 def login():
     """Login-Seite"""
-    return render_template('auth/login.html', current_user=current_user)
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    if request.method == 'POST':
+        username = request.form.get('Username')
+        password = request.form.get('Password')
+        # check if at least one required field is not filled
+        if username == "" or password == "":
+            flash("Bitte gib deine Anmeldedaten ein.", 'error')
+        cursor.execute(f'''SELECT *
+                    FROM users
+                    WHERE username = %s
+                   ''', (username,))
+        user = cursor.fetchone()
+        if user is None or not check_password_hash(user['password_hash'], password):
+            flash("Die Anmeldedaten stimmen nicht überein", 'error')
+        else:
+            flash(
+                "Anmeldung erfolgreich.", 
+                'success'
+            )
+            session['current_user'] = user
+            return redirect(url_for('index'))
+    connection.close()
+    return render_template('auth/login.html', current_user=None)
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -81,14 +109,15 @@ def register():
             session['username'] = username
             return redirect(url_for('index'))
     connection.close()
-    return render_template('auth/register.html', current_user=current_user)
+    return render_template('auth/register.html', current_user=None)
 
 
 @app.route("/logout")
 @login_required
 def logout():
     """Leer; wird für den Logout benötigt"""
-    pass
+    session.pop('current_user', None)
+    return redirect(url_for('login', next=request.url))
 
 
 @app.route("/admin")
@@ -104,7 +133,7 @@ def admin():
                    ''')
     users = cursor.fetchall()
     connection.close()
-    return render_template('admin.html', users=users, current_user=current_user)
+    return render_template('admin.html', users=users, current_user=session['current_user'])
 
 
 @app.route("/edit_user")
@@ -137,7 +166,7 @@ def pet(pet_id):
                 WHERE pets.pet_id = {pet_id}''')
     pet = cursor.fetchone()
     connection.close()
-    return render_template('pet.html', pet=pet, current_user=current_user)
+    return render_template('pet.html', pet=pet, current_user=session['current_user'])
 
 
 @app.route("/pet/<int:pet_id>/edit", methods=['GET', 'POST'])
@@ -180,14 +209,14 @@ def edit_pet(pet_id):
                 INNER JOIN animal_types 
                 ON pets.animal_type_id = animal_types.animal_type_id
                 WHERE pets.pet_id = %s
-                AND pets.owner_id = %s''', (pet_id, current_user['user_id']))
+                AND pets.owner_id = %s''', (pet_id, session['current_user']['user_id']))
     pet = cursor.fetchone()
     connection.close()
     return render_template(
         'edit_pet.html',
         pet=pet,
         animal_types=animal_types, 
-        current_user=current_user,
+        current_user=session['current_user'],
         )
 
 
@@ -201,7 +230,7 @@ def delete_pet(pet_id):
                    DELETE FROM pets
                    WHERE pet_id = %s
                    AND owner_id = %s
-                   ''', (pet_id, current_user['user_id'],))
+                   ''', (pet_id, session['current_user']['user_id'],))
     connection.commit()
     connection.close()
     flash("Das Haustier wurde erfolgreich gelöscht.", 'success')
@@ -219,7 +248,7 @@ def borrow_pet(pet_id):
                    SET borrower_id = %s
                    WHERE pet_id = %s
                    AND borrower_id is NULL''', 
-                   (current_user['user_id'],
+                   (session['current_user']['user_id'],
                     pet_id, 
                     ))
     connection.commit()
@@ -255,7 +284,7 @@ def pet_management():
                     FROM pets
                     INNER JOIN animal_types 
                        ON pets.animal_type_id = animal_types.animal_type_id
-                   WHERE pets.owner_id = %s''',(current_user['user_id'],)
+                   WHERE pets.owner_id = %s''',(session['current_user']['user_id'],)
                    )
     owned_pets = cursor.fetchall()
     cursor.execute('''SELECT * 
@@ -264,7 +293,7 @@ def pet_management():
                        ON pets.animal_type_id = animal_types.animal_type_id
                    INNER JOIN users
                         ON pets.owner_id = users.user_id
-                   WHERE pets.borrower_id = %s''',(current_user['user_id'],)
+                   WHERE pets.borrower_id = %s''',(session['current_user']['user_id'],)
                    )
     borrowed_pets = cursor.fetchall()
     connection.close()
@@ -276,7 +305,7 @@ def pet_management():
         owned_pets=owned_pets, 
         owned_pets_counter=owned_pets_counter, 
         borrowed_pets_counter=borrowed_pets_counter, 
-        current_user=current_user,
+        current_user=session['current_user'],
         )
 
 
@@ -300,7 +329,7 @@ def new_pet():
                            INSERT INTO pets 
                            (name, description, animal_type_id, owner_id) 
                            VALUES (%s, %s, %s, %s)''', 
-                           (name, description, animal_type, current_user['user_id'])) 
+                           (name, description, animal_type, session['current_user']['user_id'])) 
             connection.commit() 
             connection.close()
             flash(
@@ -312,11 +341,11 @@ def new_pet():
     return render_template(
         'add_pet.html', 
         animal_types=animal_types, 
-        current_user=current_user,
+        current_user=session['current_user'],
         )
 
 
 @app.errorhandler(404)
 def page_not_found(error):
     """Behandelt die 404 Fehler"""
-    return render_template('errors/404.html', current_user=current_user), 404
+    return render_template('errors/404.html', current_user=session['current_user']), 404
