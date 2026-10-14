@@ -9,6 +9,7 @@ class Config:
     DATABASE_USER=os.environ.get('DATABASE_USER')
     DATABASE_PASSWORD=os.environ.get('DATABASE_PASSWORD')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    SQLALCHEMY_ENGINE_OPTIONS = {'pool_recycle' : 280}
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
     UPLOAD_FOLDER = (os.environ.get('UPLOAD_FOLDER') 
                      or os.mkdir('app/static/images/user_uploads') 
