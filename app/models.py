@@ -14,7 +14,7 @@ class Roles(db.Model):
     users: so.WriteOnlyMapped['Users'] = so.relationship(back_populates='role')
 
     def __repr__(self):
-        return '<Role {}>'.format(self.role)
+        return self.role.capitalize()
 
 class Users(db.Model):
     __tablename__ = "users"
@@ -64,7 +64,7 @@ class AnimalTypes(db.Model):
     pets: so.WriteOnlyMapped['Pets'] = so.relationship(back_populates='animal_type')
 
     def __repr__(self):
-        return '<Animal type {}>'.format(self.animal_type)
+        return self.animal_type.capitalize()
     
 
 class Pets(db.Model):

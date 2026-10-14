@@ -3,7 +3,7 @@ from functools import wraps
 import sqlalchemy as sa
 from app import db
 from app.models import Roles, Users, AnimalTypes, Pets
-from app.main import bp
+from app.admin import bp
 
 # ---- DECORATORS AND GLOBAL FUNCTIONS ---- #
 # This decorator was taken from the official Flask documentation
