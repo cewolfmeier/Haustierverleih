@@ -363,14 +363,6 @@ def edit_user(user_id):
 @admin_required
 def delete_user(user_id):
     """Leer; wird zum Löschen eines Benutzers benötigt"""
-    #connection = get_db_connection()
-    #cursor = connection.cursor(dictionary=True)
-    #cursor.execute('''
-    #               DELETE FROM users
-    #               WHERE user_id = %s
-    #               ''', (user_id,))
-    #connection.commit()
-    #connection.close()
     user = db.session.scalar(sa.select(Users).where(Users.user_id == user_id))
     if user is None:
         flash("Dieser Benutzer existiert nicht.", 'error')
@@ -389,27 +381,20 @@ def delete_user(user_id):
 @admin_required
 def new_animal_type():
     """Route für neue Tierarten"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
     if request.method == 'POST':
         name = request.form.get('name')
         # check if at least one required field is not filled
         if name == "":
             flash("Erwischt, du Schlauberger!")
         else:
-            cursor.execute('''
-                           INSERT INTO animal_types 
-                           (animal_type) 
-                           VALUES (%s)''', 
-                           (name,)) 
-            connection.commit() 
-            connection.close()
+            animal_type = AnimalTypes(animal_type=name)
+            db.session.add(animal_type)
+            db.session.commit()
             flash(
                 "Glückwunsch! Eine neue Tierart wurde erfolgreich angelegt.", 
                 'success'
             )
             return redirect(url_for('admin'))
-    connection.close()
     return render_template(
         'admin/new_animal_type.html',
         current_user=session['current_user'],)
@@ -420,31 +405,23 @@ def new_animal_type():
 @admin_required
 def edit_animal_type(animal_type_id):
     """Route für die Bearbeitung von Tierarten"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('''SELECT * FROM animal_types
-                   WHERE animal_type_id = %s''',
-                   (animal_type_id,))
-    animal_type = cursor.fetchone()
+    animal_type = db.session.scalar(
+        sa.select(AnimalTypes)
+        .where(AnimalTypes.animal_type_id == animal_type_id)
+        )
     if request.method == 'POST':
         name = request.form.get('name')
         # check if at least one required field is not filled
         if name == "":
             flash("Erwischt, du Schlauberger!")
         else:
-            cursor.execute('''
-                   UPDATE animal_types 
-                   SET animal_type = %s
-                   WHERE animal_type_id = %s''', 
-                   (name, animal_type_id)) 
-            connection.commit() 
-            connection.close()
+            animal_type.animal_type = name
+            db.session.commit()
             flash(
                 "Der Benutzer wurde erfolgreich aktualisiert.", 
                 'success'
             )
             return redirect(url_for('admin'))
-    connection.close()
     return render_template(
         'admin/edit_animal_type.html',
         animal_type=animal_type,
