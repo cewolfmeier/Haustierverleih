@@ -173,6 +173,12 @@ th, td {
     color: #0d6e00;
 }
 
+.alert-warning{
+    background: rgba(255, 230, 0, 0.158);
+    border-color: #6e6c00;
+    color: #6e6c00;
+}
+
 /* elemental definitions */
 .button-form {
     margin: 1px;
