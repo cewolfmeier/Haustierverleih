@@ -1,2 +1,2 @@
 FLASK_APP=haustierverleih.py
-DEBUG=TRUE
+FLASK_DEBUG=1
