@@ -413,6 +413,27 @@ def delete_user(user_id):
 @admin_required
 def new_animal_type():
     """Route für neue Tierarten"""
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    if request.method == 'POST':
+        name = request.form.get('name')
+        # check if at least one required field is not filled
+        if name == "":
+            flash("Erwischt, du Schlauberger!")
+        else:
+            cursor.execute('''
+                           INSERT INTO animal_types 
+                           (animal_type) 
+                           VALUES (%s)''', 
+                           (name,)) 
+            connection.commit() 
+            connection.close()
+            flash(
+                "Glückwunsch! Eine neue Tierart wurde erfolgreich angelegt.", 
+                'success'
+            )
+            return redirect(url_for('admin'))
+    connection.close()
     return render_template(
         'admin/new_animal_type.html',
         current_user=session['current_user'],)
@@ -423,8 +444,34 @@ def new_animal_type():
 @admin_required
 def edit_animal_type(animal_type_id):
     """Route für die Bearbeitung von Tierarten"""
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''SELECT * FROM animal_types
+                   WHERE animal_type_id = %s''',
+                   (animal_type_id,))
+    animal_type = cursor.fetchone()
+    if request.method == 'POST':
+        name = request.form.get('name')
+        # check if at least one required field is not filled
+        if name == "":
+            flash("Erwischt, du Schlauberger!")
+        else:
+            cursor.execute('''
+                   UPDATE animal_types 
+                   SET animal_type = %s
+                   WHERE animal_type_id = %s''', 
+                   (name, animal_type_id)) 
+            connection.commit() 
+            connection.close()
+            flash(
+                "Der Benutzer wurde erfolgreich aktualisiert.", 
+                'success'
+            )
+            return redirect(url_for('admin'))
+    connection.close()
     return render_template(
         'admin/edit_animal_type.html',
+        animal_type=animal_type,
         current_user=session['current_user'],)
 
 
