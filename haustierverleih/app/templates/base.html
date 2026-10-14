@@ -14,6 +14,7 @@
             <ul class="navigation">
                 {% if current_user != None %}
                 <li>Moin {{current_user["username"]}}!</li>
+                <li class="button"><a href="{{ url_for('pet_management') }}">Tierverwaltung</a></li>
                 <li class="button"><a href="{{ url_for('logout') }}">Ausloggen</a></li>
                 {% else %}
                 <li class="button"><a href="{{ url_for('register') }}">Registrieren</a></li>
