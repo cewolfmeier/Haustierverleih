@@ -1,8 +1,11 @@
 {% extends 'base.html' %} 
 
 {% block content %}
-<h1>Haustierverleih</h1>
-<p>Registrierte Haustiere</p>
+<a href="{{ url_for('index')}}">
+    <img src="{{ url_for('static', filename='images/logo.png')}}" alt="Das Logo des Haustierverleihs">
+</a>
+<h1>Willkommen beim Haustierverleih!</h1>
+<h2>Registrierte Haustiere</h2>
 <ul class="content-list">
     {% for pet in pets %}
     <a href="{{url_for('pet', pet_id=pet['pet_id'])}}">
