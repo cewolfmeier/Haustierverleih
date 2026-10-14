@@ -61,6 +61,7 @@ def login():
             flash("Bitte gib deine Anmeldedaten ein.", 'error')
         cursor.execute(f'''SELECT *
                     FROM users
+                    INNER JOIN roles ON roles.role_id = users.role_id
                     WHERE username = %s
                    ''', (username,))
         user = cursor.fetchone()
@@ -194,7 +195,7 @@ def edit_pet(pet_id):
                             description, 
                             animal_type_id, 
                             pet_id, 
-                            current_user['user_id'],
+                            session['current_user']['user_id'],
                             )) 
             connection.commit() 
             connection.close()
