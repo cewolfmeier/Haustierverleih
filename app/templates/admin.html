@@ -3,7 +3,9 @@
 {% block content %}
 <h1>Benutzerverwaltung</h1>
 <div>
-    <p>Registrierte Benutzer</p>
+    <p>
+        <strong>Registrierte Benutzer</strong>
+    </p>
     <table>
         <thead>
             <tr>
@@ -18,9 +20,9 @@
                 <td>{{user["username"]}}</td>
                 <td>{{user["role"]}}</td>
                 <td>
-                    <a href="">Löschen</a>
-                    <a href="">Bearbeiten</a>
-                    <a href="">Rechte verwalten</a>
+                    <a class="button-table" href="">Löschen</a>
+                    <a class="button-table" href="">Bearbeiten</a>
+                    <a class="button-table" href="">Rechte verwalten</a>
                 </td>
             </tr>
             {% endfor %}

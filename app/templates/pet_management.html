@@ -2,9 +2,11 @@
 
 {% block content %}
 <h1>Tierverwaltung</h1>
-<div>
-    <p>Deine eigenen Haustiere ({{owned_pets_counter}})</p>
-    <a class="button-form" href="{{url_for('new_pet')}}">+ Neues Haustier anlegen</a>
+<div class="main-content">
+    <p>
+        <strong>Deine eigenen Haustiere ({{owned_pets_counter}})</strong>
+        <a class="button-form" href="{{url_for('new_pet')}}">+ Neues Haustier anlegen</a>
+    </p>
     <table>
         <thead>
             <tr>
@@ -21,17 +23,19 @@
                 <td>{{ pet["animal_type"] }}</td>
                 <td>{% if pet["borrower_id"] != None %}nicht {% endif %}verfügbar</td>
                 <td>
-                    <a class="button-form" href="{{ url_for('edit_pet', pet_id=pet['pet_id']) }}">Bearbeiten</a> 
-                    <a class="button-form" href="{{ url_for('delete_pet', pet_id=pet['pet_id']) }}">Löschen</a>
-                    <a class="button-form" href="{{ url_for('pet', pet_id=pet['pet_id']) }}">Details</a>
+                    <a class="button-table" href="{{ url_for('edit_pet', pet_id=pet['pet_id']) }}">Bearbeiten</a> 
+                    <a class="button-table" href="{{ url_for('delete_pet', pet_id=pet['pet_id']) }}">Löschen</a>
+                    <a class="button-table" href="{{ url_for('pet', pet_id=pet['pet_id']) }}">Details</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-</div>
-<div>
-<p>Deine ausgeliehenen Haustiere ({{borrowed_pets_counter}})</p>
+    <p>
+        <strong>
+            Deine ausgeliehenen Haustiere ({{borrowed_pets_counter}})
+        </strong>
+    </p>
     <table>
         <thead>
             <tr>
@@ -47,7 +51,7 @@
             <td>{{ pet["name"] }}</td>
             <td>{{ pet["animal_type"] }}</td>
             <td>{{ pet["owner_id"] }}</td>
-            <td><a class="button-form" href="{{ url_for('pet', pet_id=pet['pet_id']) }}">Details</a></td>
+            <td><a class="button-table" href="{{ url_for('pet', pet_id=pet['pet_id']) }}">Details</a></td>
             </tr>
             {% endfor %}
         </tbody>
