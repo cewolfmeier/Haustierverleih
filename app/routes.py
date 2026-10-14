@@ -135,18 +135,6 @@ def index():
 @login_required
 def pet(pet_id):
     """Zeigt die Details eines Tieres an"""
-    #pet = None
-    #connection = get_db_connection()
-    #cursor = connection.cursor(dictionary=True)
-    #cursor.execute(f'''SELECT * 
-    #            FROM pets
-    #            INNER JOIN animal_types 
-    #                ON pets.animal_type_id = animal_types.animal_type_id
-    #            INNER JOIN users
-    #                    ON pets.owner_id = users.user_id
-    #            WHERE pets.pet_id = {pet_id}''')
-    #pet = cursor.fetchone()
-    #connection.close()
     pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
     if pet is None:
         abort(404)
@@ -157,19 +145,11 @@ def pet(pet_id):
 @login_required
 def edit_pet(pet_id):
     """Seite zum Bearbeiten eines Tieres"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('''SELECT * FROM animal_types''')
-    animal_types = cursor.fetchall()
-    cursor.execute('''SELECT * 
-                FROM pets
-                INNER JOIN animal_types 
-                ON pets.animal_type_id = animal_types.animal_type_id
-                WHERE pets.pet_id = %s
-                AND pets.owner_id = %s''', (pet_id, session['current_user']['user_id']))
-    pet = cursor.fetchone()
+    animal_types = db.session.scalars(sa.select(Animal_Types)).all()
+    pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
     if request.method == 'POST':
-        current_image = pet['image']
+        current_image = pet.image
+        print(current_image)
         name = request.form.get('Name')
         description = request.form.get('Beschreibung')
         animal_type_id = request.form.get('Tierart')
@@ -188,25 +168,19 @@ def edit_pet(pet_id):
                 "error",
                 )
         else:
-            values= [name, description, animal_type_id, pet_id, session['current_user']['user_id']]
-            if not filename is None:
-                values.insert(3, filename)
-            values = tuple(values)
-            cursor.execute(f'''
-                           UPDATE pets 
-                           SET name = %s, description = %s, animal_type_id = %s{', image = %s' if not filename is None else ''}
-                           WHERE pet_id = %s
-                           AND owner_id = %s''', 
-                           values) 
-            connection.commit() 
-            connection.close()
+            pet.name = name
+            pet.description = description
+            pet.animal_type_id = animal_type_id
+            if filename is not None:
+                pet.image = filename
+            db.session.commit()
             flash(
                 "Glückwunsch! Deine Änderungen wurde erfolgreich gespeichert.", 
                 "success"
                 )
-            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], current_image))
+            if current_image is not None:
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], current_image))
             return redirect(url_for('pet', pet_id=pet_id))
-    connection.close()
     if pet is None or animal_types is None:
         abort(404)
     return render_template(
