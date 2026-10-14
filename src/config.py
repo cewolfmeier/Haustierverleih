@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
-
+default_user_upload_dir = os.path.join(basedir, 'app/static/images/user_uploads')
 
 class Config:
     DATABASE_USER=os.environ.get('DATABASE_USER')
@@ -12,8 +12,8 @@ class Config:
     SQLALCHEMY_ENGINE_OPTIONS = {'pool_recycle' : 280}
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
     UPLOAD_FOLDER = (os.environ.get('UPLOAD_FOLDER') 
-                     or os.mkdir('app/static/images/user_uploads') 
-                     if not os.path.exists('app/static/images/user_uploads') 
-                     else os.path.join(basedir, 'app/static/images/user_uploads'))
+                     or os.mkdir(default_user_upload_dir) 
+                     if not os.path.exists(default_user_upload_dir) 
+                     else default_user_upload_dir)
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
     MAX_CONTENT_LENGTH = 2 * 1000 * 1000 # Limit Uploads to 2 Megabyte

@@ -1,0 +1,34 @@
+[project]
+name = "haustierverleih"
+version = "0.1.0"
+description = "Ein Lernprojekt für die Webentwicklung"
+readme = "README.md"
+authors = [
+    { name = "Cedric Wolfmeier", email = "258799548+cewolfmeier@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "flask>=3.1.3",
+    "flask-migrate>=4.1.0",
+    "flask-sqlalchemy>=3.1.1",
+    "mariadb>=1.1.14",
+    "python-dotenv>=1.2.4",
+]
+
+[project.scripts]
+haustierverleih = "app:main"
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "black>=26.10.1",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.17.0",
+]
+
+[tool.uv.build-backend]
+module-name = "app"
