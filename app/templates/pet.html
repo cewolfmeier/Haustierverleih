@@ -3,7 +3,9 @@
 {% block content %}
 <a href="{{ url_for('index') }}">zurück</a>
 <div class="detail">
-    <img src="" alt=""></img>
+    {% if pet['image'] != None %}
+    <img class="thumbnail" src="{{ url_for('static', filename='images/user_uploads/'+pet['image'])}}" alt="">
+    {% endif %}
     <h2>{{ pet["name"] }}</h2>
     <p>{{ pet["description"] }}</p>
     <ul>
