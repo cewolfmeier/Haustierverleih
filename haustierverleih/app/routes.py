@@ -216,8 +216,9 @@ def new_pet():
 @app.errorhandler(404)
 def page_not_found(error):
     """Behandelt die 404 Fehler"""
-    content = """
-<h1>404 - Haustier nicht gefunden</h1>
-<p>Ups, da ist uns wohl ein Haustier entfleucht. Wir fangen es schnell wieder ein.</p>
+    content = f"""
+    <a href="{url_for("index")}">zurück zur Startseite</a>
+    <h1>404 - Haustier nicht gefunden</h1>
+    <p>Ups, da ist uns wohl ein Haustier entfleucht. Wir fangen es schnell wieder ein.</p>
 """
     return TEMPLATE_UPPER + content + TEMPLATE_LOWER
