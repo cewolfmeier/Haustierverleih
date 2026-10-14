@@ -166,7 +166,10 @@ def edit_pet(pet_id):
         animal_type_id = request.form.get('Tierart')
         # check if at least one required field is not filled
         if name == "" or description == "":
-            flash("Erwischt, du Schlauberger!", "error")
+            flash(
+                "Einige Daten wurden nicht korrekt übertragen. Bitte erneut versuchen.", 
+                "error",
+                )
         else:
             cursor.execute('''
                            UPDATE pets 
@@ -186,7 +189,6 @@ def edit_pet(pet_id):
                 "success"
                 )
             return redirect(url_for('pet', pet_id=pet_id))
-    pet = None
     cursor.execute('''SELECT * 
                 FROM pets
                 INNER JOIN animal_types 
@@ -195,6 +197,8 @@ def edit_pet(pet_id):
                 AND pets.owner_id = %s''', (pet_id, session['current_user']['user_id']))
     pet = cursor.fetchone()
     connection.close()
+    if pet is None or animal_types is None:
+        abort(404)
     return render_template(
         'edit_pet.html',
         pet=pet,
@@ -209,6 +213,19 @@ def delete_pet(pet_id):
     """Leer; wird zum Löschen eines Tieres benötigt"""
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
+    cursor.execute('''SELECT * 
+                FROM pets
+                WHERE pets.pet_id = %s''', 
+                (pet_id,))
+    pet = cursor.fetchone()
+    if pet is None:
+        connection.close()
+        flash("Dieses Haustier existiert nicht.", 'error')
+        abort(404)
+    elif pet['owner_id'] != session['current_user']['user_id']:
+        connection.close()
+        flash("Du kannst nur deine eigenen Haustiere löschen.", 'error')
+        abort(400)
     cursor.execute('''
                    DELETE FROM pets
                    WHERE pet_id = %s
@@ -226,6 +243,23 @@ def borrow_pet(pet_id):
     """Leer; wird für das Ausleihen benötigt"""
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
+    cursor.execute('''SELECT * 
+                FROM pets
+                WHERE pets.pet_id = %s''', 
+                (pet_id,))
+    pet = cursor.fetchone()
+    if pet is None:
+        connection.close()
+        flash("Dieses Haustier existiert nicht.", 'error')
+        abort(404)
+    elif pet['owner_id'] == session['current_user']['user_id']:
+        connection.close()
+        flash("Du kannst deine eigenen Haustiere nicht ausleihen.", 'error')
+        abort(400)
+    elif not pet['borrower_id'] is None:
+        connection.close()
+        flash("Dieses Haustier ist bereits verliehen", 'error')
+        abort(400)
     cursor.execute('''
                    UPDATE pets 
                    SET borrower_id = %s
@@ -246,6 +280,19 @@ def return_pet(pet_id):
     """Leer; wird für das Zurückgeben benötigt"""
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
+    cursor.execute('''SELECT * 
+                FROM pets
+                WHERE pets.pet_id = %s''', 
+                (pet_id,))
+    pet = cursor.fetchone()
+    if pet is None:
+        connection.close()
+        flash("Dieses Haustier existiert nicht.", 'error')
+        abort(404)
+    elif pet['borrower_id'] != session['current_user']['user_id']:
+        connection.close()
+        flash("Dieses Haustier kann von dir nicht zurückgegeben werden.", 'error')
+        abort(400)
     cursor.execute('''
                    UPDATE pets 
                    SET borrower_id = null
@@ -305,8 +352,10 @@ def new_pet():
         description = request.form.get('Beschreibung')
         animal_type = request.form.get('Tierart')
         # check if at least one required field is not filled
-        if name == "" or description == "":
-            flash("Erwischt, du Schlauberger!")
+        if name == "" or description == "" or animal_type == "":
+            flash(
+                "Einige Daten wurden nicht korrekt übertragen. Bitte erneut versuchen.",
+                "error")
         else:
             cursor.execute('''
                            INSERT INTO pets 
@@ -478,12 +527,19 @@ def edit_animal_type(animal_type_id):
 
 
 # --- ERRORS --- #
-@app.errorhandler(404)
-def page_not_found(error):
-    """Behandelt die 404 Fehler"""
-    return render_template('errors/404.html', current_user=session['current_user']), 404
+@app.errorhandler(400)
+def bad_request(error):
+    """Behandelt die 400 Fehler"""
+    return render_template('errors/400.html', current_user=session['current_user']), 400
+
 
 @app.errorhandler(403)
 def forbidden(error):
     """Behandelt die 403 Fehler"""
     return render_template('errors/403.html', current_user=session['current_user']), 403
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    """Behandelt die 404 Fehler"""
+    return render_template('errors/404.html', current_user=session['current_user']), 404
