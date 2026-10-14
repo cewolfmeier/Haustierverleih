@@ -3,7 +3,7 @@
 {% block content %}
 {% if user != None %}
 <h1>Benutzer {{ user['username'] }} bearbeiten</h1>
-<form action="{{url_for('admin.edit_user', user_id=user['user_id'])}}" method="post">
+<form action="{{url_for('admin.post_edit_user', user_id=user['user_id'])}}" method="post">
     <label for="roles">Benutzerrechte</label>
     <select name="roles" id="roles" required>
         {% for role in roles %}

@@ -39,27 +39,15 @@ def admin():
         animal_types=animal_types,
         )
 
-
-@bp.route("/admin/user/<int:user_id>/edit", methods=['GET', 'POST'])
+# --- USER ADMINISTRATION --- #
+@bp.get("/admin/user/<int:user_id>/edit")
 @login_required
 @admin_required
-def edit_user(user_id):
-    """Bearbeiten eines Benutzers"""
+def get_edit_user(user_id):
     user = db.session.scalar(sa.select(Users).where(Users.user_id == user_id))
     roles = db.session.scalars(sa.select(Roles)).all()
-    if request.method == 'POST':
-        role_id = request.form.get('roles')
-        # check if at least one required field is not filled
-        if role_id == "":
-            flash("Erwischt, du Schlauberger!")
-        else:
-            user.role_id = role_id
-            db.session.commit()
-            flash(
-                "Der Benutzer wurde erfolgreich aktualisiert.", 
-                'success'
-            )
-            return redirect(url_for('auth.admin'))
+    if user is None:
+        abort(404)
     return render_template(
         'admin/edit_user.html', 
         user=user,
@@ -67,8 +55,31 @@ def edit_user(user_id):
         current_user=session['current_user'],
         )
 
+@bp.post("/admin/user/<int:user_id>/edit")
+@login_required
+@admin_required
+def post_edit_user(user_id):
+    user = db.session.scalar(sa.select(Users).where(Users.user_id == user_id))
+    if user is None:
+        abort(404)
+    # -- FORM VALIDATION -- #
+    role_id = request.form.get('roles')
+    role = db.session.scalar(sa.select(Roles).where(Roles.role_id == role_id))
+    # check if at least one required field is not filled
+    if role is None:
+        flash("Ungültige Eingabe!", 'error')
+    else:
+        user.role_id = role_id
+        db.session.commit()
+        flash(
+            "Der Benutzer wurde erfolgreich aktualisiert.", 
+            'success'
+        )
+        return redirect(url_for('admin.admin'))
+    return redirect(url_for('admin.get_edit_user', user_id=user_id))
 
-@bp.route("/admin/user/<int:user_id>/delete", methods=['GET', 'POST'])
+
+@bp.route("/admin/user/<int:user_id>/delete")
 @login_required
 @admin_required
 def delete_user(user_id):
@@ -89,34 +100,52 @@ def delete_user(user_id):
     return redirect(url_for('admin.admin'))
 
 
-@bp.route("/admin/animal_type/new", methods=['GET', 'POST'])
+# --- ANIMAL TYPE ADMINISTRATION --- #
+@bp.get("/admin/animal_type/new")
 @login_required
 @admin_required
-def new_animal_type():
-    """Route für neue Tierarten"""
-    if request.method == 'POST':
-        name = request.form.get('name')
-        # check if at least one required field is not filled
-        if name == "":
-            flash("Erwischt, du Schlauberger!")
-        else:
-            animal_type = AnimalTypes(animal_type=name)
-            db.session.add(animal_type)
-            db.session.commit()
-            flash(
-                "Glückwunsch! Eine neue Tierart wurde erfolgreich angelegt.", 
-                'success'
-            )
-            return redirect(url_for('admin.admin'))
+def get_new_animal_type():
     return render_template(
         'admin/new_animal_type.html',
         current_user=session['current_user'],)
 
 
-@bp.route("/admin/animal_type/<int:animal_type_id>/edit", methods=['GET', 'POST'])
+@bp.post("/admin/animal_type/new")
 @login_required
 @admin_required
-def edit_animal_type(animal_type_id):
+def post_new_animal_type():
+    name = request.form.get('name')
+    # check if at least one required field is not filled
+    if name == "":
+        flash("Ungültige Eingabe!", "error")
+    else:
+        animal_type = AnimalTypes(animal_type=name)
+        db.session.add(animal_type)
+        db.session.commit()
+        flash("Eine neue Tierart wurde erfolgreich angelegt.", "success")
+        return redirect(url_for('admin.admin'))
+    return redirect(url_for('admin.get_new_animal_type'))
+
+
+@bp.get("/admin/animal_type/<int:animal_type_id>/edit")
+@login_required
+@admin_required
+def get_edit_animal_type(animal_type_id):
+    """Route für die Bearbeitung von Tierarten"""
+    animal_type = db.session.scalar(
+        sa.select(AnimalTypes)
+        .where(AnimalTypes.animal_type_id == animal_type_id)
+        )
+    return render_template(
+        'admin/edit_animal_type.html',
+        animal_type=animal_type,
+        current_user=session['current_user'],)
+
+
+@bp.post("/admin/animal_type/<int:animal_type_id>/edit")
+@login_required
+@admin_required
+def post_edit_animal_type(animal_type_id):
     """Route für die Bearbeitung von Tierarten"""
     animal_type = db.session.scalar(
         sa.select(AnimalTypes)
@@ -135,7 +164,4 @@ def edit_animal_type(animal_type_id):
                 'success'
             )
             return redirect(url_for('admin.admin'))
-    return render_template(
-        'admin/edit_animal_type.html',
-        animal_type=animal_type,
-        current_user=session['current_user'],)
+    return redirect(url_for('admin.get_edit_animal_type', animal_type_id=animal_type_id))

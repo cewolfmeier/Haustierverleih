@@ -21,7 +21,7 @@
                 <td>{{ user.role }}</td>
                 <td>
                     <a class="button-table" href="{{ url_for('admin.delete_user', user_id=user['user_id']) }}">Löschen</a>
-                    <a class="button-table" href="{{ url_for('admin.edit_user', user_id=user['user_id']) }}">Bearbeiten</a>
+                    <a class="button-table" href="{{ url_for('admin.get_edit_user', user_id=user['user_id']) }}">Bearbeiten</a>
                 </td>
             </tr>
             {% endfor %}
@@ -31,7 +31,7 @@
 <div>
     <p>
         <strong>Tierarten</strong>
-        <a class="button-form" href="{{url_for('admin.new_animal_type')}}">+ Neue Tierart anlegen</a>
+        <a class="button-form" href="{{url_for('admin.get_new_animal_type')}}">+ Neue Tierart anlegen</a>
     </p>
     <table>
         <thead>
@@ -45,7 +45,7 @@
             <tr>
                 <td>{{type["animal_type"]}}</td>
                 <td>
-                    <a class="button-table" href="{{ url_for('admin.edit_animal_type', animal_type_id=type['animal_type_id']) }}">Bearbeiten</a>
+                    <a class="button-table" href="{{ url_for('admin.get_edit_animal_type', animal_type_id=type['animal_type_id']) }}">Bearbeiten</a>
                 </td>
             </tr>
             {% endfor %}

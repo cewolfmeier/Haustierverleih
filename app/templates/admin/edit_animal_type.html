@@ -3,7 +3,7 @@
 {% block content %}
 {% if annimal_type != None %}
 <h1>Tierart {{ animal_type['animal_type'] }} bearbeiten</h1>
-<form action="{{url_for('admin.edit_animal_type', animal_type_id=animal_type['animal_type_id'])}}" method="post">
+<form action="{{url_for('admin.post_edit_animal_type', animal_type_id=animal_type['animal_type_id'])}}" method="post">
     <label for="animal_type">Bezeichnung</label>
     <input type="text" name="name" id="animal_type" value="{{ animal_type['animal_type']}}" required>
     <input class="button-form" type="submit" value="Speichern">
