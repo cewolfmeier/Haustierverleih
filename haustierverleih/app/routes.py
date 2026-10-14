@@ -1,6 +1,16 @@
 from app import app
 from flask import url_for, render_template
-from markupsafe import escape, Markup
+import mysql.connector
+from config import Config
+
+def get_db_connection(): 
+    connection = mysql.connector.connect( 
+        host="localhost", 
+        user=Config.DATABASE_USER, 
+        password=Config.DATABASE_PASSWORD, 
+        database="haustierverleih" 
+        ) 
+    return connection
 
 current_user = {
     "user_id": 1,
