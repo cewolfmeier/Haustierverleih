@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template
+from flask import render_template, redirect, request, url_for
 import mysql.connector
 from config import Config
 
@@ -162,10 +162,34 @@ def pet_management():
         )
 
 
-@app.route("/pet/new")
+@app.route("/pet/new", methods=['GET', 'POST'])
 def new_pet():
     """Seite zum Anlegen neuer Tiere"""
-    return render_template('add_pet.html')
+    if request.method == 'POST':
+        name = request.form.get('Name')
+        description = request.form.get('Beschreibung')
+        animal_type = request.form.get('Tierart')
+        if name == "" or description == "":
+            connection = get_db_connection()
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(f'''SELECT * FROM animal_types''')
+            animal_types = cursor.fetchall()
+            connection.close()
+        else:
+            connection = get_db_connection() 
+            cursor = connection.cursor() 
+            cursor.execute('INSERT INTO pets (name, description, animal_type_id, owner_id) VALUES (%s, %s, %s, %s)', 
+                           (name, description, animal_type, current_user['user_id'])) 
+            connection.commit() 
+            connection.close()
+            return redirect(url_for('pet_management'))
+    else:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(f'''SELECT * FROM animal_types''')
+        animal_types = cursor.fetchall()
+        connection.close()
+    return render_template('add_pet.html', animal_types=animal_types, current_user=current_user)
 
 
 @app.errorhandler(404)
