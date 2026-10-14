@@ -1,16 +1,17 @@
 /* global tag definition */
-* {
-    margin: 0;
-    padding: 0;
-}
 html, body {
     height: 100%;
 }
 body {
+    margin: 0px;
+    padding: 0px;
     background-color: #5cb8d4;
+    position: relative;
+    min-height: 100%;
 }
 
 nav {
+    padding: 5px 10px;
     background-color: #c5dcaf;
     display: flex;
     justify-content: space-between;
@@ -24,8 +25,8 @@ footer {
     position:absolute;
     bottom: 0;
     width: 100%;
-    height: 2em;
-    margin: 50px 0px 10px 0px;
+    height: 20px;
+    margin: 0 auto;
     text-align: center;
     background-color: #c5dcaf;
 
@@ -45,6 +46,7 @@ footer {
 
 /* content section */
 .content {
+    padding-bottom: 20px;
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
