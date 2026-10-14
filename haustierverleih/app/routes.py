@@ -1,5 +1,5 @@
 from app import app
-from flask import url_for
+from flask import url_for, render_template
 from markupsafe import escape, Markup
 
 current_user = {
@@ -85,27 +85,7 @@ TEMPLATE_LOWER = """
 @app.route("/index")
 def index():
     """Startseite mit Liste aller Tiere"""
-    pets_html = ""
-    for pet in pets:
-        pets_html += f"""
-<li>
-    <h2>{escape(pet["name"])} ({pet["animal_type"]})</h2>
-    {escape(pet["description"])}
-    <br>Besitzer: {pet["owner_id"]}
-    <br>{"Aktuell" if pet["borrower_id"] is None else "Nicht"} verfügbar
-</li>
-"""
-
-    content = f"""
-<h1>Haustierverleih</h1>
-<div>
-    <p>Registrierte Haustiere</p>
-    <ul>
-    {pets_html}
-    </ul>
-</div>
-"""
-    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
+    return render_template('index.html', pets=pets)
 
 
 @app.route("/login")
