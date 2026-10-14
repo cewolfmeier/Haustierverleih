@@ -146,7 +146,16 @@ def edit_pet(pet_id):
 @app.route("/pet/<int:pet_id>/delete")
 def delete_pet(pet_id):
     """Leer; wird zum Löschen eines Tieres benötigt"""
-    pass
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''
+                   DELETE FROM pets
+                   WHERE pet_id = %s
+                   AND owner_id = %s
+                   ''', (pet_id, current_user['user_id'],))
+    connection.commit()
+    connection.close()
+    return redirect(url_for('pet_management'))
 
 
 @app.route("/pet/<int:pet_id>/borrow")

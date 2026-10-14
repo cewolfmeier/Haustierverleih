@@ -17,10 +17,14 @@
         <tbody>
             {% for pet in owned_pets %}
             <tr>
-            <td>{{ pet["name"]}}</td>
-            <td>{{ pet["animal_type"] }}</td>
-            <td>{% if pet["borrower_id"] != None %}nicht {% endif %}verfügbar</td>
-            <td><a href="{{ url_for('edit_pet', pet_id=pet['pet_id']) }}">Bearbeiten</a> <a href="{{ url_for('pet', pet_id=pet['pet_id']) }}">Details</a></td>
+                <td>{{ pet["name"]}}</td>
+                <td>{{ pet["animal_type"] }}</td>
+                <td>{% if pet["borrower_id"] != None %}nicht {% endif %}verfügbar</td>
+                <td>
+                    <a href="{{ url_for('edit_pet', pet_id=pet['pet_id']) }}">Bearbeiten</a> 
+                    <a href="{{ url_for('delete_pet', pet_id=pet['pet_id']) }}">Löschen</a>
+                    <a href="{{ url_for('pet', pet_id=pet['pet_id']) }}">Details</a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
