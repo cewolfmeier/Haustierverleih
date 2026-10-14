@@ -144,13 +144,13 @@ def edit_pet(pet_id):
         animal_type_id = request.form.get('Tierart')
         if 'image' in request.files:
             image = request.files['image']
-            print(image)
-            if image and allowed_file(image.filename):
-                filename = secure_filename(image.filename)
-                filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
-                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            else:
-                flash('Das Bild konnte nicht hochgeladen werden.', 'warning')
+            if image.filename != "":
+                if image and allowed_file(image.filename):
+                    filename = secure_filename(image.filename)
+                    filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
+                    image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                else:
+                    flash("Das Bild konnte nicht hochgeladen werden.", "warning")
         # check if at least one required field is not filled
         if name == "" or description == "":
             flash(
@@ -271,10 +271,13 @@ def new_pet():
         animal_type = request.form.get('Tierart')
         if 'image' in request.files:
             image = request.files['image']
-            if image and allowed_file(image.filename):
-                filename = secure_filename(image.filename)
-                filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
-                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            if image.filename != "":
+                if image and allowed_file(image.filename):
+                    filename = secure_filename(image.filename)
+                    filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
+                    image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                else:
+                    flash("Das Bild konnte nicht hochgeladen werden.", "warning")
         # check if at least one required field is not filled
         if name == "" or description == "" or animal_type == "":
             flash(
