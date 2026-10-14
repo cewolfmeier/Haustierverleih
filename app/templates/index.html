@@ -10,6 +10,9 @@
     {% for pet in pets %}
     <a href="{{url_for('pet', pet_id=pet['pet_id'])}}">
     <li>
+        {% if pet['image'] != None %}
+        <img class="thumbnail" src="{{ url_for('static', filename='images/user_uploads/'+pet['image'])}}" alt="">
+        {% endif %}
         <h2>{{ pet["name"] }} ({{ pet["animal_type"] }})</h2>
         <br>{{ pet["description"] }}
         <br>Besitzer: {{ pet["username"] }}
