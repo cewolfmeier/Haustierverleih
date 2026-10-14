@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1>Haustier {{ pet['name'] }} bearbeiten</h1>
-<form action="{{url_for('edit_pet', pet_id=pet['pet_id'])}}" method="post">
+<form action="{{url_for('edit_pet', pet_id=pet['pet_id'])}}" method="post" enctype=multipart/form-data>
     <label for="pet_name">Name</label>
     <input type="text" name="Name" id="pet_name" value="{{ pet['name']}}" required>
     <label for="pet_description">Beschreibung</label>
@@ -14,7 +14,7 @@
         {% endfor %}
     </select>
     <label for="image">Foto-Upload</label>
-    <input name="image" id="image" type="file" size="50" accept="text/*">
+    <input name="image" id="image" type="file">
     <input class="button-form" type="submit" value="Speichern">
 </form>
 

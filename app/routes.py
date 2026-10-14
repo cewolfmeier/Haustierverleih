@@ -173,35 +173,6 @@ def edit_pet(pet_id):
     cursor = connection.cursor(dictionary=True)
     cursor.execute('''SELECT * FROM animal_types''')
     animal_types = cursor.fetchall()
-    if request.method == 'POST':
-        name = request.form.get('Name')
-        description = request.form.get('Beschreibung')
-        animal_type_id = request.form.get('Tierart')
-        # check if at least one required field is not filled
-        if name == "" or description == "":
-            flash(
-                "Einige Daten wurden nicht korrekt übertragen. Bitte erneut versuchen.", 
-                "error",
-                )
-        else:
-            cursor.execute('''
-                           UPDATE pets 
-                           SET name = %s, description = %s, animal_type_id = %s
-                           WHERE pet_id = %s
-                           AND owner_id = %s''', 
-                           (name, 
-                            description, 
-                            animal_type_id, 
-                            pet_id, 
-                            session['current_user']['user_id'],
-                            )) 
-            connection.commit() 
-            connection.close()
-            flash(
-                "Glückwunsch! Deine Änderungen wurde erfolgreich gespeichert.", 
-                "success"
-                )
-            return redirect(url_for('pet', pet_id=pet_id))
     cursor.execute('''SELECT * 
                 FROM pets
                 INNER JOIN animal_types 
@@ -209,6 +180,44 @@ def edit_pet(pet_id):
                 WHERE pets.pet_id = %s
                 AND pets.owner_id = %s''', (pet_id, session['current_user']['user_id']))
     pet = cursor.fetchone()
+    if request.method == 'POST':
+        current_image = pet['image']
+        name = request.form.get('Name')
+        description = request.form.get('Beschreibung')
+        animal_type_id = request.form.get('Tierart')
+        if 'image' in request.files:
+            image = request.files['image']
+            if image and allowed_file(image.filename):
+                filename = secure_filename(image.filename)
+                filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
+                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            else:
+                flash('Das Bild konnte nicht hochgeladen werden.', 'warning')
+        # check if at least one required field is not filled
+        if name == "" or description == "":
+            flash(
+                "Einige Daten wurden nicht korrekt übertragen. Bitte erneut versuchen.", 
+                "error",
+                )
+        else:
+            values= [name, description, animal_type_id, pet_id, session['current_user']['user_id']]
+            if not filename is None:
+                values.insert(3, filename)
+            values = tuple(values)
+            cursor.execute(f'''
+                           UPDATE pets 
+                           SET name = %s, description = %s, animal_type_id = %s{', image = %s' if not filename is None else ''}
+                           WHERE pet_id = %s
+                           AND owner_id = %s''', 
+                           values) 
+            connection.commit() 
+            connection.close()
+            flash(
+                "Glückwunsch! Deine Änderungen wurde erfolgreich gespeichert.", 
+                "success"
+                )
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], current_image))
+            return redirect(url_for('pet', pet_id=pet_id))
     connection.close()
     if pet is None or animal_types is None:
         abort(404)
@@ -371,7 +380,6 @@ def new_pet():
                 filename = secure_filename(image.filename)
                 filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
                 image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                file_saved = True
             else:
                 flash('Das Bild konnte nicht hochgeladen werden.', 'warning')
         # check if at least one required field is not filled
