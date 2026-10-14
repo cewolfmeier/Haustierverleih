@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template
+from markupsafe import escape, Markup
 
 pets = [
     {
@@ -60,91 +60,139 @@ pets = [
     },
 ]
 
+TEMPLATE_UPPER = """
+<!doctype html>
+<html lang="de">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1"> 
+        <title>Haustierverleih</title> 
+    </head> 
+    <body>
+"""
+
+TEMPLATE_LOWER = """
+    </body> 
+</html>
+"""
 
 @app.route("/")
 def index():
     """Startseite mit Liste aller Tiere"""
-    pass
+    pets_html = ""
+    for pet in pets:
+        pets_html += f"""
+<li>
+    <h2>{escape(pet["name"])}</h2>
+    <br>{escape(pet["description"])}
+    <br>Besitzer: {pet["owner_id"]}
+    <br>{"Aktuell" if pet["borrower_id"] is None else "Nicht"} verfügbar
+</li>
+"""
+
+    content = f"""
+<h1>Haustierverleih</h1>
+<p>Registrierte Haustiere</p>
+<ul>
+{pets_html}
+</ul>
+"""
+    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
 
 @app.route("/login")
 def login():
     """Login-Seite"""
-    pass
+    content = """"""
+    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
 
 @app.route("/register")
-def index():
+def register():
     """Seite zur Account-Erstellung"""
-    pass
+    content = """"""
+    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
 
 @app.route("/logout")
-def index():
+def logout():
     """Leer; wird für den Logout benötigt"""
     pass
 
 
 @app.route("/admin")
-def index():
+def admin():
     """Admin-Bereich"""
-    pass
+    content = """"""
+    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
 
 @app.route("/edit_user")
-def index():
+def edit_user():
     """Bearbeiten eines Benutzers"""
-    pass
+    content = """"""
+    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
 
 @app.route("/delete_user")
-def index():
+def delete_user():
     """Leer; wird zum Löschen eines Benutzers benötigt"""
     pass
 
 
 @app.route("/pet/<pet_id>")
-def index(pet_id: int):
+def pet(pet_id: int):
     """Zeigt die Details eines Tieres an"""
-    pass
+    content = """"""
+    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
 
 @app.route("/pet/<pet_id>/edit")
-def index(pet_id: int):
+def edit_pet(pet_id: int):
     """Seite zum Bearbeiten eines Tieres"""
-    pass
+    content = """"""
+    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
 
 @app.route("/pet/<pet_id>/delete")
-def index(pet_id: int):
+def delete_pet(pet_id: int):
     """Leer; wird zum Löschen eines Tieres benötigt"""
     pass
 
 
 @app.route("/pet/<pet_id>/borrow")
-def index(pet_id: int):
+def borrow_pet(pet_id: int):
     """Leer; wird für das Ausleihen benötigt"""
-    pass
+    content = """"""
+    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
 
 @app.route("/pet/<pet_id>/return")
-def index(pet_id: int):
+def return_pet(pet_id: int):
     """Leer; wird für das Zurückgeben benötigt"""
-    pass
+    content = """"""
+    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
 
 @app.route("/pet-management")
-def index():
+def pet_management():
     """Verwaltung eigener und geliehener Tiere"""
-    pass
+    content = """"""
+    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
 
 @app.route("/pet/new")
-def index():
+def new_pet():
     """Seite zum Anlegen neuer Tiere"""
-    pass
+    content = """"""
+    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
 
 @app.errorhandler(404)
-def page_not_found():
+def page_not_found(error):
     """Behandelt die 404 Fehler"""
+    content = """
+<h1>404 - Haustier nicht gefunden</h1>
+<p>Ups, da ist uns wohl ein Haustier entfleucht. Wir fangen es schnell wieder ein.</p>
+"""
+    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
