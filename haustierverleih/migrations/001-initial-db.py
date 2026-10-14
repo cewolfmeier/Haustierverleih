@@ -1,5 +1,4 @@
 import mysql.connector
-#from config import Config
 
 TABLES = ["roles", "users", "animal_types", "pets"]
 ROLES = [("admin",), ("user",)]
@@ -22,8 +21,8 @@ PETS = [
 
 connection = mysql.connector.connect( 
         host="localhost", 
-        user="haustierverleih", 
-        password="haustierverleih", 
+        user="", 
+        password="", 
         database="haustierverleih" 
         )
 
@@ -49,3 +48,4 @@ connection.commit()
 fill_pets = "INSERT INTO pets (name, description, animal_type_id, owner_id, borrower_id) VALUES (%s,%s,%s,%s,%s)"
 mycursor.executemany(fill_pets, PETS)
 connection.commit()
+connection.close()
