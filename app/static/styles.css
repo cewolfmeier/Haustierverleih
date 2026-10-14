@@ -133,6 +133,7 @@ th, td {
     border-radius: 10px;
     border-width: 2px;
     border-style: solid;
+    text-align: center;
 }
 .alert-info{
     background: rgba(0, 225, 255, 0.158);
