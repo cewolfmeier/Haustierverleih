@@ -1,0 +1,52 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+<h1>Tierverwaltung</h1>
+<div>
+    <p>Deine eigenen Haustiere ({{owned_pets_counter}})</p>
+    <a href="{url_for('new_pet')}">+ Neues Haustier anlegen</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Tierart</th>
+                <th>Verfügbarkeit</th>
+                <th>Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pet in owned_pets %}
+            <tr>
+            <td>{{ pet["name"]}}</td>
+            <td>{{ pet["animal_type"] }}</td>
+            <td>{% if pet["borrower_id"] != None %}nicht {% endif %}verfügbar</td>
+            <td><a href="{{ url_for('edit_pet', pet_id=pet['pet_id']) }}">Bearbeiten</a> <a href="{{ url_for('pet', pet_id=pet['pet_id']) }}">Details</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div>
+<p>Deine ausgeliehenen Haustiere ({{borrowed_pets_counter}})</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Tierart</th>
+                <th>Verfügbarkeit</th>
+                <th>Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pet in borrowed_pets %}
+            <tr>
+            <td>{{ pet["name"] }}</td>
+            <td>{{ pet["animal_type"] }}</td>
+            <td>{{ pet["owner_id"] }}</td>
+            <td><a href="{{ url_for('pet', pet_id=pet['pet_id']) }}">Details</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
