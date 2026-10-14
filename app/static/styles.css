@@ -107,10 +107,6 @@ th, td {
     border-radius: 20px;
 }
 
-.content-main img{
-    height: 200px;
-}
-
 .content form{
     display: flex;
     flex-flow: column nowrap;
@@ -127,15 +123,16 @@ th, td {
     list-style-type: none;
 }
 .content-list li{
-    width: 200px;
-    height: 300px;
+    width: 250px;
+    height: 370px;
     margin: 10px;
     padding: 18px 15px;
     background: #c5dcaf9a;
     color: rgb(61, 59, 56);
     display: flex;
     flex-flow: column nowrap;
-    justify-content: center;
+    justify-content: space-around;
+    align-items: center;
     border-radius: 15px;
 }
 .content-list li:hover {
@@ -242,18 +239,31 @@ th, td {
 }
 
 .thumbnail {
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 5px;
-    /*width: 150px;*/
+    border-radius: 10%;
+    height: 150px;
 }
 
-.badge-dark {
+.title-image {
+    width: 200px;
+}
+
+.badge {
     padding: .65em .35em;
-    border-radius: 10px;
-    background:#000000d3;
+    border-radius: 10px; 
     color:white;
     text-align: center;
     font-weight: bold;
     font-size: .75em;
+}
+
+.description {
+    color:#9c9c9c
+}
+
+.success {
+    background: #0d6e00;
+}
+
+.dark {
+    background:#000000d3;
 }

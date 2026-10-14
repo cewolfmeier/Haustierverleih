@@ -4,17 +4,21 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> 
-        <title>Haustierverleih</title> 
+        {% if title %}
+        <title>Haustierverleih - {{ title }}</title>
+        {% else %}
+        <title>Haustierverleih</title>
+        {% endif %}
     </head> 
     <body>
         <div class="content">
-            <header>
+            <header class="shadow">
                 <nav>
                     <a href="{{ url_for('main.index')}}">
                         <img src="{{ url_for('static', filename='images/logo.png')}}" alt="Das Logo des Haustierverleihs">
                     </a>
                     <ul class="navigation">
-                        {% if current_user != None %}
+                        {% if current_user %}
                         <li>
                             <div>Moin {{current_user["username"]}}!</div>
                         </li>
@@ -51,7 +55,7 @@
             {% endwith %}
             </header>
             <main>
-                <div class="content-main">
+                <div class="content-main shadow">
                 {% block content %}{% endblock %}
                 </div>
             </main>

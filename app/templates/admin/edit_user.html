@@ -1,7 +1,7 @@
 {% extends 'base.html' %} 
 
 {% block content %}
-<h1>Benutzer {{ user['username'] }} bearbeiten</h1>
+<h1>Benutzer {{ user }} bearbeiten</h1>
 <form action="{{url_for('admin.post_edit_user', user_id=user['user_id'])}}" method="post">
     {% if user.user_id == current_user['user_id'] %}
     <label for="current_password">Aktuelles Passwort</label>
@@ -14,7 +14,7 @@
     <label for="roles">Benutzerrechte</label>
     <select name="roles" id="roles" required>
         {% for role in roles %}
-        <option value="{{ role['role_id'] }}" {% if user['role_id']==role['role_id'] %}selected{% endif %}>{{ role['role'] }}</option>
+        <option value="{{ role['role_id'] }}" {% if user['role_id']==role['role_id'] %}selected{% endif %}>{{ role }}</option>
         {% endfor %}
     </select>
     {% endif %}
