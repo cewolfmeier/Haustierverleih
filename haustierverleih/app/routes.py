@@ -175,8 +175,14 @@ def pet(pet_id):
 @app.route("/pet/<pet_id>/edit")
 def edit_pet(pet_id: int):
     """Seite zum Bearbeiten eines Tieres"""
-    content = """"""
-    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
+    pet_dict = None   
+    if pet_id.isdecimal(): 
+        pet_id = int(pet_id)
+        for pet in pets:
+            if pet["pet_id"] == pet_id:
+                pet_dict = pet
+                break
+    return render_template('edit_pet.html', pet=pet_dict, current_user=current_user)
 
 
 @app.route("/pet/<pet_id>/delete")
@@ -214,7 +220,7 @@ def pet_management():
             borrowed_pets.append(pet)
             borrowed_pets_counter += 1
     return render_template(
-        'pet-management.html', 
+        'pet_management.html', 
         borrowed_pets=borrowed_pets, 
         owned_pets=owned_pets, 
         owned_pets_counter=owned_pets_counter, 
