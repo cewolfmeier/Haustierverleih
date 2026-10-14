@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1>Registrieren</h1>
-<form action="{{url_for('register')}}" method="post">
+<form action="{{url_for('auth.register')}}" method="post">
     <label for="username">Benutzername</label>
     <input type="text" name="Username" id="username" required>
     <label for="password">Passwort</label>

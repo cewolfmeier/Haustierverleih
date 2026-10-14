@@ -1,4 +1,3 @@
-from app import app
 from flask import render_template, redirect, request, url_for, flash, session, abort
 from werkzeug.utils import secure_filename
 from functools import wraps
@@ -7,12 +6,13 @@ import os
 import sqlalchemy as sa
 from app import db
 from app.models import Roles, Users, AnimalTypes, Pets
+from app.main import bp
 
 # ---- DECORATORS AND GLOBAL FUNCTIONS ---- #
 # This function was taken from the official Flask documentation
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+           filename.rsplit('.', 1)[1].lower() in bp.config['ALLOWED_EXTENSIONS']
 
 
 # This decorator was taken from the official Flask documentation
@@ -20,7 +20,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not 'current_user' in session:
-            return redirect(url_for('login', next=request.url))
+            return redirect(url_for('auth.login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -34,81 +34,9 @@ def admin_required(f):
     return decorated_function
 
 # ---- ROUTES ---- #
-# --- AUTHENTICATION --- #
-@app.route("/login", methods=['GET', 'POST'])
-def login():
-    """Login-Seite"""
-    if request.method == 'POST':
-        # -- FORM VALIDATION -- #
-        username = request.form.get('Username')
-        password = request.form.get('Password')
-        # check required fields
-        if username == "" or password == "":
-            flash("Bitte gib deine Anmeldedaten ein.", 'error')
-        # -- DATABASE HANDLING -- #
-        username = username.lower()
-        user = db.session.scalar(
-            sa.select(Users).where(Users.username == username)
-        )
-        # -- LOGIN HANDLING -- #
-        if user is None or not user.check_password(password):
-            flash("Die Anmeldedaten stimmen nicht überein", 'error')
-        else:
-            user.login()
-            flash("Anmeldung erfolgreich.", 'success')
-            return redirect(url_for('index'))
-    return render_template('auth/login.html', current_user=None)
-
-
-@app.route("/register", methods=['GET', 'POST'])
-def register():
-    """Seite zur Account-Erstellung"""
-    role_user = db.session.scalar(
-            sa.select(Roles).where(Roles.role == 'user')
-        )
-    if request.method == 'POST':
-        # -- FORM VALIDATION -- #
-        username = request.form.get('Username')
-        password = request.form.get('Password')
-        password_repeat = request.form.get('Password-Repeat')
-        # check required fields
-        if username == "" or password == "" or password_repeat == "":
-            flash("Netter Versuch, so klappt das aber nicht.", 'error')
-        elif password != password:
-            flash("Die Passworteingabe stimmt nicht überein", 'error')
-        # -- DATABASE HANDLING -- #
-        else:
-            username = username.lower()
-            user = db.session.scalar(
-            sa.select(Users).where(Users.username == username)
-            )
-            if user is None:
-                user = Users(username=username, role_id=role_user.role_id)
-                user.set_password(password)
-                db.session.add(user)
-                db.session.commit()
-                user.login()
-                flash("Glückwunsch! Du bist jetzt registriert.", 'success')
-                return redirect(url_for('index'))
-            else: 
-                flash(
-                    'Diesen Benutzer gibt es bereits, bitte wähle einen anderen Benutzernamen.',
-                    'error'
-                    )
-    return render_template('auth/register.html', current_user=None)
-
-
-@app.route("/logout")
-@login_required
-def logout():
-    """Leer; wird für den Logout benötigt"""
-    session.pop('current_user', None)
-    return redirect(url_for('login', next=request.url))
-
-
 # --- MAIN --- #
-@app.route("/")
-@app.route("/index")
+@bp.route("/")
+@bp.route("/index")
 @login_required
 def index():
     """Startseite mit Liste aller Tiere"""
@@ -119,7 +47,7 @@ def index():
         current_user=session['current_user'],
         )
 
-@app.route("/pet/<int:pet_id>")
+@bp.route("/pet/<int:pet_id>")
 @login_required
 def pet(pet_id):
     """Zeigt die Details eines Tieres an"""
@@ -129,7 +57,7 @@ def pet(pet_id):
     return render_template('pet.html', pet=pet, current_user=session['current_user'])
 
 
-@app.route("/pet/<int:pet_id>/edit", methods=['GET', 'POST'])
+@bp.route("/pet/<int:pet_id>/edit", methods=['GET', 'POST'])
 @login_required
 def edit_pet(pet_id):
     """Seite zum Bearbeiten eines Tieres"""
@@ -147,7 +75,7 @@ def edit_pet(pet_id):
                 if image and allowed_file(image.filename):
                     filename = secure_filename(image.filename)
                     filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
-                    image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    image.save(os.path.join(bp.config['UPLOAD_FOLDER'], filename))
                 else:
                     flash("Das Bild konnte nicht hochgeladen werden.", "warning")
         # check required fields
@@ -166,14 +94,14 @@ def edit_pet(pet_id):
                 }
             )
             if filename is not None:
-                pet.delete_image(app.config['UPLOAD_FOLDER'])
+                pet.delete_image(bp.config['UPLOAD_FOLDER'])
                 pet.image = filename
             db.session.commit()
             flash(
                 "Glückwunsch! Deine Änderungen wurde erfolgreich gespeichert.", 
                 "success"
                 )
-            return redirect(url_for('pet', pet_id=pet_id))
+            return redirect(url_for('main.pet', pet_id=pet_id))
     if pet is None or animal_types is None:
         abort(404)
     return render_template(
@@ -184,7 +112,7 @@ def edit_pet(pet_id):
         )
 
 
-@app.route("/pet/<int:pet_id>/delete")
+@bp.route("/pet/<int:pet_id>/delete")
 @login_required
 def delete_pet(pet_id):
     """Leer; wird zum Löschen eines Tieres benötigt"""
@@ -195,14 +123,14 @@ def delete_pet(pet_id):
     elif pet.owner_id != session['current_user']['user_id']:
         flash("Du kannst nur deine eigenen Haustiere löschen.", 'error')
         abort(400)
-    pet.delete_image(app.config['UPLOAD_FOLDER'])
+    pet.delete_image(bp.config['UPLOAD_FOLDER'])
     db.session.delete(pet)
     db.session.commit()
     flash("Das Haustier wurde erfolgreich gelöscht.", 'success')
-    return redirect(url_for('pet_management'))
+    return redirect(url_for('main.pet_management'))
 
 
-@app.route("/pet/<int:pet_id>/borrow")
+@bp.route("/pet/<int:pet_id>/borrow")
 @login_required
 def borrow_pet(pet_id):
     """Leer; wird für das Ausleihen benötigt"""
@@ -219,10 +147,10 @@ def borrow_pet(pet_id):
     pet.borrower_id = session['current_user']['user_id']
     db.session.commit()
     flash("Du leihst jetzt dieses Haustier aus.", 'success')
-    return redirect(url_for('pet', pet_id=pet_id))
+    return redirect(url_for('main.pet', pet_id=pet_id))
 
 
-@app.route("/pet/<int:pet_id>/return")
+@bp.route("/pet/<int:pet_id>/return")
 @login_required
 def return_pet(pet_id):
     """Leer; wird für das Zurückgeben benötigt"""
@@ -236,10 +164,10 @@ def return_pet(pet_id):
     pet.borrower_id = None
     db.session.commit()
     flash("Du hast das Haustier erfolgreich zurückgegeben.", 'success')
-    return redirect(url_for('pet', pet_id=pet_id))
+    return redirect(url_for('main.pet', pet_id=pet_id))
 
 
-@app.route("/pet-management")
+@bp.route("/pet-management")
 @login_required
 def pet_management():
     """Verwaltung eigener und geliehener Tiere"""
@@ -261,7 +189,7 @@ def pet_management():
         )
 
 
-@app.route("/pet/new", methods=['GET', 'POST'])
+@bp.route("/pet/new", methods=['GET', 'POST'])
 @login_required
 def new_pet():
     """Seite zum Anlegen neuer Tiere"""
@@ -278,7 +206,7 @@ def new_pet():
                 if image and allowed_file(image.filename):
                     filename = secure_filename(image.filename)
                     filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
-                    image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    image.save(os.path.join(bp.config['UPLOAD_FOLDER'], filename))
                 else:
                     flash("Das Bild konnte nicht hochgeladen werden.", "warning")
         # check if at least one required field is not filled
@@ -301,7 +229,7 @@ def new_pet():
                 "Glückwunsch! Dein Haustier wurde erfolgreich gespeichert.", 
                 'success'
             )
-            return redirect(url_for('pet_management'))
+            return redirect(url_for('main.pet_management'))
     return render_template(
         'add_pet.html', 
         animal_types=animal_types, 
@@ -310,7 +238,7 @@ def new_pet():
 
 
 # --- ADMINISTRATION --- #
-@app.route("/admin")
+@bp.route("/admin")
 @login_required
 @admin_required
 def admin():
@@ -325,7 +253,7 @@ def admin():
         )
 
 
-@app.route("/admin/user/<int:user_id>/edit", methods=['GET', 'POST'])
+@bp.route("/admin/user/<int:user_id>/edit", methods=['GET', 'POST'])
 @login_required
 @admin_required
 def edit_user(user_id):
@@ -344,7 +272,7 @@ def edit_user(user_id):
                 "Der Benutzer wurde erfolgreich aktualisiert.", 
                 'success'
             )
-            return redirect(url_for('admin'))
+            return redirect(url_for('admin.admin'))
     return render_template(
         'admin/edit_user.html', 
         user=user,
@@ -353,7 +281,7 @@ def edit_user(user_id):
         )
 
 
-@app.route("/admin/user/<int:user_id>/delete", methods=['GET', 'POST'])
+@bp.route("/admin/user/<int:user_id>/delete", methods=['GET', 'POST'])
 @login_required
 @admin_required
 def delete_user(user_id):
@@ -367,14 +295,14 @@ def delete_user(user_id):
         abort(400)
     pets = db.session.scalars(sa.select(Pets).where(Pets.owner_id == user_id))
     for pet in pets:
-        pet.delete_image(app.config['UPLOAD_FOLDER'])
+        pet.delete_image(bp.config['UPLOAD_FOLDER'])
     db.session.delete(user)
     db.session.commit()
     flash("Der Benutzer wurde erfolgreich gelöscht.", 'success')
-    return redirect(url_for('admin'))
+    return redirect(url_for('admin.admin'))
 
 
-@app.route("/admin/animal_type/new", methods=['GET', 'POST'])
+@bp.route("/admin/animal_type/new", methods=['GET', 'POST'])
 @login_required
 @admin_required
 def new_animal_type():
@@ -392,13 +320,13 @@ def new_animal_type():
                 "Glückwunsch! Eine neue Tierart wurde erfolgreich angelegt.", 
                 'success'
             )
-            return redirect(url_for('admin'))
+            return redirect(url_for('admin.admin'))
     return render_template(
         'admin/new_animal_type.html',
         current_user=session['current_user'],)
 
 
-@app.route("/admin/animal_type/<int:animal_type_id>/edit", methods=['GET', 'POST'])
+@bp.route("/admin/animal_type/<int:animal_type_id>/edit", methods=['GET', 'POST'])
 @login_required
 @admin_required
 def edit_animal_type(animal_type_id):
@@ -419,27 +347,8 @@ def edit_animal_type(animal_type_id):
                 "Der Benutzer wurde erfolgreich aktualisiert.", 
                 'success'
             )
-            return redirect(url_for('admin'))
+            return redirect(url_for('admin.admin'))
     return render_template(
         'admin/edit_animal_type.html',
         animal_type=animal_type,
         current_user=session['current_user'],)
-
-
-# --- ERRORS --- #
-@app.errorhandler(400)
-def bad_request(error):
-    """Behandelt die 400 Fehler"""
-    return render_template('errors/400.html', current_user=session['current_user']), 400
-
-
-@app.errorhandler(403)
-def forbidden(error):
-    """Behandelt die 403 Fehler"""
-    return render_template('errors/403.html', current_user=session['current_user']), 403
-
-
-@app.errorhandler(404)
-def page_not_found(error):
-    """Behandelt die 404 Fehler"""
-    return render_template('errors/404.html', current_user=session['current_user']), 404

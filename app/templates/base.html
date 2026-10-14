@@ -10,7 +10,7 @@
         <div class="content">
             <header>
                 <nav>
-                    <a href="{{ url_for('index')}}">
+                    <a href="{{ url_for('main.index')}}">
                         <img src="{{ url_for('static', filename='images/logo.png')}}" alt="Das Logo des Haustierverleihs">
                     </a>
                     <ul class="navigation">
@@ -18,21 +18,21 @@
                         <li>Moin {{current_user["username"]}}!</li>
                         {% if current_user['role'] == 'admin' %}
                         <li class="button">
-                            <a href="{{ url_for('admin') }}">Admin-Bereich</a>
+                            <a href="{{ url_for('admin.admin') }}">Admin-Bereich</a>
                         </li>
                         {% endif %}
                         <li class="button">
-                            <a href="{{ url_for('pet_management') }}">Meine Tiere</a>
+                            <a href="{{ url_for('main.pet_management') }}">Meine Tiere</a>
                         </li>
                         <li class="button">
-                            <a href="{{ url_for('logout') }}">Ausloggen</a>
+                            <a href="{{ url_for('auth.logout') }}">Ausloggen</a>
                         </li>
                         {% else %}
                         <li class="button">
-                            <a href="{{ url_for('register') }}">Registrieren</a>
+                            <a href="{{ url_for('auth.register') }}">Registrieren</a>
                         </li>
                         <li class="button">
-                            <a href="{{ url_for('login') }}">Einloggen</a>
+                            <a href="{{ url_for('auth.login') }}">Einloggen</a>
                         </li>
                         {% endif %}
                     </ul> 

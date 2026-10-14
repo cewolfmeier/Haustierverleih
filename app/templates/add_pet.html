@@ -1,7 +1,7 @@
 {% extends 'base.html' %} 
 
 {% block content %}
-<form action="{{url_for('new_pet')}}" method="post" enctype=multipart/form-data>
+<form action="{{url_for('main.new_pet')}}" method="post" enctype=multipart/form-data>
     <h1>Neues Haustier anlegen</h1>
     <label for="name">Name</label>
     <input type="text" name="Name" id="name" required>

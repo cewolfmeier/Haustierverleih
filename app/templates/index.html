@@ -1,14 +1,14 @@
 {% extends 'base.html' %} 
 
 {% block content %}
-<a href="{{ url_for('index')}}">
+<a href="{{ url_for('main.index')}}">
     <img src="{{ url_for('static', filename='images/logo.png')}}" alt="Das Logo des Haustierverleihs">
 </a>
 <h1>Willkommen beim Haustierverleih!</h1>
 <h2>Registrierte Haustiere</h2>
 <ul class="content-list">
     {% for pet in pets %}
-    <a href="{{url_for('pet', pet_id=pet.pet_id)}}">
+    <a href="{{url_for('main.pet', pet_id=pet.pet_id)}}">
     <li>
         {% if pet.image != None %}
         <img class="thumbnail" src="{{ url_for('static', filename='images/user_uploads/'+pet.image)}}" alt="">

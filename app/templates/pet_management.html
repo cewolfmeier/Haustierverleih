@@ -5,7 +5,7 @@
 <div class="main-content">
     <p>
         <strong>Deine eigenen Haustiere ({{owned_pets_counter}})</strong>
-        <a class="button-form" href="{{url_for('new_pet')}}">+ Neues Haustier anlegen</a>
+        <a class="button-form" href="{{url_for('main.new_pet')}}">+ Neues Haustier anlegen</a>
     </p>
     <table>
         <thead>
@@ -23,9 +23,9 @@
                 <td>{{ pet.animal_type.animal_type }}</td>
                 <td>{% if pet.borrower_id != None %}nicht {% endif %}verfügbar</td>
                 <td>
-                    <a class="button-table" href="{{ url_for('edit_pet', pet_id=pet.pet_id) }}">Bearbeiten</a> 
-                    <a class="button-table" href="{{ url_for('delete_pet', pet_id=pet.pet_id) }}">Löschen</a>
-                    <a class="button-table" href="{{ url_for('pet', pet_id=pet.pet_id) }}">Details</a>
+                    <a class="button-table" href="{{ url_for('main.edit_pet', pet_id=pet.pet_id) }}">Bearbeiten</a> 
+                    <a class="button-table" href="{{ url_for('main.delete_pet', pet_id=pet.pet_id) }}">Löschen</a>
+                    <a class="button-table" href="{{ url_for('main.pet', pet_id=pet.pet_id) }}">Details</a>
                 </td>
             </tr>
             {% endfor %}
@@ -51,7 +51,7 @@
             <td>{{ pet.name }}</td>
             <td>{{ pet.animal_type.animal_type }}</td>
             <td>{{ pet.owned.username }}</td>
-            <td><a class="button-table" href="{{ url_for('pet', pet_id=pet.pet_id) }}">Details</a></td>
+            <td><a class="button-table" href="{{ url_for('main.pet', pet_id=pet.pet_id) }}">Details</a></td>
             </tr>
             {% endfor %}
         </tbody>
