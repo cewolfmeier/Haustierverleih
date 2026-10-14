@@ -1,0 +1,38 @@
+/* global tag definition */
+body {
+    margin: 0px;
+    padding: 0px;
+    /*background-color: #a8aa8;
+    color: bisque; */
+}
+nav {
+    background: rgba(26, 25, 25);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+a {
+    text-decoration: none;
+}
+
+footer {
+    margin: 50px 0px 10px 0px;
+    text-align: center;
+    color: black;
+}
+/* navigation section */
+.navigation {
+    /*margin: 0px;
+    padding: 5px;*/
+    
+    color: white;
+    display: flex;
+    justify-content: center;
+    border-radius: 5px;
+    list-style-type: none;
+
+}
+
+nav img{
+   height: 50px; 
+}

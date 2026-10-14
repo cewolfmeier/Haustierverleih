@@ -8,17 +8,22 @@
     </head> 
     <body>
         <nav>
-            <ul>
+            <a href="{{ url_for('index')}}">
+                <img src="{{ url_for('static', filename='pictures/logo.png')}}" alt="Das Logo des Haustierverleihs">
+            </a>
+            <ul class="navigation">
                 {% if current_user != None %}
                 <li>Moin {{current_user["username"]}}!</li>
-                <li><a href="{{ url_for('logout') }}">Ausloggen</a></li>
+                <li><a href="{{ url_for('logout') }}" class="button">Ausloggen</a></li>
                 {% else %}
-                <li><a href="{{ url_for('register') }}">Registrieren</a></li>
-                <li><a href="{{ url_for('login') }}">Einloggen</a></li>
+                <li><a href="{{ url_for('register') }}" class="button">Registrieren</a></li>
+                <li><a href="{{ url_for('login') }}" class="button">Einloggen</a></li>
                 {% endif %}
-            </ul>
-            <img src="{{ url_for('static', filename='pictures/logo.png')}}" alt="Das logo des Haustierverleihs">
+            </ul> 
         </nav>
         {% block content %}{% endblock %}
+        <footer>
+            Haustierverleih 2025
+        </footer>
     </body> 
 </html>
