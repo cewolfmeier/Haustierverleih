@@ -237,3 +237,8 @@ th, td {
     list-style-type: none;
     background: rgb(0 0 0 / 20%);
 }
+
+.thumbnail {
+    margin: 10px;
+    border-radius: 100%;
+}
