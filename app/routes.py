@@ -4,6 +4,7 @@ import mysql.connector
 from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+import uuid
 
 # ---- DECORATORS AND GLOBAL FUNCTIONS ---- #
 def get_db_connection(): 
@@ -349,6 +350,8 @@ def pet_management():
 @login_required
 def new_pet():
     """Seite zum Anlegen neuer Tiere"""
+    #myuuid = uuid.uuid4()
+    #print(str(myuuid))
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
     cursor.execute('''SELECT * FROM animal_types''')
@@ -357,6 +360,8 @@ def new_pet():
         name = request.form.get('Name')
         description = request.form.get('Beschreibung')
         animal_type = request.form.get('Tierart')
+        image = request.form.get('image')
+        print(image)
         # check if at least one required field is not filled
         if name == "" or description == "" or animal_type == "":
             flash(
