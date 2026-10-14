@@ -57,15 +57,13 @@ def admin():
     """Admin-Bereich"""
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute('SELECT * FROM users')
+    cursor.execute(f'''SELECT *
+                    FROM users
+                    INNER JOIN roles 
+                       ON users.role_id = roles.role_id
+                   ''')
     users = cursor.fetchall()
-    cursor.execute('SELECT * FROM roles')
-    roles = cursor.fetchall()
     connection.close()
-    for user in users:
-        for role in roles:
-            if user["role_id"] == role["role_id"]:
-                user["role"] = role["role"]
     return render_template('admin.html', users=users, current_user=current_user)
 
 
@@ -141,20 +139,19 @@ def pet_management():
                     FROM pets
                     INNER JOIN animal_types 
                        ON pets.animal_type_id = animal_types.animal_type_id
+                   WHERE pets.owner_id = {current_user['user_id']}
                    ''')
-    pets = cursor.fetchall()
+    owned_pets = cursor.fetchall()
+    cursor.execute(f'''SELECT * 
+                    FROM pets
+                    INNER JOIN animal_types 
+                       ON pets.animal_type_id = animal_types.animal_type_id
+                   WHERE pets.borrower_id = {current_user['user_id']}
+                   ''')
+    borrowed_pets = cursor.fetchall()
     connection.close()
-    owned_pets = []
-    owned_pets_counter = 0
-    borrowed_pets = []
-    borrowed_pets_counter = 0
-    for pet in pets:
-        if pet["owner_id"] == current_user["user_id"]:
-            owned_pets.append(pet)
-            owned_pets_counter += 1
-        elif pet["borrower_id"] == current_user["user_id"]:
-            borrowed_pets.append(pet)
-            borrowed_pets_counter += 1
+    owned_pets_counter = len(owned_pets)
+    borrowed_pets_counter = len(borrowed_pets)
     return render_template(
         'pet_management.html', 
         borrowed_pets=borrowed_pets, 
