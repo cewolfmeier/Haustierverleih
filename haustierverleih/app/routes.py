@@ -1,4 +1,5 @@
 from app import app
+from flask import url_for
 from markupsafe import escape, Markup
 
 pets = [
@@ -83,7 +84,7 @@ def index():
     for pet in pets:
         pets_html += f"""
 <li>
-    <h2>{escape(pet["name"])}</h2>
+    <h2>{escape(pet["name"])} ({pet["animal_type"]})</h2>
     <br>{escape(pet["description"])}
     <br>Besitzer: {pet["owner_id"]}
     <br>{"Aktuell" if pet["borrower_id"] is None else "Nicht"} verfügbar
@@ -92,10 +93,12 @@ def index():
 
     content = f"""
 <h1>Haustierverleih</h1>
-<p>Registrierte Haustiere</p>
-<ul>
-{pets_html}
-</ul>
+<div>
+    <p>Registrierte Haustiere</p>
+    <ul>
+    {pets_html}
+    </ul>
+</div>
 """
     return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
@@ -141,9 +144,31 @@ def delete_user():
 
 
 @app.route("/pet/<pet_id>")
-def pet(pet_id: int):
+def pet(pet_id):
     """Zeigt die Details eines Tieres an"""
-    content = """"""
+    pet_dict = None
+    content = f'<a href="{url_for("index")}">zurück</a>\n'
+    
+    if pet_id.isdecimal(): 
+        pet_id = int(pet_id)
+        for pet in pets:
+            if pet["pet_id"] == pet_id:
+                pet_dict = pet
+                break
+    if pet_dict is None:
+        content+= "<p>Sorry, dieses Haustier gibt es nicht.</p>"
+    else:
+        content+= f"""
+<div>
+    <h1>{escape(pet_dict["name"])}</h1>
+    <p>{escape(pet_dict["description"])}</p>
+    <ul>
+        <li>Tierart: {pet_dict["animal_type"]}</li>
+        <li>Besitzer-ID: {pet_dict["owner_id"]}</li>
+        <li>Verfügbarkeit: {"" if pet_dict["borrower_id"] else "nicht "}verfügbar</li>
+    </ul>
+</div>
+"""
     return TEMPLATE_UPPER + content + TEMPLATE_LOWER
 
 
