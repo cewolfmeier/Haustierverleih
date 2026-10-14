@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, redirect, request, url_for, flash, session
+from flask import render_template, redirect, request, url_for, flash, session, abort
 import mysql.connector
 from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -30,7 +30,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not 'admin' in session['current_user']['role']:
-            return redirect(url_for('forbidden'))
+            abort(403)
         return f(*args, **kwargs)
     return decorated_function
 
