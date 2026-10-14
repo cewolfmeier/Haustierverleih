@@ -49,8 +49,8 @@
             {% for pet in borrowed_pets %}
             <tr>
             <td>{{ pet.name }}</td>
-            <td>{{ pet.animal_type.animal_type }}</td>
-            <td>{{ pet.owned.username }}</td>
+            <td>{{ pet.animal_type }}</td>
+            <td>{{ pet.owned }}</td>
             <td><a class="button-table" href="{{ url_for('main.pet', pet_id=pet.pet_id) }}">Details</a></td>
             </tr>
             {% endfor %}

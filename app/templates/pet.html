@@ -9,8 +9,8 @@
     <h2>{{ pet.name }}</h2>
     <p>{{ pet.description }}</p>
     <ul>
-        <li>Tierart: {{ pet.animal_type.animal_type }}</li>
-        <li>Besitzer: {{ pet.owned.username }}</li>
+        <li>Tierart: {{ pet.animal_type }}</li>
+        <li>Besitzer: {{ pet.owned }}</li>
         <li>Verfügbarkeit: {% if pet.borrower_id != None %}nicht {% endif %}verfügbar</li>
     </ul>
     {% if current_user['user_id'] == pet.owner_id%}

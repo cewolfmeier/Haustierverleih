@@ -15,7 +15,7 @@
         {% endif %}
         <h2>{{ pet.name }} ({{ pet.animal_type.animal_type }})</h2>
         <br>{{ pet.description }}
-        <br>Besitzer: {{ pet.owned.username }}
+        <br>Besitzer: {{ pet.owned }}
         <br>{% if pet.borrower_id == None %}Aktuell{% else %}Nicht{% endif %} verfügbar   
     </li>
     </a>
