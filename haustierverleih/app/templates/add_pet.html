@@ -1,0 +1,18 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+<form action="{{url_for('new_pet')}}" method="post">
+    <h1>Neues Haustier anlegen</h1>
+    <label for="name">Name</label>
+    <input type="text" name="Name" id="name" required>
+    <label for="pet_description">Beschreibung</label>
+    <input type="text" name="Beschreibung" id="pet_description" required>
+    <label for="animal_type">Tierart</label>
+    <select name="Tierart" id="animal_type">
+        {% for type in animal_types %}
+        <option value="{{ type['animal_type_id'] }}">{{ type['animal_type'] }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Tier anlegen">
+</form>
+{% endblock %}
