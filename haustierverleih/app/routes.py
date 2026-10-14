@@ -16,91 +16,6 @@ current_user = {
     "user_id": 1,
     "username": "root"
 }
-ROLES = [
-    {
-        "role_id": 1,
-        "role": 'admin'
-    },
-    {
-        "role_id": 2,
-        "role": 'user'
-    },
-]
-USERS = [
-    {
-        "user_id": 1,
-        "username": "root",
-        "role_id": 1
-    },
-    {
-        "user_id": 2,
-        "username": "herbert",
-        "role_id": 2
-    },
-    {
-        "user_id": 3,
-        "username": "herta",
-        "role_id": 2
-    }
-]
-pets = [
-    {
-        "pet_id": 1,
-        "name": "Thor II",
-        "description": "Ein nordischer Hund",
-        "animal_type": "dog",
-        "owner_id": 1,
-        "borrower_id": None,
-    },
-    {
-        "pet_id": 2,
-        "name": "Blacky",
-        "description": "Eine kleine schwarze Katze",
-        "animal_type": "cat",
-        "owner_id": 1,
-        "borrower_id": None,
-    },
-    {
-        "pet_id": 3,
-        "name": "Mauzi",
-        "description": "Eine Katze",
-        "animal_type": "cat",
-        "owner_id": 1,
-        "borrower_id": None,
-    },
-    {
-        "pet_id": 4,
-        "name": "Maggy the Dog",
-        "description": "Es ist Maggy!",
-        "animal_type": "dog",
-        "owner_id": 1,
-        "borrower_id": None,
-    },
-    {
-        "pet_id": 5,
-        "name": "Keks",
-        "description": "Bitte nicht essen",
-        "animal_type": "dog",
-        "owner_id": 1,
-        "borrower_id": None,
-    },
-    {
-        "pet_id": 6,
-        "name": "Schmackes",
-        "description": "Geht ab wie Schmidts Katze",
-        "animal_type": "dog",
-        "owner_id": 2,
-        "borrower_id": 1,
-    },
-    {
-        "pet_id": 7,
-        "name": "Herr von Bödefeld",
-        "description": "Hat mehr Klasse als du je haben wirst",
-        "animal_type": "cat",
-        "owner_id": 2,
-        "borrower_id": 1,
-    },
-]
 
 TEMPLATE_UPPER = """
 <!doctype html>
@@ -122,6 +37,15 @@ TEMPLATE_LOWER = """
 @app.route("/index")
 def index():
     """Startseite mit Liste aller Tiere"""
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute(f'''SELECT * 
+                    FROM pets
+                    INNER JOIN animal_types 
+                       ON pets.animal_type_id = animal_types.animal_type_id
+                   ''')
+    pets = cursor.fetchall()
+    connection.close()
     return render_template('index.html', pets=pets, current_user=current_user)
 
 
@@ -148,9 +72,15 @@ def logout():
 @app.route("/admin")
 def admin():
     """Admin-Bereich"""
-    users = USERS
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM users')
+    users = cursor.fetchall()
+    cursor.execute('SELECT * FROM roles')
+    roles = cursor.fetchall()
+    connection.close()
     for user in users:
-        for role in ROLES:
+        for role in roles:
             if user["role_id"] == role["role_id"]:
                 user["role"] = role["role"]
     return render_template('admin.html', users=users, current_user=current_user)
@@ -172,27 +102,41 @@ def delete_user():
 @app.route("/pet/<pet_id>")
 def pet(pet_id):
     """Zeigt die Details eines Tieres an"""
-    pet_dict = None   
+    pet = None
     if pet_id.isdecimal(): 
         pet_id = int(pet_id)
-        for pet in pets:
-            if pet["pet_id"] == pet_id:
-                pet_dict = pet
-                break
-    return render_template('pet.html', pet=pet_dict, current_user=current_user)
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(f'''SELECT * 
+                    FROM pets
+                    INNER JOIN animal_types 
+                       ON pets.animal_type_id = animal_types.animal_type_id
+                    WHERE pets.pet_id = {pet_id}''')
+        result = cursor.fetchall()
+        if len(result) == 1:
+            pet = result
+        connection.close()
+    return render_template('pet.html', pet=pet, current_user=current_user)
 
 
 @app.route("/pet/<pet_id>/edit")
 def edit_pet(pet_id: int):
     """Seite zum Bearbeiten eines Tieres"""
-    pet_dict = None   
+    pet = None
     if pet_id.isdecimal(): 
         pet_id = int(pet_id)
-        for pet in pets:
-            if pet["pet_id"] == pet_id:
-                pet_dict = pet
-                break
-    return render_template('edit_pet.html', pet=pet_dict, current_user=current_user)
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(f'''SELECT * 
+                    FROM pets
+                    INNER JOIN animal_types 
+                       ON pets.animal_type_id = animal_types.animal_type_id
+                    WHERE pets.pet_id = {pet_id}''')
+        result = cursor.fetchall()
+        if len(result) == 1:
+            pet = result
+        connection.close()
+    return render_template('edit_pet.html', pet=pet, current_user=current_user)
 
 
 @app.route("/pet/<pet_id>/delete")
@@ -218,6 +162,15 @@ def return_pet(pet_id: int):
 @app.route("/pet-management")
 def pet_management():
     """Verwaltung eigener und geliehener Tiere"""
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute(f'''SELECT * 
+                    FROM pets
+                    INNER JOIN animal_types 
+                       ON pets.animal_type_id = animal_types.animal_type_id
+                   ''')
+    pets = cursor.fetchall()
+    connection.close()
     owned_pets = []
     owned_pets_counter = 0
     borrowed_pets = []
