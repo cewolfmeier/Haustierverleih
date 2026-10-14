@@ -90,12 +90,18 @@ def register():
                            VALUES (%s, %s, %s)''', 
                            (username, generate_password_hash(password), role_id_user['role_id'])) 
             connection.commit() 
-            connection.close()
             flash(
                 "Glückwunsch! Du bist jetzt registriert.", 
                 'success'
             )
-            session['username'] = username
+            cursor.execute(f'''SELECT *
+                    FROM users
+                    INNER JOIN roles ON roles.role_id = users.role_id
+                    WHERE username = %s
+                   ''', (username,))
+            user = cursor.fetchone()
+            connection.close()
+            session['current_user'] = user
             return redirect(url_for('index'))
     connection.close()
     return render_template('auth/register.html', current_user=None)
