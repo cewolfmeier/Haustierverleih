@@ -195,28 +195,15 @@ def edit_pet(pet_id):
 @login_required
 def delete_pet(pet_id):
     """Leer; wird zum Löschen eines Tieres benötigt"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('''SELECT * 
-                FROM pets
-                WHERE pets.pet_id = %s''', 
-                (pet_id,))
-    pet = cursor.fetchone()
+    pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
     if pet is None:
-        connection.close()
         flash("Dieses Haustier existiert nicht.", 'error')
         abort(404)
-    elif pet['owner_id'] != session['current_user']['user_id']:
-        connection.close()
+    elif pet.owner_id != session['current_user']['user_id']:
         flash("Du kannst nur deine eigenen Haustiere löschen.", 'error')
         abort(400)
-    cursor.execute('''
-                   DELETE FROM pets
-                   WHERE pet_id = %s
-                   AND owner_id = %s
-                   ''', (pet_id, session['current_user']['user_id'],))
-    connection.commit()
-    connection.close()
+    db.session.delete(pet)
+    db.session.commit()
     flash("Das Haustier wurde erfolgreich gelöscht.", 'success')
     return redirect(url_for('pet_management'))
 
@@ -225,35 +212,18 @@ def delete_pet(pet_id):
 @login_required
 def borrow_pet(pet_id):
     """Leer; wird für das Ausleihen benötigt"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('''SELECT * 
-                FROM pets
-                WHERE pets.pet_id = %s''', 
-                (pet_id,))
-    pet = cursor.fetchone()
+    pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
     if pet is None:
-        connection.close()
         flash("Dieses Haustier existiert nicht.", 'error')
         abort(404)
-    elif pet['owner_id'] == session['current_user']['user_id']:
-        connection.close()
+    elif pet.owner_id == session['current_user']['user_id']:
         flash("Du kannst deine eigenen Haustiere nicht ausleihen.", 'error')
         abort(400)
-    elif not pet['borrower_id'] is None:
-        connection.close()
+    elif pet.borrower_id is not None:
         flash("Dieses Haustier ist bereits verliehen", 'error')
         abort(400)
-    cursor.execute('''
-                   UPDATE pets 
-                   SET borrower_id = %s
-                   WHERE pet_id = %s
-                   AND borrower_id is NULL''', 
-                   (session['current_user']['user_id'],
-                    pet_id, 
-                    ))
-    connection.commit()
-    connection.close()
+    pet.borrower_id = session['current_user']['user_id']
+    db.session.commit()
     flash("Du leihst jetzt dieses Haustier aus.", 'success')
     return redirect(url_for('pet', pet_id=pet_id))
 
@@ -262,28 +232,15 @@ def borrow_pet(pet_id):
 @login_required
 def return_pet(pet_id):
     """Leer; wird für das Zurückgeben benötigt"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('''SELECT * 
-                FROM pets
-                WHERE pets.pet_id = %s''', 
-                (pet_id,))
-    pet = cursor.fetchone()
+    pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
     if pet is None:
-        connection.close()
         flash("Dieses Haustier existiert nicht.", 'error')
         abort(404)
-    elif pet['borrower_id'] != session['current_user']['user_id']:
-        connection.close()
+    elif pet.borrower_id != session['current_user']['user_id']:
         flash("Dieses Haustier kann von dir nicht zurückgegeben werden.", 'error')
         abort(400)
-    cursor.execute('''
-                   UPDATE pets 
-                   SET borrower_id = null
-                   WHERE pet_id = %s''', 
-                   (pet_id,))
-    connection.commit()
-    connection.close()
+    pet.borrower_id = None
+    db.session.commit()
     flash("Du hast das Haustier erfolgreich zurückgegeben.", 'success')
     return redirect(url_for('pet', pet_id=pet_id))
 
