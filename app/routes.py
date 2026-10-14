@@ -26,6 +26,15 @@ def login_required(f):
     return decorated_function
 
 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not 'admin' in session['current_user']['role']:
+            return redirect(url_for('forbidden'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @app.route("/")
 @app.route("/index")
 @login_required
@@ -123,6 +132,7 @@ def logout():
 
 @app.route("/admin")
 @login_required
+@admin_required
 def admin():
     """Admin-Bereich"""
     connection = get_db_connection()
@@ -350,3 +360,8 @@ def new_pet():
 def page_not_found(error):
     """Behandelt die 404 Fehler"""
     return render_template('errors/404.html', current_user=session['current_user']), 404
+
+@app.errorhandler(403)
+def forbidden(error):
+    """Behandelt die 403 Fehler"""
+    return render_template('errors/403.html', current_user=session['current_user']), 403
