@@ -155,19 +155,43 @@ def delete_pet(pet_id):
                    ''', (pet_id, current_user['user_id'],))
     connection.commit()
     connection.close()
+    flash("Das Haustier wurde erfolgreich gelöscht.")
     return redirect(url_for('pet_management'))
 
 
 @app.route("/pet/<int:pet_id>/borrow")
 def borrow_pet(pet_id):
     """Leer; wird für das Ausleihen benötigt"""
-    pass
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''
+                   UPDATE pets 
+                   SET borrower_id = %s
+                   WHERE pet_id = %s
+                   AND borrower_id is NULL''', 
+                   (current_user['user_id'],
+                    pet_id, 
+                    ))
+    connection.commit()
+    connection.close()
+    flash("Du leihst jetzt dieses Haustier aus.")
+    return redirect(url_for('pet', pet_id=pet_id))
 
 
 @app.route("/pet/<int:pet_id>/return")
 def return_pet(pet_id):
     """Leer; wird für das Zurückgeben benötigt"""
-    pass
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''
+                   UPDATE pets 
+                   SET borrower_id = null
+                   WHERE pet_id = %s''', 
+                   (pet_id,))
+    connection.commit()
+    connection.close()
+    flash("Du hast das Haustier erfolgreich zurückgegeben.")
+    return redirect(url_for('pet', pet_id=pet_id))
 
 
 @app.route("/pet-management")
