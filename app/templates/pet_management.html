@@ -50,7 +50,7 @@
             <tr>
             <td>{{ pet.name }}</td>
             <td>{{ pet.animal_type.animal_type }}</td>
-            <td>{{ pet.username }}</td>
+            <td>{{ pet.owned.username }}</td>
             <td><a class="button-table" href="{{ url_for('pet', pet_id=pet.pet_id) }}">Details</a></td>
             </tr>
             {% endfor %}
