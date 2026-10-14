@@ -36,6 +36,19 @@ footer {
 
 }
 
+table{
+    border-collapse: collapse;
+    border-radius: 10px;
+    border-style: solid;
+    background: rgb(0 0 0 / 10%);
+}
+
+th, td {
+  padding: 10px;
+  border-style: solid;
+  border-color: rgb(0 0 0 / 20%);
+}
+
 /* classes */
 /* navigation section */
 .navigation {
