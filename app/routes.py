@@ -1,7 +1,7 @@
 from app import app
 from flask import render_template, redirect, request, url_for, flash, session, abort
 import mysql.connector
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
 import uuid
@@ -49,8 +49,6 @@ def admin_required(f):
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     """Login-Seite"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
     if request.method == 'POST':
         username = request.form.get('Username')
         password = request.form.get('Password')
@@ -73,18 +71,15 @@ def login():
                 'role' : user.role.role,
                 }
             return redirect(url_for('index'))
-    connection.close()
     return render_template('auth/login.html', current_user=None)
 
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     """Seite zur Account-Erstellung"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('''SELECT role_id FROM roles
-                   WHERE role = "user"''')
-    role_id_user = cursor.fetchone()
+    role_user = db.session.scalar(
+            sa.select(Roles).where(Roles.role == 'user')
+        )
     if request.method == 'POST':
         username = request.form.get('Username')
         password = request.form.get('Password')
@@ -95,26 +90,23 @@ def register():
         elif password != password:
             flash("Die Passworteingabe stimmt nicht überein", 'error')
         else:
-            cursor.execute('''
-                           INSERT INTO users 
-                           (username, password_hash, role_id) 
-                           VALUES (%s, %s, %s)''', 
-                           (username, generate_password_hash(password), role_id_user['role_id'])) 
-            connection.commit() 
+            new_user = Users(username = username, role_id = role_user.role_id)
+            new_user.set_password(password)
+            db.session.add(new_user)
+            db.session.commit()
             flash(
                 "Glückwunsch! Du bist jetzt registriert.", 
                 'success'
             )
-            cursor.execute(f'''SELECT *
-                    FROM users
-                    INNER JOIN roles ON roles.role_id = users.role_id
-                    WHERE username = %s
-                   ''', (username,))
-            user = cursor.fetchone()
-            connection.close()
-            session['current_user'] = user
+            user = db.session.scalar(
+                sa.select(Users).where(Users.username == username)
+            )
+            session['current_user'] = {
+                'user_id':user.user_id,
+                'username' : user.username,
+                'role' : user.role.role,
+                }
             return redirect(url_for('index'))
-    connection.close()
     return render_template('auth/register.html', current_user=None)
 
 
@@ -132,16 +124,7 @@ def logout():
 @login_required
 def index():
     """Startseite mit Liste aller Tiere"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute(f'''SELECT *
-                    FROM pets
-                    INNER JOIN animal_types 
-                       ON pets.animal_type_id = animal_types.animal_type_id
-                    INNER JOIN users ON pets.owner_id = user_id
-                   ''')
-    pets = cursor.fetchall()
-    connection.close()
+    pets = db.session.scalars(sa.select(Pets)).all()
     return render_template(
         'index.html', 
         pets=pets, 
