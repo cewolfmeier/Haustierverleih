@@ -162,30 +162,14 @@ def delete_user():
 @app.route("/pet/<pet_id>")
 def pet(pet_id):
     """Zeigt die Details eines Tieres an"""
-    pet_dict = None
-    content = f'<a href="{url_for("index")}">zurück</a>\n'
-    
+    pet_dict = None   
     if pet_id.isdecimal(): 
         pet_id = int(pet_id)
         for pet in pets:
             if pet["pet_id"] == pet_id:
                 pet_dict = pet
                 break
-    if pet_dict is None:
-        content+= "<p>Sorry, dieses Haustier gibt es nicht.</p>"
-    else:
-        content+= f"""
-<div>
-    <h1>{escape(pet_dict["name"])}</h1>
-    <p>{escape(pet_dict["description"])}</p>
-    <ul>
-        <li>Tierart: {pet_dict["animal_type"]}</li>
-        <li>Besitzer-ID: {pet_dict["owner_id"]}</li>
-        <li>Verfügbarkeit: {"" if pet_dict["borrower_id"] else "nicht "}verfügbar</li>
-    </ul>
-</div>
-"""
-    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
+    return render_template('pet.html', pet=pet_dict, current_user=current_user)
 
 
 @app.route("/pet/<pet_id>/edit")
