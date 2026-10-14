@@ -78,6 +78,7 @@ TEMPLATE_LOWER = """
 """
 
 @app.route("/")
+@app.route("/index")
 def index():
     """Startseite mit Liste aller Tiere"""
     pets_html = ""
@@ -85,7 +86,7 @@ def index():
         pets_html += f"""
 <li>
     <h2>{escape(pet["name"])} ({pet["animal_type"]})</h2>
-    <br>{escape(pet["description"])}
+    {escape(pet["description"])}
     <br>Besitzer: {pet["owner_id"]}
     <br>{"Aktuell" if pet["borrower_id"] is None else "Nicht"} verfügbar
 </li>
