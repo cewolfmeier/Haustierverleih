@@ -123,9 +123,25 @@ def post_edit_pet(pet_id):
     return redirect(url_for('main.get_pet_edit', pet_id=pet_id))
 
 
-@bp.route("/pet/<int:pet_id>/delete")
+@bp.get("/pet/<int:pet_id>/delete")
 @login_required
-def delete_pet(pet_id):
+def get_delete_pet(pet_id):
+    """Leer; wird zum Löschen eines Tieres benötigt"""
+    pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
+    if pet is None:
+        flash("Dieses Haustier existiert nicht.", 'error')
+        abort(404)
+    elif pet.owner_id != session['current_user']['user_id']:
+        flash("Du kannst nur deine eigenen Haustiere löschen.", 'error')
+        abort(400)
+    return {
+        'petId' : pet.pet_id,
+        'name' : pet.name,
+    }
+
+@bp.post("/pet/<int:pet_id>/delete")
+@login_required
+def post_delete_pet(pet_id):
     """Leer; wird zum Löschen eines Tieres benötigt"""
     pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
     if pet is None:
