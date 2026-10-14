@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, redirect, request, url_for
+from flask import render_template, redirect, request, url_for, flash
 import mysql.connector
 from config import Config
 
@@ -169,12 +169,14 @@ def new_pet():
         name = request.form.get('Name')
         description = request.form.get('Beschreibung')
         animal_type = request.form.get('Tierart')
+        # check if at least one required field is not filled
         if name == "" or description == "":
             connection = get_db_connection()
             cursor = connection.cursor(dictionary=True)
             cursor.execute(f'''SELECT * FROM animal_types''')
             animal_types = cursor.fetchall()
             connection.close()
+            flash("Erwischt, du Schlauberger!")
         else:
             connection = get_db_connection() 
             cursor = connection.cursor() 
@@ -182,6 +184,7 @@ def new_pet():
                            (name, description, animal_type, current_user['user_id'])) 
             connection.commit() 
             connection.close()
+            flash("Glückwunsch! Dein Haustier wurde erfolgreich gespeichert.")
             return redirect(url_for('pet_management'))
     else:
         connection = get_db_connection()
