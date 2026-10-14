@@ -10,6 +10,9 @@ class Config:
     DATABASE_PASSWORD=os.environ.get('DATABASE_PASSWORD')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
-    UPLOAD_FOLDER = os.path.join(basedir, 'app/static/images/user_uploads')
+    UPLOAD_FOLDER = (os.environ.get('UPLOAD_FOLDER') 
+                     or os.mkdir('app/static/images/user_uploads') 
+                     if not os.path.exists('app/static/images/user_uploads') 
+                     else os.path.join(basedir, 'app/static/images/user_uploads'))
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
     MAX_CONTENT_LENGTH = 2 * 1000 * 1000 # Limit Uploads to 2 Megabyte
