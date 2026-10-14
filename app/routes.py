@@ -396,6 +396,15 @@ def edit_user(user_id):
 @admin_required
 def delete_user(user_id):
     """Leer; wird zum Löschen eines Benutzers benötigt"""
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''
+                   DELETE FROM users
+                   WHERE user_id = %s
+                   ''', (user_id,))
+    connection.commit()
+    connection.close()
+    flash("Der Benutzer wurde erfolgreich gelöscht.", 'success')
     return redirect(url_for('admin'))
 
 
