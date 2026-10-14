@@ -361,6 +361,10 @@ def delete_user(user_id):
     elif session['current_user']['role'] == "user":
         flash("Du darfst keine Benutzer löschen", 'error')
         abort(400)
+    pets = db.session.scalars(sa.select(Pets).where(Pets.owner_id == user_id))
+    for pet in pets:
+        if pet.image is not None:
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], pet.image))
     db.session.delete(user)
     db.session.commit()
     flash("Der Benutzer wurde erfolgreich gelöscht.", 'success')
