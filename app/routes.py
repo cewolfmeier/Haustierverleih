@@ -1,20 +1,26 @@
 from app import app
 from flask import render_template, redirect, request, url_for, flash, session, abort
 import mysql.connector
-from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from functools import wraps
 import uuid
+import os
 
 # ---- DECORATORS AND GLOBAL FUNCTIONS ---- #
 def get_db_connection(): 
     connection = mysql.connector.connect( 
         host="localhost", 
-        user=Config.DATABASE_USER, 
-        password=Config.DATABASE_PASSWORD, 
+        user=app.config['DATABASE_USER'], 
+        password=app.config['DATABASE_PASSWORD'], 
         database="haustierverleih" 
         ) 
     return connection
+
+# This function was taken from the official Flask documentation
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 
 # This decorator was taken from the official Flask documentation
@@ -350,8 +356,7 @@ def pet_management():
 @login_required
 def new_pet():
     """Seite zum Anlegen neuer Tiere"""
-    #myuuid = uuid.uuid4()
-    #print(str(myuuid))
+    filename = None
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
     cursor.execute('''SELECT * FROM animal_types''')
@@ -360,19 +365,29 @@ def new_pet():
         name = request.form.get('Name')
         description = request.form.get('Beschreibung')
         animal_type = request.form.get('Tierart')
-        image = request.form.get('image')
-        print(image)
+        if 'image' in request.files:
+            image = request.files['image']
+            if image and allowed_file(image.filename):
+                filename = secure_filename(image.filename)
+                filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
+                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                file_saved = True
+            else:
+                flash('Das Bild konnte nicht hochgeladen werden.', 'warning')
         # check if at least one required field is not filled
         if name == "" or description == "" or animal_type == "":
             flash(
                 "Einige Daten wurden nicht korrekt übertragen. Bitte erneut versuchen.",
                 "error")
         else:
-            cursor.execute('''
+            values= [name, description, animal_type, session['current_user']['user_id']]
+            if not filename is None:
+                values.append(filename)
+            values = tuple(values)
+            cursor.execute(f'''
                            INSERT INTO pets 
-                           (name, description, animal_type_id, owner_id) 
-                           VALUES (%s, %s, %s, %s)''', 
-                           (name, description, animal_type, session['current_user']['user_id'])) 
+                           (name, description, animal_type_id, owner_id {', image' if not filename is None else ''}) 
+                           VALUES (%s, %s, %s, %s{', %s' if not filename is None else ''})''', values) 
             connection.commit() 
             connection.close()
             flash(
