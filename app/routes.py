@@ -147,6 +147,8 @@ def pet(pet_id):
                 WHERE pets.pet_id = {pet_id}''')
     pet = cursor.fetchone()
     connection.close()
+    if pet is None:
+        abort(404)
     return render_template('pet.html', pet=pet, current_user=session['current_user'])
 
 
