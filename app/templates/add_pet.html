@@ -1,7 +1,7 @@
 {% extends 'base.html' %} 
 
 {% block content %}
-<form action="{{url_for('new_pet')}}" method="post">
+<form action="{{url_for('new_pet')}}" method="post" enctype=multipart/form-data>
     <h1>Neues Haustier anlegen</h1>
     <label for="name">Name</label>
     <input type="text" name="Name" id="name" required>
@@ -14,7 +14,7 @@
         {% endfor %}
     </select>
     <label for="image">Foto-Upload</label>
-    <input name="image" id="image" type="file" size="50" accept="text/*">
+    <input name="image" id="image" type="file">
     <input class="button-form" type="submit" value="Tier anlegen">
 </form>
 {% endblock %}
