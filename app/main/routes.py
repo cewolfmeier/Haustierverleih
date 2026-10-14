@@ -43,6 +43,7 @@ def index():
     pets = db.session.scalars(sa.select(Pets)).all()
     return render_template(
         'index.html', 
+        title="Hauptseite",
         pets=pets, 
         current_user=session['current_user'],
         )
@@ -54,7 +55,12 @@ def pet(pet_id):
     pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
     if pet is None:
         abort(404)
-    return render_template('pet.html', pet=pet, current_user=session['current_user'])
+    return render_template(
+        'pet.html', 
+        title=pet,
+        pet=pet, 
+        current_user=session['current_user']
+        )
 
 
 @bp.get("/pet/<int:pet_id>/edit")
@@ -66,6 +72,7 @@ def get_edit_pet(pet_id):
         abort(404)
     return render_template(
         'edit_pet.html',
+        title=f"{pet} bearbeiten",
         pet=pet,
         animal_types=animal_types, 
         current_user=session['current_user'],
@@ -184,7 +191,8 @@ def pet_management():
     owned_pets_counter = len(owned_pets)
     borrowed_pets_counter = len(borrowed_pets)
     return render_template(
-        'pet_management.html', 
+        'pet_management.html',
+        title="Meine Tiere",
         borrowed_pets=borrowed_pets, 
         owned_pets=owned_pets, 
         owned_pets_counter=owned_pets_counter, 
@@ -197,7 +205,8 @@ def pet_management():
 def get_new_pet():
     animal_types = db.session.scalars(sa.select(AnimalTypes)).all()
     return render_template(
-        'new_pet.html', 
+        'new_pet.html',
+        title="Neues Haustier anlegen",
         animal_types=animal_types, 
         current_user=session['current_user'],
         )
