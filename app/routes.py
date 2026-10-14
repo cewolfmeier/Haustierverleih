@@ -8,7 +8,7 @@ import uuid
 import os
 import sqlalchemy as sa
 from app import db
-from app.models import Roles, Users, Animal_Types, Pets
+from app.models import Roles, Users, AnimalTypes, Pets
 
 # ---- DECORATORS AND GLOBAL FUNCTIONS ---- #
 def get_db_connection(): 
@@ -145,7 +145,7 @@ def pet(pet_id):
 @login_required
 def edit_pet(pet_id):
     """Seite zum Bearbeiten eines Tieres"""
-    animal_types = db.session.scalars(sa.select(Animal_Types)).all()
+    animal_types = db.session.scalars(sa.select(AnimalTypes)).all()
     pet = db.session.scalar(sa.select(Pets).where(Pets.pet_id == pet_id))
     if request.method == 'POST':
         current_image = pet.image
@@ -274,7 +274,7 @@ def pet_management():
 def new_pet():
     """Seite zum Anlegen neuer Tiere"""
     filename = None
-    animal_types = db.session.scalars(sa.select(Animal_Types)).all()
+    animal_types = db.session.scalars(sa.select(AnimalTypes)).all()
     if request.method == 'POST':
         name = request.form.get('Name')
         description = request.form.get('Beschreibung')
@@ -320,17 +320,8 @@ def new_pet():
 @admin_required
 def admin():
     """Admin-Bereich"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('''SELECT * FROM animal_types''')
-    animal_types = cursor.fetchall()
-    cursor.execute(f'''SELECT *
-                    FROM users
-                    INNER JOIN roles 
-                       ON users.role_id = roles.role_id
-                   ''')
-    users = cursor.fetchall()
-    connection.close()
+    animal_types = db.session.scalars(sa.select(AnimalTypes)).all()
+    users = db.session.scalars(sa.select(Users)).all()
     return render_template(
         'admin/admin.html', 
         users=users, 
@@ -344,33 +335,21 @@ def admin():
 @admin_required
 def edit_user(user_id):
     """Bearbeiten eines Benutzers"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('''SELECT * FROM users
-                   WHERE user_id = %s''',
-                   (user_id,))
-    user = cursor.fetchone()
-    cursor.execute('''SELECT * FROM roles''')
-    roles = cursor.fetchall()
+    user = db.session.scalar(sa.select(Users).where(Users.user_id == user_id))
+    roles = db.session.scalars(sa.select(Roles)).all()
     if request.method == 'POST':
         role_id = request.form.get('roles')
         # check if at least one required field is not filled
         if role_id == "":
             flash("Erwischt, du Schlauberger!")
         else:
-            cursor.execute('''
-                   UPDATE users 
-                   SET role_id = %s
-                   WHERE user_id = %s''', 
-                   (role_id, user_id)) 
-            connection.commit() 
-            connection.close()
+            user.role_id = role_id
+            db.session.commit()
             flash(
                 "Der Benutzer wurde erfolgreich aktualisiert.", 
                 'success'
             )
             return redirect(url_for('admin'))
-    connection.close()
     return render_template(
         'admin/edit_user.html', 
         user=user,
@@ -384,14 +363,23 @@ def edit_user(user_id):
 @admin_required
 def delete_user(user_id):
     """Leer; wird zum Löschen eines Benutzers benötigt"""
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('''
-                   DELETE FROM users
-                   WHERE user_id = %s
-                   ''', (user_id,))
-    connection.commit()
-    connection.close()
+    #connection = get_db_connection()
+    #cursor = connection.cursor(dictionary=True)
+    #cursor.execute('''
+    #               DELETE FROM users
+    #               WHERE user_id = %s
+    #               ''', (user_id,))
+    #connection.commit()
+    #connection.close()
+    user = db.session.scalar(sa.select(Users).where(Users.user_id == user_id))
+    if user is None:
+        flash("Dieser Benutzer existiert nicht.", 'error')
+        abort(404)
+    elif session['current_user']['role'] == "user":
+        flash("Du darfst keine Benutzer löschen", 'error')
+        abort(400)
+    db.session.delete(user)
+    db.session.commit()
     flash("Der Benutzer wurde erfolgreich gelöscht.", 'success')
     return redirect(url_for('admin'))
 

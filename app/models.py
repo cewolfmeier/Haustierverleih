@@ -25,11 +25,14 @@ class Users(db.Model):
 
     owned_pets: so.WriteOnlyMapped['Pets'] = so.relationship(
         back_populates='owned', 
-        foreign_keys="Pets.owner_id"
+        foreign_keys="Pets.owner_id",
+        passive_deletes=True,
+        cascade='all, delete',
         )
     borrowed_pets: so.WriteOnlyMapped['Pets'] = so.relationship(
         back_populates='borrowed', 
-        foreign_keys="Pets.borrower_id"
+        foreign_keys="Pets.borrower_id",
+        passive_deletes=True,
         )
 
     def __repr__(self):
@@ -42,7 +45,7 @@ class Users(db.Model):
         return check_password_hash(self.password_hash, password)
     
 
-class Animal_Types(db.Model):
+class AnimalTypes(db.Model):
     __tablename__ = "animal_types"
     animal_type_id: so.Mapped[int] = so.mapped_column(primary_key=True)
     animal_type: so.Mapped[str] = so.mapped_column(sa.String(255), index=True,
@@ -60,17 +63,23 @@ class Pets(db.Model):
     name: so.Mapped[str] = so.mapped_column(sa.String(255), index=True)
     description: so.Mapped[str] = so.mapped_column(sa.String(255), index=True)
     image: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
-    animal_type_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Animal_Types
+    animal_type_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(AnimalTypes
                                                                     .animal_type_id)
                                                                     ,index=True)
-    owner_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Users.user_id)
+    owner_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Users.user_id, ondelete='CASCADE')
                                                                     ,index=True)
-    borrower_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Users.user_id)
-                                                                    ,index=True)
+    borrower_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Users.user_id, ondelete='SET NULL')
+                                                                    ,index=True, nullable=True)
     
-    animal_type: so.Mapped[Animal_Types] = so.relationship(back_populates='pets')
-    owned: so.Mapped[Users] = so.relationship(back_populates='owned_pets',foreign_keys="Pets.owner_id")
-    borrowed: so.Mapped[Users] = so.relationship(back_populates='borrowed_pets', foreign_keys="Pets.borrower_id")
+    animal_type: so.Mapped[AnimalTypes] = so.relationship(back_populates='pets')
+    owned: so.Mapped[Users] = so.relationship(
+        back_populates='owned_pets',
+        foreign_keys="Pets.owner_id",
+        )
+    borrowed: so.Mapped[Users] = so.relationship(
+        back_populates='borrowed_pets', 
+        foreign_keys="Pets.borrower_id",
+        )
 
     def __repr__(self):
         return '<Pet {}>'.format(self.name)
