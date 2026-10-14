@@ -1,0 +1,30 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+<h1>Benutzerverwaltung</h1>
+<div>
+    <p>Registrierte Benutzer</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Benutzername</th>
+                <th>Rolle</th>
+                <th>Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{user["username"]}}</td>
+                <td>{{user["role"]}}</td>
+                <td>
+                    <a href="">Löschen</a>
+                    <a href="">Bearbeiten</a>
+                    <a href="">Rechte verwalten</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
