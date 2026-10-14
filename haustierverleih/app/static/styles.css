@@ -18,13 +18,15 @@ a {
 footer {
     margin: 50px 0px 10px 0px;
     text-align: center;
-    color: black;
+    background: rgba(26, 25, 25);
+    color: white;
 }
+
+/* classes */
 /* navigation section */
 .navigation {
     /*margin: 0px;
     padding: 5px;*/
-    
     color: white;
     display: flex;
     justify-content: center;
@@ -33,6 +35,18 @@ footer {
 
 }
 
+/* content section */
+.content-list {
+    margin: 50px;
+    padding: 30px 10px;
+    background-image: url(static/root+color+grab.webp);
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+}
+ /* tag definition*/
 nav img{
    height: 50px; 
 }
