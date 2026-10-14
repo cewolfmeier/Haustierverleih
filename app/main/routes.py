@@ -5,7 +5,7 @@ import uuid
 import os
 import sqlalchemy as sa
 from app import db
-from app.models import Roles, Users, AnimalTypes, Pets
+from app.models import AnimalTypes, Pets
 from app.main import bp
 
 # ---- DECORATORS AND GLOBAL FUNCTIONS ---- #
