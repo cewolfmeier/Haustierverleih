@@ -17,22 +17,6 @@ current_user = {
     "username": "root"
 }
 
-TEMPLATE_UPPER = """
-<!doctype html>
-<html lang="de">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1"> 
-        <title>Haustierverleih</title> 
-    </head> 
-    <body>
-"""
-
-TEMPLATE_LOWER = """
-    </body> 
-</html>
-"""
-
 @app.route("/")
 @app.route("/index")
 def index():
@@ -52,15 +36,13 @@ def index():
 @app.route("/login")
 def login():
     """Login-Seite"""
-    content = """"""
-    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
+    return render_template('auth/login.html')
 
 
 @app.route("/register")
 def register():
     """Seite zur Account-Erstellung"""
-    content = """"""
-    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
+    return render_template('auth/register.html')
 
 
 @app.route("/logout")
@@ -89,8 +71,7 @@ def admin():
 @app.route("/edit_user")
 def edit_user():
     """Bearbeiten eines Benutzers"""
-    content = """"""
-    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
+    return render_template('edit_user.html')
 
 
 @app.route("/delete_user")
@@ -148,15 +129,13 @@ def delete_pet(pet_id: int):
 @app.route("/pet/<pet_id>/borrow")
 def borrow_pet(pet_id: int):
     """Leer; wird für das Ausleihen benötigt"""
-    content = """"""
-    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
+    pass
 
 
 @app.route("/pet/<pet_id>/return")
 def return_pet(pet_id: int):
     """Leer; wird für das Zurückgeben benötigt"""
-    content = """"""
-    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
+    pass
 
 
 @app.route("/pet-management")
@@ -195,16 +174,10 @@ def pet_management():
 @app.route("/pet/new")
 def new_pet():
     """Seite zum Anlegen neuer Tiere"""
-    content = """"""
-    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
+    return render_template('add_pet.html')
 
 
 @app.errorhandler(404)
 def page_not_found(error):
     """Behandelt die 404 Fehler"""
-    content = f"""
-    <a href="{url_for("index")}">zurück zur Startseite</a>
-    <h1>404 - Haustier nicht gefunden</h1>
-    <p>Ups, da ist uns wohl ein Haustier entfleucht. Wir fangen es schnell wieder ein.</p>
-"""
-    return TEMPLATE_UPPER + content + TEMPLATE_LOWER
+    return render_template('errors/404.html'), 404
