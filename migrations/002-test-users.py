@@ -11,8 +11,8 @@ USERS = [
 ]
 connection = mysql.connector.connect( 
         host="localhost", 
-        user="haustierverleih", 
-        password="haustierverleih", 
+        user="", 
+        password="", 
         database="haustierverleih" 
         )
 
