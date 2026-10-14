@@ -17,8 +17,14 @@ nav {
     justify-content: space-between;
     align-items: center;
 }
+
+nav img{
+   height: 100px; 
+}
+
 a {
     text-decoration: none;
+    text-decoration-color: black;
 }
 
 footer {
@@ -42,6 +48,13 @@ footer {
     border-radius: 5px;
     list-style-type: none;
 
+}
+
+.navigation li{
+    margin: 5px;
+    padding: 10px 12px;
+    text-align: center;
+    display: inline-block;
 }
 
 /* content section */
@@ -74,7 +87,25 @@ footer {
     justify-content: center;
     border-radius: 15px;
 }
- /* tag definition*/
-nav img{
-   height: 50px; 
+.content-list li:hover {
+    background: rgb(0 0 0 / 80%);
+}
+
+/* elemental definitions */
+.button {
+    margin: 5px;
+    padding: 10px 12px;
+    background: rgb(0 0 0 / 5%);
+    display: inline-block;
+    color: #163944;
+    border: none;
+    border-radius: 5px;
+}
+
+.button:hover {
+    background: rgb(0 0 0 / 20%);
+}
+
+.shadow {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
