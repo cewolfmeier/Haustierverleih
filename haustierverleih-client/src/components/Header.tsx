@@ -47,15 +47,6 @@ export default function Header(){
                     </li>
                 </ul> 
             </nav>
-        {/*
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-            <div className="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
-        */}
         </header>
     )
 }
