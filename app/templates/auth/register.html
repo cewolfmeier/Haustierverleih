@@ -1,5 +1,14 @@
 {% extends 'base.html' %} 
 
 {% block content %}
-
+<h1>Registrieren</h1>
+<form action="{{url_for('register')}}" method="post">
+    <label for="username">Benutzername</label>
+    <input type="text" name="Username" id="username" required>
+    <label for="password">Passwort</label>
+    <input type="password" name="Password" id="password" required>
+    <label for="password-repeat">Passwort wiederholen</label>
+    <input type="password" name="Password-Repeat" id="password-repeat" required>
+    <input class="button-form" type="submit" value="Registrieren">
+</form>
 {% endblock %}

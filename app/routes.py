@@ -2,6 +2,7 @@ from app import app
 from flask import render_template, redirect, request, url_for, flash
 import mysql.connector
 from config import Config
+from werkzeug.security import generate_password_hash
 
 def get_db_connection(): 
     connection = mysql.connector.connect( 
@@ -37,13 +38,39 @@ def index():
 @app.route("/login")
 def login():
     """Login-Seite"""
-    return render_template('auth/login.html')
+    return render_template('auth/login.html', current_user=current_user)
 
 
 @app.route("/register")
 def register():
     """Seite zur Account-Erstellung"""
-    return render_template('auth/register.html')
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''SELECT role_id FROM roles
+                   WHERE role = "user"''')
+    role_id_user = cursor.fetchone()
+    if request.method == 'POST':
+        username = request.form.get('Username')
+        password = request.form.get('Password')
+        password_repeat = request.form.get('Password-Repeat')
+        # check if at least one required field is not filled
+        if username == "" or password == "" or password_repeat == "":
+            flash("Netter Versuch, so klappt das aber nicht.", 'error')
+        else:
+            cursor.execute('''
+                           INSERT INTO users 
+                           (username, passoword, role_id) 
+                           VALUES (%s, %s, %s, %s)''', 
+                           (username, generate_password_hash(password), role_id_user)) 
+            connection.commit() 
+            connection.close()
+            flash(
+                "Glückwunsch! Dein Haustier wurde erfolgreich gespeichert.", 
+                'success'
+            )
+            return redirect(url_for('pet_management'))
+    connection.close()
+    return render_template('auth/register.html', current_user=current_user)
 
 
 @app.route("/logout")
