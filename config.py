@@ -8,6 +8,7 @@ load_dotenv(os.path.join(basedir, '.env'))
 class Config:
     DATABASE_USER=os.environ.get('DATABASE_USER')
     DATABASE_PASSWORD=os.environ.get('DATABASE_PASSWORD')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
     UPLOAD_FOLDER = os.path.join(basedir, 'app/static/images/user_uploads')
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}

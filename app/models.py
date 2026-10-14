@@ -1,0 +1,70 @@
+from typing import Optional
+import sqlalchemy as sa
+import sqlalchemy.orm as so
+from app import db
+
+class Roles(db.Model):
+    __tablename__ = "roles"
+    role_id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    role: so.Mapped[str] = so.mapped_column(sa.String(255), index=True, unique=True)
+
+    users: so.WriteOnlyMapped['Users'] = so.relationship(back_populates='role')
+
+    def __repr__(self):
+        return '<Role {}>'.format(self.role)
+
+class Users(db.Model):
+    __tablename__ = "users"
+    user_id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    username: so.Mapped[str] = so.mapped_column(sa.String(255), index=True, unique=True)
+    password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(255))
+    role_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Roles.role_id),index=True)
+
+    role: so.Mapped[Roles] = so.relationship(back_populates='users')
+
+    owned_pets: so.WriteOnlyMapped['Pets'] = so.relationship(
+        back_populates='owned', 
+        foreign_keys="Pets.owner_id"
+        )
+    borrowed_pets: so.WriteOnlyMapped['Pets'] = so.relationship(
+        back_populates='borrowed', 
+        foreign_keys="Pets.borrower_id"
+        )
+
+    def __repr__(self):
+        return '<User {}>'.format(self.username)
+    
+
+class Animal_Types(db.Model):
+    __tablename__ = "animal_types"
+    animal_type_id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    animal_type: so.Mapped[str] = so.mapped_column(sa.String(255), index=True,
+                                                   unique=True)
+
+    pets: so.WriteOnlyMapped['Pets'] = so.relationship(back_populates='animal_type')
+
+    def __repr__(self):
+        return '<Animal type {}>'.format(self.animal_type)
+    
+
+class Pets(db.Model):
+    __tablename__ = "pets"
+    pet_id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    name: so.Mapped[str] = so.mapped_column(sa.String(255), index=True)
+    description: so.Mapped[str] = so.mapped_column(sa.String(255), index=True)
+    image: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
+    animal_type_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Animal_Types
+                                                                    .animal_type_id)
+                                                                    ,index=True)
+    owner_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Users.user_id)
+                                                                    ,index=True)
+    borrower_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Users.user_id)
+                                                                    ,index=True)
+    
+    animal_type: so.Mapped[Animal_Types] = so.relationship(back_populates='pets')
+    owned: so.Mapped[Users] = so.relationship(back_populates='owned_pets',foreign_keys="Pets.owner_id")
+    borrowed: so.Mapped[Users] = so.relationship(back_populates='borrowed_pets', foreign_keys="Pets.borrower_id")
+
+    def __repr__(self):
+        return '<Pet {}>'.format(self.name)
+    
