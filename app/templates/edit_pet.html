@@ -2,21 +2,19 @@
 
 {% block content %}
 {% if pet != None %}
-<div>
-    <h1>Haustier {{ pet['name'] }} bearbeiten</h1>
-    <form action="{{url_for('edit_pet', pet_id=pet['pet_id'])}}" method="post">
-        <label for="pet_name">Name</label>
-        <input type="text" name="Name" id="pet_name" value="{{ pet['name']}}" required>
-        <label for="pet_description">Beschreibung</label>
-        <input type="text" name="Beschreibung" id="pet_description" value="{{ pet['description']}}" required>
-        <label for="animal_type">Tierart</label>
-        <select name="Tierart" id="animal_type">
-            {% for type in animal_types %}
-            <option value="{{ type['animal_type_id'] }}" {% if pet['animal_type_id']==type['animal_type_id'] %}selected{% endif %}>{{ type['animal_type'] }}</option>
-            {% endfor %}
-        </select>
-        <input class="button-form" type="submit" value="Speichern">
-    </form>
-</div>
+<h1>Haustier {{ pet['name'] }} bearbeiten</h1>
+<form action="{{url_for('edit_pet', pet_id=pet['pet_id'])}}" method="post">
+    <label for="pet_name">Name</label>
+    <input type="text" name="Name" id="pet_name" value="{{ pet['name']}}" required>
+    <label for="pet_description">Beschreibung</label>
+    <input type="text" name="Beschreibung" id="pet_description" value="{{ pet['description']}}" required>
+    <label for="animal_type">Tierart</label>
+    <select name="Tierart" id="animal_type">
+        {% for type in animal_types %}
+        <option value="{{ type['animal_type_id'] }}" {% if pet['animal_type_id']==type['animal_type_id'] %}selected{% endif %}>{{ type['animal_type'] }}</option>
+        {% endfor %}
+    </select>
+    <input class="button-form" type="submit" value="Speichern">
+</form>
 {% endif %}
 {% endblock %}

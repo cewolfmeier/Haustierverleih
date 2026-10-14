@@ -7,33 +7,37 @@
         <title>Haustierverleih</title> 
     </head> 
     <body>
-        <nav>
-            <a href="{{ url_for('index')}}">
-                <img src="{{ url_for('static', filename='pictures/logo.png')}}" alt="Das Logo des Haustierverleihs">
-            </a>
-            <ul class="navigation">
-                {% if current_user != None %}
-                <li>Moin {{current_user["username"]}}!</li>
-                <li class="button"><a href="{{ url_for('pet_management') }}">Tierverwaltung</a></li>
-                <li class="button"><a href="{{ url_for('logout') }}">Ausloggen</a></li>
-                {% else %}
-                <li class="button"><a href="{{ url_for('register') }}">Registrieren</a></li>
-                <li class="button"><a href="{{ url_for('login') }}">Einloggen</a></li>
-                {% endif %}
-            </ul> 
-        </nav>
         <div class="content">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
-        {% block content %}{% endblock %}
-        <footer>
-            Haustierverleih 2025
-        </footer>
+            <header>
+                <nav>
+                    <a href="{{ url_for('index')}}">
+                        <img src="{{ url_for('static', filename='pictures/logo.png')}}" alt="Das Logo des Haustierverleihs">
+                    </a>
+                    <ul class="navigation">
+                        {% if current_user != None %}
+                        <li>Moin {{current_user["username"]}}!</li>
+                        <li class="button"><a href="{{ url_for('pet_management') }}">Tierverwaltung</a></li>
+                        <li class="button"><a href="{{ url_for('logout') }}">Ausloggen</a></li>
+                        {% else %}
+                        <li class="button"><a href="{{ url_for('register') }}">Registrieren</a></li>
+                        <li class="button"><a href="{{ url_for('login') }}">Einloggen</a></li>
+                        {% endif %}
+                    </ul> 
+                </nav>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+            </header>
+            <main>
+                {% block content %}{% endblock %}
+            </main>
+            <footer>
+                Haustierverleih 2025
+            </footer>
         </div>
     </body> 
 </html>
