@@ -8,3 +8,8 @@ export type Me = {
     username: string;
     links: Link[];
 }
+
+export type animalType ={
+    animalTypeId: number;
+    animalType: string;
+}
