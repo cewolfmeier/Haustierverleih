@@ -1,5 +1,5 @@
-import { usePetsApiCall } from "../hooks/ApiHooks";
-import Pet from "../components/Pet";
+import { usePetsApiCall } from "../../hooks/ApiHooks";
+import Pet from "../../components/Pet";
 
 export default function IndexPage(){
     const pets = usePetsApiCall()

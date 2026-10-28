@@ -1,4 +1,4 @@
-import type { animalType } from "../Schemas";
+import type { animalType } from "../../Schemas";
 
 interface NewPetPageProps{
     animalTypes:animalType[]

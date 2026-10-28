@@ -1,7 +1,7 @@
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
-import IndexPage from "./pages/IndexPage";
+import IndexPage from "./pages/main/IndexPage";
 import FlashProvider from "./contexts/FlashProvider";
 
 function App() {
