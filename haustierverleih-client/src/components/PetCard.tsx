@@ -1,4 +1,4 @@
-interface PetProps {
+interface PetCardProps {
     props: {
         petId: number,
         name:string,
@@ -10,7 +10,7 @@ interface PetProps {
     };
 };
 
-export default function Pet({props}:PetProps){
+export default function PetCard({props}:PetCardProps){
     return (
         <a href="/"> {/* {{url_for('main.pet', pet_id=pet.pet_id)}}*/}
         <li className="shadow">

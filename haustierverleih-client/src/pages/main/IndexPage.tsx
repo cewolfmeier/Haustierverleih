@@ -1,8 +1,23 @@
-import { usePetsApiCall } from "../../hooks/ApiHooks";
-import Pet from "../../components/Pet";
+import { useEffect, useState } from "react";
+import PetCard from "../../components/PetCard";
+import { useApi } from "../../contexts/ApiProvider";
+import type { Pet } from "../../Schemas";
 
 export default function IndexPage(){
-    const pets = usePetsApiCall()
+    const api = useApi();
+    const [pets, setPets] = useState<Pet[] | null | undefined>();
+
+    useEffect(()=>{
+        (async () => {
+            const response = await api.get<Pet[]>("/pets");
+            if (response.ok && response.body) {
+                setPets(response.body)
+            } else {
+                setPets(null);
+            };
+        })();
+    }, [api]);
+
     return (
         <>
             <a href="/">        
@@ -21,7 +36,7 @@ export default function IndexPage(){
                         {pets.length === 0 ?
                             <p>Aktuell gibt es keine Haustiere zum zeigen.</p>
                             :
-                            pets.map(pet => <Pet key={pet.petId} props={pet} />)
+                            pets.map(pet => <PetCard key={pet.petId} props={pet} />)
                         }
                         </>
                     }
