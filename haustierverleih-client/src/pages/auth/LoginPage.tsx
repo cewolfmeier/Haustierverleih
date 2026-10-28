@@ -1,0 +1,14 @@
+export default function LoginPage(){
+    return(
+        <>
+        <h1>Anmelden</h1>
+        <form action="{{url_for('auth.login')}}" method="post">
+            <label htmlFor="username">Benutzername</label>
+            <input type="text" name="Username" id="username" required />
+            <label htmlFor="password">Passwort</label>
+            <input type="password" name="Password" id="password" required />
+            <input className="button-form" type="submit" value="Anmelden" />
+        </form>
+        </>
+    );
+};
