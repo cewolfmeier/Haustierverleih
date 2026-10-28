@@ -9,12 +9,12 @@ export type Me = {
     links: Link[];
 }
 
-export type animalType ={
+export type AnimalType ={
     animalTypeId: number;
     animalType: string;
 }
 
-export type pet ={
+export type Pet ={
     petId: number,
     name:string,
     description: string,
@@ -22,4 +22,10 @@ export type pet ={
     animalTypeId: number,
     ownerId: number,
     borrowerId: number|null,
+}
+
+export type User ={
+    userId: number;
+    username: string;
+    roleId:Number;
 }
