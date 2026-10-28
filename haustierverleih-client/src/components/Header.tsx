@@ -1,14 +1,8 @@
-import { useEffect, useState } from "react";
 import { useMeApiCall } from "../hooks/ApiHooks";
-import type { Me } from "../Schemas";
+
 
 export default function Header(){
-    const [user, setUser] = useState<Me|undefined>();
-    const userCall = useMeApiCall();
-
-    useEffect(()=>{
-        setUser(userCall);
-    },[userCall]);
+    const user = useMeApiCall();
 
     return (
         <header className="shadow">
