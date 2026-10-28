@@ -1,0 +1,11 @@
+
+export default function NewAnimalTypePage(){
+    return(
+        <form action="{{url_for('admin.post_new_animal_type')}}" method="post">
+            <h1>Neue Tierart anlegen</h1>
+            <label htmlFor="name">Bezeichnung</label>
+            <input type="text" name="name" id="name" required />
+            <input className="button-form" type="submit" value="Tierart anlegen" />
+        </form>
+    );
+};

@@ -29,3 +29,8 @@ export type User ={
     username: string;
     roleId:Number;
 }
+
+export type Role = {
+    roleId: number;
+    role: string;
+}
