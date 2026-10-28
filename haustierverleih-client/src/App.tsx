@@ -3,17 +3,20 @@ import Footer from "./components/Footer";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import IndexPage from "./pages/main/IndexPage";
 import FlashProvider from "./contexts/FlashProvider";
+import ApiProvider from "./contexts/ApiProvider";
 
 function App() {
   return (
     <div className="content">
       <BrowserRouter>
         <FlashProvider>
-          <Header />
-          <Routes>
-            <Route path="/" element={<IndexPage />} />
-          </Routes>
-          <Footer/>
+          <ApiProvider>
+            <Header />
+            <Routes>
+              <Route path="/" element={<IndexPage />} />
+            </Routes>
+            <Footer/>
+          </ApiProvider>
         </FlashProvider>
       </BrowserRouter>
     </div>
