@@ -1,9 +1,9 @@
 import PetRow from "../../components/PetRow";
-import type { pet } from "../../Schemas";
+import type { Pet } from "../../Schemas";
 
 interface PetManagementPage{
-    ownedPets:pet[],
-    borrowedPets:pet[],
+    ownedPets:Pet[],
+    borrowedPets:Pet[],
 }
 
 export default function PetManagementPage({ownedPets, borrowedPets}:PetManagementPage){

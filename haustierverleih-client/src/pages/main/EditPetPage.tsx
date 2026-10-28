@@ -1,16 +1,8 @@
-import type { animalType } from "../../Schemas";
+import type { AnimalType, Pet } from "../../Schemas";
 
 interface EditPetPageProps{
-    animalTypes:animalType[],
-    pet: {
-        petId: number,
-        name:string,
-        description: string,
-        image: string,
-        animalTypeId: number,
-        ownerId: number,
-        borrowerId: number|null,
-    },
+    animalTypes:AnimalType[],
+    pet: Pet,
 }
 
 export default function EditPetPage({animalTypes, pet}:EditPetPageProps){

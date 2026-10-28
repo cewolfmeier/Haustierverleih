@@ -1,7 +1,7 @@
-import type { animalType } from "../../Schemas";
+import type { AnimalType } from "../../Schemas";
 
 interface NewPetPageProps{
-    animalTypes:animalType[]
+    animalTypes:AnimalType[]
 }
 
 export default function NewPetPage({animalTypes}:NewPetPageProps){

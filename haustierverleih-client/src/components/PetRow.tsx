@@ -1,7 +1,7 @@
-import type { pet } from "../Schemas";
+import type { Pet } from "../Schemas";
 
 interface PetRowProps{
-    pet: pet
+    pet: Pet
     isOwner: boolean
 }
 
