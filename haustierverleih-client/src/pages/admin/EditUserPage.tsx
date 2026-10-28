@@ -6,7 +6,7 @@ interface EditUserPageProps{
     roles:Role[],
 }
 
-export default function EditUserNamePage({user, currentUser, roles}:EditUserPageProps){
+export default function EditUserPage({user, currentUser, roles}:EditUserPageProps){
     const admin = {
         roleId: 1,
         role: "admin"
