@@ -1,12 +1,32 @@
+import { useEffect, useState } from "react";
 import PetRow from "../../components/PetRow";
+import { useApi } from "../../contexts/ApiProvider";
 import type { Pet } from "../../Schemas";
 
-interface PetManagementPage{
-    ownedPets:Pet[],
-    borrowedPets:Pet[],
-}
+export default function PetManagementPage(){
+    const api = useApi();
+    const [ownedPets, setOwnedPets] = useState<Pet[] | null | undefined>();
+    const [borrowedPets, setBorrowedPets] = useState<Pet[] | null | undefined>();
 
-export default function PetManagementPage({ownedPets, borrowedPets}:PetManagementPage){
+    useEffect(()=>{
+        (async () => {
+            const response = await api.get<Pet[]>("/me/pets");
+            if (response.ok && response.body) {
+                setOwnedPets(response.body)
+            } else {
+                setOwnedPets(null);
+            };
+        })();
+        (async () => {
+            const response = await api.get<Pet[]>("/me/pets");
+            if (response.ok && response.body) {
+                setBorrowedPets(response.body)
+            } else {
+                setBorrowedPets(null);
+            };
+        })();
+    }, [api]);
+
     return(
         <>
             <div className="modal" tabIndex={-1} id="modal">
@@ -29,7 +49,7 @@ export default function PetManagementPage({ownedPets, borrowedPets}:PetManagemen
             <h1>Tierverwaltung</h1>
             <div className="main-content">
                 <p>
-                    <strong>Deine eigenen Haustiere ({ownedPets.length})</strong>
+                    <strong>Deine eigenen Haustiere ({ownedPets?.length})</strong>
                     <a className="button" href="{{ url_for('main.get_new_pet') }}">+ Neues Haustier anlegen</a>
                 </p>
                 <table>
@@ -42,14 +62,24 @@ export default function PetManagementPage({ownedPets, borrowedPets}:PetManagemen
                         </tr>
                     </thead>
                     <tbody>
-                        {ownedPets.map(pet=><PetRow key={pet.petId} pet={pet} isOwner={true}/>)}
+                        {ownedPets === undefined?
+                            <p>Deine Haustiere konnten nicht geladen werden.</p>
+                            :
+                            <>
+                            {ownedPets === null?
+                                <p>Du hast noch keine Haustiere.</p>
+                                :
+                                ownedPets.map(pet=><PetRow key={pet.petId} pet={pet} isOwner={true}/>)
+                            }
+                            </>
+                        }
                     </tbody>
                 </table>
                 </div>
                 <div className="main-content">
                 <p>
                     <strong>
-                        Deine ausgeliehenen Haustiere ({borrowedPets.length})
+                        Deine ausgeliehenen Haustiere ({borrowedPets?.length})
                     </strong>
                 </p>
                 <table>
@@ -62,7 +92,17 @@ export default function PetManagementPage({ownedPets, borrowedPets}:PetManagemen
                         </tr>
                     </thead>
                     <tbody>
-                        {borrowedPets.map(pet=><PetRow key={pet.petId} pet={pet} isOwner={false}/>)}
+                        {borrowedPets === undefined?
+                            <p>Deine ausgeliehenen Haustiere konnten nicht geladen werden.</p>
+                            :
+                            <>
+                            {borrowedPets === null?
+                                <p>Du hast aktuell keine Haustiere ausgeliehen.</p>
+                                :
+                                borrowedPets.map(pet=><PetRow key={pet.petId} pet={pet} isOwner={false}/>)
+                            }
+                            </>
+                        }
                     </tbody>
                 </table>
             </div>
