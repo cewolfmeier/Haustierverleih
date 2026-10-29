@@ -1,13 +1,34 @@
+import { useEffect, useState } from "react";
 import AnimalTypeRow from "../../components/admin/AnimalTypeRow";
 import UserRow from "../../components/admin/UserRow";
+import { useApi } from "../../contexts/ApiProvider";
 import type { AnimalType, User } from "../../Schemas";
 
-interface AdminPageProps{
-    animalTypes:AnimalType[],
-    users:User[],
-}
 
-export default function AdminPage({animalTypes, users}:AdminPageProps){
+export default function AdminPage(){
+    const api = useApi();
+    const [animalTypes, setAnimalTypes] = useState<AnimalType[] | null | undefined>();
+    const [users, setUsers] = useState<User[] | null | undefined>();
+
+    useEffect(()=>{
+        (async () => {
+            const response = await api.get<AnimalType[]>("/animaltypes");
+            if (response.ok && response.body) {
+                setAnimalTypes(response.body)
+            } else {
+                setAnimalTypes(null);
+            };
+        })();
+        (async () => {
+            const response = await api.get<User[]>("/users");
+            if (response.ok && response.body) {
+                setUsers(response.body)
+            } else {
+                setUsers(null);
+            };
+        })();
+    }, [api]);
+
     return(
         <>
             <h1>Verwaltung</h1>
@@ -24,7 +45,17 @@ export default function AdminPage({animalTypes, users}:AdminPageProps){
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map(user=><UserRow key={user.userId} user={user}/>)}
+                            {users === undefined?
+                                <p>Benutzer konnten nicht geladen werden.</p>
+                                :
+                                <>
+                                {users === null?
+                                    <p>Es gibt noch keine Benutzer.</p>
+                                    :
+                                    users.map(user=><UserRow key={user.userId} user={user}/>)
+                                }
+                                </>
+                            }
                         </tbody>
                     </table>
                     </div>
@@ -41,7 +72,17 @@ export default function AdminPage({animalTypes, users}:AdminPageProps){
                             </tr>
                         </thead>
                         <tbody>
-                            {animalTypes.map(animalType=><AnimalTypeRow key={animalType.animalTypeId} animalType={animalType}/>)}
+                            {animalTypes === undefined?
+                                <p>Tierarten konnten nicht geladen werden.</p>
+                                :
+                                <>
+                                {animalTypes === null?
+                                    <p>Es gibt noch keine Tierarten.</p>
+                                    :
+                                    animalTypes.map(animalType=><AnimalTypeRow key={animalType.animalTypeId} animalType={animalType}/>)
+                                }
+                                </>
+                            }
                         </tbody>
                     </table>
             </div>
