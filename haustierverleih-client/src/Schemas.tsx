@@ -30,12 +30,16 @@ export type User ={
     roleId:Number;
 }
 
+export type Role = {
+    roleId: number;
+    role: string;
+}
+
 export type NewUser = {
     username: string;
     password: string;
 }
 
-export type Role = {
-    roleId: number;
-    role: string;
+export type NewAnimalType = {
+    animalType: string;
 }

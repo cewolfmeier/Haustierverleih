@@ -62,7 +62,7 @@ export default function AdminPage(){
                     <div className="main-content">
                     <p>
                         <strong>Tierarten</strong>
-                        <a className="button" href="{{url_for('admin.get_new_animal_type')}}">+ Neue Tierart anlegen</a>
+                        <a className="button" href="/admin/animaltypes/new">+ Neue Tierart anlegen</a>
                     </p>
                     <table>
                         <thead>
