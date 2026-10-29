@@ -19,3 +19,17 @@ def get_pet_collection()->list[dict]:
         }
         for pet in pets
     ]
+
+@bp.get("/pets/<int:id>")
+def get_pet_by_id()->dict:
+    """Return a collection of pets"""
+    pet = db.get_or_404(Pets, id)
+    return {
+        "petId": pet.pet_id,
+        "name": pet.name,
+        "description": pet.description,
+        "image": pet.image,
+        "animalTypeId": pet.animal_type_id,
+        "ownerId": pet.owner_id,
+        "borrowerId": pet.borrower_id
+    }
