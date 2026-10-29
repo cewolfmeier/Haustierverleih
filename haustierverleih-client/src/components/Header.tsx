@@ -17,22 +17,22 @@ export default function Header(){
                                 <div>Moin {user.username} !</div>
                             </li>
                             <li>
-                                <a className="button" href="/">Profil bearbeiten</a>
+                                <a className="button" href="/me/edit">Profil bearbeiten</a>
                             </li>
                             <li>
-                                <a className="button" href="/">Meine Tiere</a>
+                                <a className="button" href="/mypets">Meine Tiere</a>
                             </li>
                             <li>
-                                <a className="button" href="/">Admin Bereich</a>
+                                <a className="button" href="/admin">Admin Bereich</a>
                             </li>
                         </>
                     : 
                         <>
                             <li>
-                                <a className="button" href="/">Registrieren</a> {/* href="{{ url_for('auth.register') }}"*/}
+                                <a className="button" href="/register">Registrieren</a>
                             </li>
                             <li>
-                                <a className="button" href="/">Einloggen</a>  {/*href="{{ url_for('auth.login') }}" */}
+                                <a className="button" href="/login">Einloggen</a>
                             </li>
                         </>
                     }                    
