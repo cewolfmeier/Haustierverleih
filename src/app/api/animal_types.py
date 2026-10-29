@@ -1,4 +1,6 @@
+from flask import request
 import sqlalchemy as sa
+from sqlalchemy.exc import IntegrityError
 from app import db
 from app.models import AnimalTypes
 from app.api import bp
@@ -14,3 +16,19 @@ def get_animal_type_collection()->list[dict]:
         }
         for animal_type in animal_types
     ]
+
+@bp.post("/animaltypes")
+def add_new_animal_type()->tuple[dict, int]:
+    """Return a collection of animal types"""
+    new_animal_type = AnimalTypes(
+        animal_type = request.json["animalType"]
+    )
+    try:
+        db.session.add(new_animal_type)
+        db.session.commit()
+    except IntegrityError:
+        return {}, 400
+    return {
+            "animalTypeId": new_animal_type.animal_type_id,
+            "animalType": new_animal_type.animal_type,
+        }, 201
