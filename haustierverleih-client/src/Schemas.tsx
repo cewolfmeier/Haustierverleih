@@ -30,6 +30,11 @@ export type User ={
     roleId:Number;
 }
 
+export type NewUser = {
+    username: string;
+    password: string;
+}
+
 export type Role = {
     roleId: number;
     role: string;
