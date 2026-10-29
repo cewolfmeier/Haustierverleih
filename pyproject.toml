@@ -33,3 +33,10 @@ dev = [
 
 [tool.uv.build-backend]
 module-name = "app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["app"]
