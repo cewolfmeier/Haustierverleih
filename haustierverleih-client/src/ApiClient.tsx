@@ -1,10 +1,14 @@
 import axios from "axios";
 
 type Response<TRES> = {
-  ok: boolean;
+  statusText: string;
   status: number;
-  body: TRES | null;
+  data: TRES | null;
   errors: {json: any} | null;
+}
+
+type Request<TREQ> = {
+    data: TREQ | null;
 }
 
 export default class ApiClient{
@@ -17,12 +21,11 @@ export default class ApiClient{
     });
 
     async get<TRES>(path:string): Promise<Response<TRES>> {
-        const { data } = await this.client.get(path);
-        return data;
+        return await this.client.get(path);
+    }
+
+    async post<TREQ, TRES>(path:string, body:TREQ): Promise<Response<TRES>> {
+        return await this.client.post(path, body);
     }
 
 };
-/*
-  async get<TRES>(url: string, query?: Query, options?: Options<null>): Promise<Response<TRES>> {
-    return this.request<null, TRES>({method: 'GET', url, query, ...options});
-  }*/
