@@ -1,3 +1,4 @@
+from flask import request
 import sqlalchemy as sa
 from app import db
 from app.models import Users
@@ -15,3 +16,17 @@ def get_users_collection()->list[dict]:
         }
         for user in users
     ]
+
+@bp.post("/users")
+def add_new_user()->tuple[dict, int]:
+    """Adds a new user and returns a short ok message"""
+    new_user = Users(
+        username = request.json["username"],
+        role_id = 1 #ToDo: Change to actual role id for lowest user privilege
+        )
+    new_user.set_password(request.json["password"])
+    if db.session.scalar(sa.select(Users).where(Users.username == new_user.username)):
+        return {"message": "user is already registered"}, 400
+    db.session.add(new_user)
+    db.session.commit()
+    return {"message": "ok"}, 201
