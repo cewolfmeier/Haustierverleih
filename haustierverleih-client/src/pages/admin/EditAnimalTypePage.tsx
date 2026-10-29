@@ -12,8 +12,8 @@ export default function EditAnimalTypePage(){
     useEffect(()=>{
         (async () => {
             const response = await api.get<AnimalType>("/animaltypes/"+animalTypeId);
-            if (response.ok && response.body) {
-                setAnimalType(response.body)
+            if (response.status === 200 && response.data) {
+                setAnimalType(response.data)
             } else {
                 setAnimalType(null);
             };
