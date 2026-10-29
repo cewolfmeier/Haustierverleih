@@ -9,8 +9,8 @@ export default function NewPetPage(){
     useEffect(()=>{
         (async () => {
             const response = await api.get<AnimalType[]>("/animaltypes");
-            if (response.ok && response.body) {
-                setAnimalTypes(response.body)
+            if (response.status === 200 && response.data) {
+                setAnimalTypes(response.data)
             } else {
                 setAnimalTypes(null);
             };

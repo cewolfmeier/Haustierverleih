@@ -13,16 +13,16 @@ export default function AdminPage(){
     useEffect(()=>{
         (async () => {
             const response = await api.get<AnimalType[]>("/animaltypes");
-            if (response.ok && response.body) {
-                setAnimalTypes(response.body)
+            if (response.status === 200 && response.data) {
+                setAnimalTypes(response.data)
             } else {
                 setAnimalTypes(null);
             };
         })();
         (async () => {
             const response = await api.get<User[]>("/users");
-            if (response.ok && response.body) {
-                setUsers(response.body)
+            if (response.status === 200 && response.data) {
+                setUsers(response.data)
             } else {
                 setUsers(null);
             };
@@ -46,11 +46,11 @@ export default function AdminPage(){
                         </thead>
                         <tbody>
                             {users === undefined?
-                                <p>Benutzer konnten nicht geladen werden.</p>
+                                <tr><td>Benutzer konnten nicht geladen werden.</td></tr>
                                 :
                                 <>
                                 {users === null?
-                                    <p>Es gibt noch keine Benutzer.</p>
+                                    <tr><td>Es gibt noch keine Benutzer.</td></tr>
                                     :
                                     users.map(user=><UserRow key={user.userId} user={user}/>)
                                 }
@@ -73,11 +73,11 @@ export default function AdminPage(){
                         </thead>
                         <tbody>
                             {animalTypes === undefined?
-                                <p>Tierarten konnten nicht geladen werden.</p>
+                                <tr><td>Tierarten konnten nicht geladen werden.</td></tr>
                                 :
                                 <>
                                 {animalTypes === null?
-                                    <p>Es gibt noch keine Tierarten.</p>
+                                    <tr><td>Es gibt noch keine Tierarten.</td></tr>
                                     :
                                     animalTypes.map(animalType=><AnimalTypeRow key={animalType.animalTypeId} animalType={animalType}/>)
                                 }

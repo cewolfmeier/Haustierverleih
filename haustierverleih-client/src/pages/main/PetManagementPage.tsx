@@ -11,16 +11,16 @@ export default function PetManagementPage(){
     useEffect(()=>{
         (async () => {
             const response = await api.get<Pet[]>("/me/pets");
-            if (response.ok && response.body) {
-                setOwnedPets(response.body)
+            if (response.status == 200 && response.data) {
+                setOwnedPets(response.data)
             } else {
                 setOwnedPets(null);
             };
         })();
         (async () => {
             const response = await api.get<Pet[]>("/me/pets");
-            if (response.ok && response.body) {
-                setBorrowedPets(response.body)
+            if (response.status == 200 && response.data) {
+                setBorrowedPets(response.data)
             } else {
                 setBorrowedPets(null);
             };
@@ -50,7 +50,7 @@ export default function PetManagementPage(){
             <div className="main-content">
                 <p>
                     <strong>Deine eigenen Haustiere ({ownedPets?.length})</strong>
-                    <a className="button" href="{{ url_for('main.get_new_pet') }}">+ Neues Haustier anlegen</a>
+                    <a className="button" href="/mypets/new">+ Neues Haustier anlegen</a>
                 </p>
                 <table>
                     <thead>

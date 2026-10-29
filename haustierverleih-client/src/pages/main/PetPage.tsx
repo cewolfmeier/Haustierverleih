@@ -17,8 +17,8 @@ export default function PetPage({currentUser}:PetPageProps){
     useEffect(()=>{
         (async () => {
             const response = await api.get<Pet>("/pets/"+petId);
-            if (response.ok && response.body) {
-                setPet(response.body)
+            if (response.status === 200 && response.data) {
+                setPet(response.data)
             } else {
                 setPet(null);
             };

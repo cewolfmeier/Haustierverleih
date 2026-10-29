@@ -10,8 +10,8 @@ export default function IndexPage(){
     useEffect(()=>{
         (async () => {
             const response = await api.get<Pet[]>("/pets");
-            if (response.ok && response.body) {
-                setPets(response.body)
+            if (response.status == 200 && response.data) {
+                setPets(response.data)
             } else {
                 setPets(null);
             };

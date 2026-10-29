@@ -12,16 +12,16 @@ export default function EditPetPage(){
     useEffect(()=>{
         (async () => {
             const response = await api.get<Pet>("/me/pets/"+petId);
-            if (response.ok && response.body) {
-                setPet(response.body)
+            if (response.status == 200 && response.data) {
+                setPet(response.data)
             } else {
                 setPet(null);
             };
         })();
         (async () => {
             const response = await api.get<AnimalType[]>("/animaltypes");
-            if (response.ok && response.body) {
-                setAnimalTypes(response.body)
+            if (response.status == 200 && response.data) {
+                setAnimalTypes(response.data)
             } else {
                 setAnimalTypes(null);
             };
