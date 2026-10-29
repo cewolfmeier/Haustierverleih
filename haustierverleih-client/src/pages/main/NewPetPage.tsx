@@ -25,7 +25,7 @@ export default function NewPetPage(){
 
     const onSubmit = async (event: React.SubmitEvent) => {
         event.preventDefault(); //Note: prevents a reload of the page so Formdata doesn't get lost
-        await api.post<NewPet, Pet>("/animaltypes", 
+        await api.post<NewPet, Pet>("/pets", 
             {   
                 name: nameField.current ? nameField.current.value : "",
                 description: descriptionField.current ? descriptionField.current.value : "",
