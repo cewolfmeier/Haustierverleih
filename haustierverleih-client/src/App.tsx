@@ -27,6 +27,7 @@ function App() {
               <Route path="/register" element={<RegisterPage />} />
 
               <Route path="/" element={<IndexPage />} />
+              <Route path="/me/edit" element={<EditUserPage />} />
               <Route path="/mypets" element={<PetManagementPage />} />
               <Route path="/mypets/:petId/edit" element={<EditPetPage />} />
               <Route path="/mypets/new" element={<NewPetPage />} />
