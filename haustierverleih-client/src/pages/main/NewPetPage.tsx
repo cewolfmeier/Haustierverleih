@@ -1,10 +1,22 @@
+import { useEffect, useState } from "react";
+import { useApi } from "../../contexts/ApiProvider";
 import type { AnimalType } from "../../Schemas";
 
-interface NewPetPageProps{
-    animalTypes:AnimalType[]
-}
+export default function NewPetPage(){
+    const api = useApi();
+    const [animalTypes, setAnimalTypes] = useState<AnimalType[] | null | undefined>();
 
-export default function NewPetPage({animalTypes}:NewPetPageProps){
+    useEffect(()=>{
+        (async () => {
+            const response = await api.get<AnimalType[]>("/animaltypes");
+            if (response.ok && response.body) {
+                setAnimalTypes(response.body)
+            } else {
+                setAnimalTypes(null);
+            };
+        })();
+    }, [api]);
+
     return(
         <>
         <h1>Neues Haustier anlegen</h1>
@@ -16,7 +28,7 @@ export default function NewPetPage({animalTypes}:NewPetPageProps){
                 <input type="text" name="Beschreibung" id="pet_description" required />
                 <label htmlFor="animal_type">Tierart</label>
                 <select name="Tierart" id="animal_type">
-                    {animalTypes.map(animalType => (<option value={animalType.animalTypeId}>{animalType.animalType}</option>))}
+                    {animalTypes?.map(animalType => (<option value={animalType.animalTypeId}>{animalType.animalType}</option>))}
                 </select>
                 <label htmlFor="image">Foto-Upload</label>
                 <input name="image" id="image" type="file" />
