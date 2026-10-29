@@ -17,6 +17,9 @@ def get_users_collection()->list[dict]:
         for user in users
     ]
 
+""" Note: Usually, one would register with an email with 
+    an email-confirmation being sent to prevent 
+    an attack by flooding the database with dummy users"""
 @bp.post("/users")
 def add_new_user()->tuple[dict, int]:
     """Adds a new user and returns a short ok message"""
