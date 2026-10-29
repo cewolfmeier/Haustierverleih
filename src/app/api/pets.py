@@ -22,7 +22,7 @@ def get_pet_collection()->list[dict]:
 
 @bp.get("/pets/<int:id>")
 def get_pet_by_id()->dict:
-    """Return a collection of pets"""
+    """Return a pet by id"""
     pet = db.get_or_404(Pets, id)
     return {
         "petId": pet.pet_id,
