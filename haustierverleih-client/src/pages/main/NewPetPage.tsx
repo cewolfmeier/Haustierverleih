@@ -29,14 +29,6 @@ export default function NewPetPage(){
         {
           'Content-Type': 'multipart/form-data',
         });
-        /*
-            {   
-                name: nameField.current ? nameField.current.value : "",
-                description: descriptionField.current ? descriptionField.current.value : "",
-                animalTypeId: animalTypeField.current ? parseInt(animalTypeField.current.value) : null,
-                image: pictureField.current ? pictureField.current.value : null
-            }
-                */
     }
 
     return(
