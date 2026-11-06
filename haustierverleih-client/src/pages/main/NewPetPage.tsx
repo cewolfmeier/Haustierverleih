@@ -50,7 +50,7 @@ export default function NewPetPage(){
                 <input type="text" name="description" id="description" required />
                 <label htmlFor="animalType">Tierart</label>
                 <select name="animalType" id="animalType">
-                    {animalTypes?.map(animalType => (<option value={animalType.animalTypeId}>{animalType.animalType}</option>))}
+                    {animalTypes?.map(animalType => (<option key={animalType.animalTypeId} value={animalType.animalTypeId}>{animalType.animalType}</option>))}
                 </select>
                 <label htmlFor="image">Foto-Upload</label>
                 <input name="image" id="image" type="file" />
