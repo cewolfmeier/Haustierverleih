@@ -15,7 +15,6 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -26,31 +25,6 @@ def admin_required(f):
 
 # ---- ROUTES ---- #
 # --- AUTHENTICATION --- #
-@bp.route("/login", methods=['GET', 'POST'])
-def login():
-    """Login-Seite"""
-    if request.method == 'POST':
-        # -- FORM VALIDATION -- #
-        username = request.form.get('Username')
-        password = request.form.get('Password')
-        # check required fields
-        if username == "" or password == "":
-            flash("Bitte gib deine Anmeldedaten ein.", 'error')
-        # -- DATABASE HANDLING -- #
-        username = username.lower()
-        user = db.session.scalar(
-            sa.select(Users).where(Users.username == username)
-        )
-        # -- LOGIN HANDLING -- #
-        if user is None or not user.check_password(password):
-            flash("Die Anmeldedaten stimmen nicht überein", 'error')
-        else:
-            user.login()
-            flash("Anmeldung erfolgreich.", 'success')
-            return redirect(url_for('main.index'))
-    return render_template('auth/login.html', current_user=None)
-
-
 @bp.route("/register", methods=['GET', 'POST'])
 def register():
     """Seite zur Account-Erstellung"""

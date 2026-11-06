@@ -14,6 +14,8 @@ import AdminPage from "./pages/admin/AdminPage";
 import EditAnimalTypePage from "./pages/admin/EditAnimalTypePage";
 import NewAnimalTypePage from "./pages/admin/NewAnimalTypePage";
 import EditUserPage from "./pages/admin/EditUserPage";
+import PrivateRoute from "./components/PrivateRoute";
+import UserProvider from "./contexts/UserProvider";
 
 function App() {
   return (
@@ -21,25 +23,30 @@ function App() {
       <BrowserRouter>
         <FlashProvider>
           <ApiProvider>
-            <Header />
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-
-              <Route path="/" element={<IndexPage />} />
-              <Route path="/me/edit" element={<EditUserPage />} />
-              <Route path="/mypets" element={<PetManagementPage />} />
-              <Route path="/mypets/:petId/edit" element={<EditPetPage />} />
-              <Route path="/mypets/new" element={<NewPetPage />} />
-              <Route path="/mypets/:petId" element={<PetPage />} />
-              
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="/admin/animaltypes/:animalTypeId/edit" element={<EditAnimalTypePage />} />
-              <Route path="/admin/animaltypes/new" element={<NewAnimalTypePage />} />
-              <Route path="/admin/users/:userId/edit" element={<EditUserPage />} />
-              
-            </Routes>
-            <Footer/>
+            <UserProvider>
+              <Header />
+              <Routes>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/" element={<IndexPage />} />
+              </Routes>
+              <PrivateRoute>
+                <Routes>
+                  <Route path="/me/edit" element={<EditUserPage />} />
+                  <Route path="/mypets" element={<PetManagementPage />} />
+                  <Route path="/mypets/:petId/edit" element={<EditPetPage />} />
+                  <Route path="/mypets/new" element={<NewPetPage />} />
+                  <Route path="/mypets/:petId" element={<PetPage />} />
+                </Routes>
+                <Routes>
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="/admin/animaltypes/:animalTypeId/edit" element={<EditAnimalTypePage />} />
+                  <Route path="/admin/animaltypes/new" element={<NewAnimalTypePage />} />
+                  <Route path="/admin/users/:userId/edit" element={<EditUserPage />} />
+                </Routes>
+              </PrivateRoute>
+              <Footer/>
+            </UserProvider>
           </ApiProvider>
         </FlashProvider>
       </BrowserRouter>
