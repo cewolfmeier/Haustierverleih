@@ -48,22 +48,25 @@ def get_pet_by_id()->dict:
 def create_pet()->tuple[dict, int]:
     """Return a pet by id"""
     filename = None
-    if "image" in request.json:
+    if "image" in request.files:
         image = request.files["image"]
         if image.filename:
             if image and allowed_file(image.filename):
                 filename = secure_filename(image.filename)
                 filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
                 image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+
     new_pet = Pets(
-        name = request.json["name"],
-        description = request.json["description"],
-        animal_type_id = request.json["animalTypeId"],
-        image = filename
+        name = request.form.get("name"),
+        description = request.form.get("description"),
+        animal_type_id = request.form.get("animalType"),
+        image = filename,
+        owner_id = 1
         #Todo: Set Owner Id from current user
     )
     db.session.add(new_pet)
     db.session.commit()
+    
     return {
         "petId": new_pet.pet_id,
         "name": new_pet.name,

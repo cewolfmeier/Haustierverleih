@@ -10,7 +10,6 @@ export default function NewPetPage(){
     const descriptionField = useRef<HTMLInputElement>(null);
     const animalTypeField = useRef<HTMLInputElement>(null);
     const pictureField = useRef<HTMLInputElement>(null);
-    //const formData = new FormData();
 
     useEffect(()=>{
         (async () => {
@@ -25,14 +24,19 @@ export default function NewPetPage(){
 
     const onSubmit = async (event: React.SubmitEvent) => {
         event.preventDefault(); //Note: prevents a reload of the page so Formdata doesn't get lost
-        await api.post<NewPet, Pet>("/pets", 
+        const formData = new FormData(event.target);
+        await api.post<FormData, Pet>("/pets", formData,
+        {
+          'Content-Type': 'multipart/form-data',
+        });
+        /*
             {   
                 name: nameField.current ? nameField.current.value : "",
                 description: descriptionField.current ? descriptionField.current.value : "",
                 animalTypeId: animalTypeField.current ? parseInt(animalTypeField.current.value) : null,
                 image: pictureField.current ? pictureField.current.value : null
             }
-        );
+                */
     }
 
     return(
@@ -41,11 +45,11 @@ export default function NewPetPage(){
         <div className="detail shadow">
             <Form onSubmit={onSubmit} encType="multipart/form-data">
                 <label htmlFor="name">Name</label>
-                <input type="text" name="Name" id="name" required />
-                <label htmlFor="pet_description">Beschreibung</label>
-                <input type="text" name="Beschreibung" id="pet_description" required />
-                <label htmlFor="animal_type">Tierart</label>
-                <select name="Tierart" id="animal_type">
+                <input type="text" name="name" id="name" required />
+                <label htmlFor="description">Beschreibung</label>
+                <input type="text" name="description" id="description" required />
+                <label htmlFor="animalType">Tierart</label>
+                <select name="animalType" id="animalType">
                     {animalTypes?.map(animalType => (<option value={animalType.animalTypeId}>{animalType.animalType}</option>))}
                 </select>
                 <label htmlFor="image">Foto-Upload</label>

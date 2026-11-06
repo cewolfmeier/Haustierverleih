@@ -8,9 +8,9 @@ export default function ApiProvider({ children }: React.PropsWithChildren<{}>) {
   const api = new ApiClient();
 
   return (
-    <ApiContext.Provider value={api}>
+    <ApiContext value={api}>
       {children}
-    </ApiContext.Provider>
+    </ApiContext>
   );
 }
 
