@@ -28,4 +28,8 @@ export default class ApiClient{
         return await this.client.post(path, body, {headers:headers});
     }
 
+    async put<TREQ, TRES>(path:string, body:TREQ, headers={'Content-Type': 'application/json'}): Promise<Response<TRES>> {
+        return await this.client.put(path, body, {headers:headers});
+    }
+
 };

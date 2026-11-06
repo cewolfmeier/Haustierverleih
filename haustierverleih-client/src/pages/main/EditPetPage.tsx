@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useApi } from "../../contexts/ApiProvider";
 import type { AnimalType, Pet } from "../../Schemas";
 import { useParams } from "react-router-dom";
+import { Form } from "react-bootstrap";
 
 export default function EditPetPage(){
     const { petId } = useParams<{ petId: string }>();
@@ -28,6 +29,16 @@ export default function EditPetPage(){
         })();
     }, [api]);
 
+    const onSubmit = async (event: React.SubmitEvent) => {
+        event.preventDefault(); //Note: prevents a reload of the page so Formdata doesn't get lost
+        const formData = new FormData(event.target);
+        formData.append("petId", petId?petId:"")
+        await api.put<FormData, Pet>("/pets", formData,
+        {
+          'Content-Type': 'multipart/form-data',
+        });
+    }
+
     return(
         <>
         {pet === undefined?
@@ -41,26 +52,24 @@ export default function EditPetPage(){
                 <>
                     <h1>Haustier { pet.name } bearbeiten</h1>
                     <div className="detail shadow">
-                        <form action="{{url_for('main.post_edit_pet', pet_id=pet.pet_id)}}" method="put" encType="multipart/form-data">
+                        <Form onSubmit={onSubmit} method="put" encType="multipart/form-data">
                             <label htmlFor="name">Name</label>
-                            <input type="text" name="Name" id="name" required value={pet.name}/>
-                            <label htmlFor="pet_description">Beschreibung</label>
-                            <input type="text" name="Beschreibung" id="pet_description" value={pet.description} required />
-                            <label htmlFor="animal_type">Tierart</label>
-                            <select name="Tierart" id="animal_type">
-                                {animalTypes?.map(animalType => (<option value={animalType.animalTypeId} selected={pet.animalTypeId == animalType.animalTypeId ? true: false}>{animalType.animalType}</option>))}
+                            <input type="text" name="name" id="name" required value={pet.name}/>
+                            <label htmlFor="description">Beschreibung</label>
+                            <input type="text" name="description" id="description" value={pet.description} required />
+                            <label htmlFor="animalType">Tierart</label>
+                            <select name="Tierart" id="animalType">
+                                {animalTypes?.map(animalType => (<option key={animalType.animalTypeId} value={animalType.animalTypeId} selected={pet.animalTypeId == animalType.animalTypeId ? true: false}>{animalType.animalType}</option>))}
                             </select>
                             <label htmlFor="image">Foto-Upload</label>
                             <input name="image" id="image" type="file" />
                             <input className="button" type="submit" value="Speichern" />
-                        </form>
+                        </Form>
                     </div>
                 </>
             }
             </>
-
-        }
-        
+        } 
         </>
     );
 };

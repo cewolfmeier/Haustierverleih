@@ -76,3 +76,32 @@ def create_pet()->tuple[dict, int]:
         "ownerId": new_pet.owner_id,
         "borrowerId": new_pet.borrower_id
     }, 201
+
+@bp.put("/pets")
+def update_pet()->tuple[dict, int]:
+    """Return a pet by id"""
+    pet = db.get_or_404(Pets, request.form.get("petId"))
+    filename = None
+    if "image" in request.files:
+        image = request.files["image"]
+        if image.filename:
+            if image and allowed_file(image.filename):
+                filename = secure_filename(image.filename)
+                filename = str(uuid.uuid4()) + "." + filename.rsplit('.', 1)[1].lower()
+                image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+
+    pet.name = request.form.get("name"),
+    pet.description = request.form.get("description"),
+    pet.animal_type_id = request.form.get("animalType"),
+    pet.image = filename,
+    db.session.commit()
+    
+    return {
+        "petId": pet.pet_id,
+        "name": pet.name,
+        "description": pet.description,
+        "image": pet.image,
+        "animalTypeId": pet.animal_type_id,
+        "ownerId": pet.owner_id,
+        "borrowerId": pet.borrower_id
+    }, 200
