@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useApi } from "../../contexts/ApiProvider";
 import type { AnimalType, NewPet, Pet } from "../../Schemas";
 import { Form } from "react-bootstrap";
@@ -6,10 +6,6 @@ import { Form } from "react-bootstrap";
 export default function NewPetPage(){
     const api = useApi();
     const [animalTypes, setAnimalTypes] = useState<AnimalType[] | null | undefined>();
-    const nameField = useRef<HTMLInputElement>(null);
-    const descriptionField = useRef<HTMLInputElement>(null);
-    const animalTypeField = useRef<HTMLInputElement>(null);
-    const pictureField = useRef<HTMLInputElement>(null);
 
     useEffect(()=>{
         (async () => {
