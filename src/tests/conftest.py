@@ -1,7 +1,11 @@
+import base64
+
 import pytest
+
 from app import create_app, db
 from app.models import Roles, Users
 from config import Config
+
 
 class TestConfig(Config):
     TESTING = True
@@ -35,10 +39,28 @@ def app():
         )
         db.session.commit()
 
-    yield app
+        yield app
 
-    db.drop_all()
+        db.drop_all()
+
 
 @pytest.fixture
 def client(app):
     return app.test_client()
+
+
+class AuthActions:
+    def __init__(self, client):
+        self._client = client
+
+    def login(self, username="test", password="test"):
+        credentials = base64.b64encode(f"{username}:{password}".encode()).decode(
+            "utf-8"
+        )
+        headers = {"Authorization": "Basic " + credentials}
+        self._client.post("api/v0/login", headers=headers)
+
+
+@pytest.fixture
+def auth(client):
+    return AuthActions(client)
