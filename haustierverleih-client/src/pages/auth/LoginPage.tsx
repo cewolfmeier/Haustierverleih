@@ -1,15 +1,15 @@
 import { Form } from "react-bootstrap";
-import { useApi } from "../../contexts/ApiProvider";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../../contexts/UserProvider";
 import { useRef } from "react";
+import { useUser } from "../../contexts/UserContext";
 
 export default function LoginPage(){
-    const api = useApi();
     const user = useUser();
     const navigate = useNavigate()
     const usernameFieldRef = useRef<HTMLInputElement>(null);
     const passwordFieldRef = useRef<HTMLInputElement>(null);
+
+    if (user) navigate("/");
 
     const onSubmit = async (event: React.SubmitEvent) => {
         if (!usernameFieldRef.current || !passwordFieldRef.current) return;
@@ -18,14 +18,6 @@ export default function LoginPage(){
             usernameFieldRef.current.value,
             passwordFieldRef.current.value,
         )
-        const formData = new FormData(event.target);
-        const response = await api.post("/login", formData, {
-          'Content-Type': 'multipart/form-data',
-        });
-        console.log(response)
-        if (response.status === 200) {
-            navigate("/")
-        }
     }
 
     return(

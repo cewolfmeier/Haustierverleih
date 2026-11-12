@@ -32,20 +32,16 @@ export default class ApiClient{
         return await this.client.put(path, body, {headers:headers});
     }
 
-    async login<TRES>(username:string, password:string){
-        const response = await this.client.post(
-            "/login", 
+    async login<TRES>(username:string, password:string):Promise<Response<TRES>>{
+        return await this.client.post(
+            "/login",
+            {},
             {
                 headers:{
                     Authorization:  'Basic ' + btoa(username + ":" + password)
                 },
             }
         );
-        if (response.status === 200){
-            console.log(response.headers.getSetCookie())
-            return response
-            //cookieStore.set("accessToken", response.headers.getSetCookie());
-        };
     }
 
 };

@@ -32,7 +32,7 @@ export type Role = {
 export type User ={
     userId: number;
     username: string;
-    roleId:Number;
+    isAdmin: boolean;
 }
 
 export type NewAnimalType = {
