@@ -1,4 +1,4 @@
-from flask import request, current_app, make_response
+from flask import request, current_app, make_response, abort
 import sqlalchemy as sa
 from app import db
 from app.api import bp
@@ -6,7 +6,19 @@ from app.models import Users
 from datetime import datetime, timezone, timedelta
 import jwt
 from functools import wraps
-from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
+from flask_httpauth import HTTPBasicAuth
+
+basic_auth = HTTPBasicAuth()
+
+@basic_auth.verify_password
+def verify_password(username, password)->Users|None:
+    username = username.lower()
+    user = db.session.scalar(
+        sa.select(Users).where(Users.username == username)
+    )
+    if user and user.check_password(password):
+        return user
+
 
 def token_required(f):
     @wraps(f)
@@ -17,7 +29,7 @@ def token_required(f):
             return {'msg': 'token.missing'}, 401
 
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = Users.query.filter_by(public_id=data['public_id']).first()
         except:
             return {'msg': 'token.invalid'}, 401
@@ -27,19 +39,11 @@ def token_required(f):
     return decorated
 
 @bp.post("/login")
+@basic_auth.login_required
 def login():
-    username = request.form.get('Username')
-    password = request.form.get('Password')
-    if not username or not password:
-        return {"msg": "form.missingData"}, 401
-    username = username.lower()
-    user = db.session.scalar(
-        sa.select(Users).where(Users.username == username)
-    )
-    # -- LOGIN HANDLING -- #
-    if user is None or not user.check_password(password):
-        return {"msg": "login.wrongCredentials"}, 401
-    user.login()
+    user = basic_auth.current_user()
+    if not user:
+        abort(500)
     token = jwt.encode(
         {
             'public_id': user.user_id, 

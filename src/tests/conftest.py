@@ -1,6 +1,6 @@
 import pytest
 from app import create_app, db
-from app.models import Roles
+from app.models import Roles, Users
 from config import Config
 
 class TestConfig(Config):
@@ -19,6 +19,18 @@ def app():
             [
                 Roles(role_id=1, role="User"),
                 Roles(role_id=2, role="Admin"),
+            ]
+        )
+        db.session.commit()
+        testuser = Users(
+            user_id=1,
+            username="test",
+            role_id=1,
+        )
+        testuser.set_password("test")
+        db.session.add_all(
+            [
+                testuser,
             ]
         )
         db.session.commit()
