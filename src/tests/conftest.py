@@ -5,7 +5,7 @@ from config import Config
 
 class TestConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "mariadb+mariadbconnector://hvtest:hvtest@127.0.0.1:3305/hvtest"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory"
 
 
 @pytest.fixture
