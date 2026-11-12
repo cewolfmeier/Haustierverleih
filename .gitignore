@@ -7,3 +7,4 @@ boot.sh
 docker-compose.yml
 logs
 .vscode
+:memory

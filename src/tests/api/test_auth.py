@@ -14,6 +14,13 @@ def test_refuse_login_with_invalid_credentials(client):
     response = client.post("api/v0/login", headers=invalid_password_header)
     assert response.status_code == 401
 
-def test_accept_login_with_auth_header(client):
+def test_login_happy_path(client):
     response = client.post("api/v0/login", headers=headers)
     assert response.status_code == 200
+    assert "Set-Cookie" in response.headers
+    assert "jwt" in response.headers["Set-Cookie"]
+    assert response.json == {
+        "userId":1,
+        "username":"test",
+        "isAdmin": False
+    }

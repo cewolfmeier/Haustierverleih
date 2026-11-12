@@ -46,13 +46,19 @@ def login():
         abort(500)
     token = jwt.encode(
         {
-            'public_id': user.user_id, 
-            'exp': datetime.now(timezone.utc) + timedelta(hours=1)
+            "sub": user.user_id,
+            "name": user.username,
+            "admin": user.role_id == 2,
+            "exp": datetime.now(timezone.utc) + timedelta(hours=1)
         },
         current_app.config['SECRET_KEY'], 
         algorithm="HS256"
     )
 
-    response = make_response({"msg": "login.success"})
+    response = make_response({
+        "userId":user.user_id,
+        "username":user.username,
+        "isAdmin": user.role_id == 2,
+    })
     response.set_cookie('jwt_token', token)
     return response, 200
