@@ -52,29 +52,29 @@ export default function PetManagementPage(){
                     <strong>Deine eigenen Haustiere ({ownedPets?.length})</strong>
                     <a className="button" href="/mypets/new">+ Neues Haustier anlegen</a>
                 </p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Tierart</th>
-                            <th>Verfügbarkeit</th>
-                            <th>Aktionen</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {ownedPets === undefined?
-                            <p>Deine Haustiere konnten nicht geladen werden.</p>
-                            :
-                            <>
-                            {ownedPets === null?
-                                <p>Du hast noch keine Haustiere.</p>
-                                :
-                                ownedPets.map(pet=><PetRow key={pet.petId} pet={pet} isOwner={true}/>)
-                            }
-                            </>
-                        }
-                    </tbody>
-                </table>
+                { ownedPets === undefined?
+                    <p>Deine Haustiere konnten nicht geladen werden.</p>
+                    :
+                    <>
+                    {ownedPets === null?
+                        <p>Du hast noch keine Haustiere.</p>
+                        :
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Tierart</th>
+                                    <th>Verfügbarkeit</th>
+                                    <th>Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {ownedPets.map(pet=><PetRow key={pet.petId} pet={pet} isOwner={true}/>)}
+                            </tbody>
+                        </table>
+                    }
+                    </>
+                }
                 </div>
                 <div className="main-content">
                 <p>
@@ -82,29 +82,29 @@ export default function PetManagementPage(){
                         Deine ausgeliehenen Haustiere ({borrowedPets?.length})
                     </strong>
                 </p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Tierart</th>
-                            <th>Besitzer</th>
-                            <th>Aktionen</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {borrowedPets === undefined?
-                            <p>Deine ausgeliehenen Haustiere konnten nicht geladen werden.</p>
-                            :
-                            <>
-                            {borrowedPets === null?
-                                <p>Du hast aktuell keine Haustiere ausgeliehen.</p>
-                                :
-                                borrowedPets.map(pet=><PetRow key={pet.petId} pet={pet} isOwner={false}/>)
-                            }
-                            </>
-                        }
-                    </tbody>
-                </table>
+                { borrowedPets === undefined?
+                    <p>Deine ausgeliehenen Haustiere konnten nicht geladen werden.</p>
+                    :
+                    <>
+                    { borrowedPets === null?
+                        <p>Du hast aktuell keine Haustiere ausgeliehen.</p>
+                        :        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Tierart</th>
+                                    <th>Besitzer</th>
+                                    <th>Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {borrowedPets.map(pet=><PetRow key={pet.petId} pet={pet} isOwner={false}/>)} 
+                            </tbody>
+                        </table>
+                    }
+                    </> 
+                }
             </div>
         </>
     );
