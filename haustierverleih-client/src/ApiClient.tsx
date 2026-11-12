@@ -46,24 +46,8 @@ export default class ApiClient{
 
 };
 /*
-  async login(username: string, password: string): Promise<'ok' | 'fail' | 'error'> {
-    const response = await this.post<null, Token>('/tokens', null, {
-      headers: {
-        Authorization:  'Basic ' + btoa(username + ":" + password)
-      }
-    });
-    if (!response.ok || !response.body) {
-      return response.status === 401 ? 'fail' : 'error';
-    }
-    localStorage.setItem('accessToken', response.body.access_token || '');
-    return 'ok';
-  }
-
   async logout() {
     await this.delete('/tokens');
     localStorage.removeItem('accessToken');
   }
-
-  isAuthenticated() {
-    return localStorage.getItem('accessToken') !== null;
-  }*/
+*/
