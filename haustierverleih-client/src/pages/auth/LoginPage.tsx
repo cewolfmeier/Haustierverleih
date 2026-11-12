@@ -9,7 +9,7 @@ export default function LoginPage(){
     const usernameFieldRef = useRef<HTMLInputElement>(null);
     const passwordFieldRef = useRef<HTMLInputElement>(null);
 
-    if (user) navigate("/");
+    if (user.user) navigate("/");
 
     const onSubmit = async (event: React.SubmitEvent) => {
         if (!usernameFieldRef.current || !passwordFieldRef.current) return;

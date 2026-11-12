@@ -5,19 +5,21 @@ import { UserContext } from './UserContext';
 
 
 export default function UserProvider({ children }: React.PropsWithChildren<{}>) {
-  const [user, setUser] = useState<User | null | undefined>();
+  const currentUser = localStorage.getItem("currentUser");
+  const [user, setUser] = useState<User | null | undefined>(currentUser?JSON.parse(currentUser):null);
   const api = useApi();
 
   const login = useCallback(async (username: string, password: string) => {
     const response = await api.login<User>(username, password);
     if (response && response.status === 200) {
       setUser(response.data);
+      localStorage.setItem("currentUser", JSON.stringify(response.data));
     }
   }, [api]);
 
   const logout = useCallback(async () => {
-    //await api.logout();
     setUser(null);
+    localStorage.removeItem("currentUser");
   }, [api]);
 
   return (
