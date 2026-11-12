@@ -17,6 +17,7 @@ import EditUserPage from "./pages/admin/EditUserPage";
 import PrivateRoute from "./components/PrivateRoute";
 import UserProvider from "./contexts/UserProvider";
 import { Container } from "react-bootstrap";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -39,12 +40,14 @@ function App() {
                     <Route path="/mypets/new" element={<NewPetPage />} />
                     <Route path="/mypets/:petId" element={<PetPage />} />
                   </Routes>
-                  <Routes>
-                    <Route path="/admin" element={<AdminPage />} />
-                    <Route path="/admin/animaltypes/:animalTypeId/edit" element={<EditAnimalTypePage />} />
-                    <Route path="/admin/animaltypes/new" element={<NewAnimalTypePage />} />
-                    <Route path="/admin/users/:userId/edit" element={<EditUserPage />} />
-                  </Routes>
+                  <ProtectedRoute>
+                    <Routes>
+                      <Route path="/admin" element={<AdminPage />} />
+                      <Route path="/admin/animaltypes/:animalTypeId/edit" element={<EditAnimalTypePage />} />
+                      <Route path="/admin/animaltypes/new" element={<NewAnimalTypePage />} />
+                      <Route path="/admin/users/:userId/edit" element={<EditUserPage />} />
+                    </Routes>
+                  </ProtectedRoute>
                 </PrivateRoute>
               } />
               </Routes>
