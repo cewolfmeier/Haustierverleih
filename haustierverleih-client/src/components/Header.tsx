@@ -1,9 +1,8 @@
-import { useMeApiCall } from "../hooks/ApiHooks";
+import { useUser } from "../contexts/UserContext";
 
 
 export default function Header(){
-    const user = useMeApiCall();
-
+    const {user, logout} = useUser();
     return (
         <header className="shadow">
             <nav>
@@ -22,11 +21,16 @@ export default function Header(){
                             <li>
                                 <a className="button" href="/mypets">Meine Tiere</a>
                             </li>
+                            { user.isAdmin &&
                             <li>
                                 <a className="button" href="/admin">Admin Bereich</a>
                             </li>
+                            }
+                            <li>
+                                <a className="button" onClick={logout}>Ausloggen</a> 
+                            </li>
                         </>
-                    : 
+                    :
                         <>
                             <li>
                                 <a className="button" href="/register">Registrieren</a>
@@ -36,9 +40,6 @@ export default function Header(){
                             </li>
                         </>
                     }                    
-                    <li>
-                        <a className="button" href="{{ url_for('auth.logout') }}">Ausloggen</a> 
-                    </li>
                 </ul> 
             </nav>
         </header>
