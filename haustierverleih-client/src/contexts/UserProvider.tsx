@@ -5,26 +5,22 @@ import { tokensQueries } from '../services/tokens/queries';
 
 
 export default function UserProvider({ children }: React.PropsWithChildren<{}>) {
-  	const currentUser = () => {
-		const user = localStorage.getItem("currentUser") 
-		if (user) return JSON.parse(user);
-		return null;
-	};
+	const user = localStorage.getItem("currentUser");
+	const currentUser = user? JSON.parse(user): null;
 	const newToken = useMutation(tokensQueries.new());
+	const deleteToken = useMutation(tokensQueries.delete());
 
 	const login = useCallback(async (username: string, password: string) => {
 		newToken.mutate({username:username, password:password});
 	}, []);
-/*
-  const logout = useCallback(async () => {
-    setUser(null);
-    localStorage.removeItem("currentUser");
-  }, [api]);*/
+
+	const logout = useCallback(async () => {
+    	deleteToken.mutate();
+  	}, []);
 
   return (
-    <UserContext value={{ currentUser, login }}>
+    <UserContext value={{ currentUser, login, logout }}>
       {children}
     </UserContext>
   );
 }
-

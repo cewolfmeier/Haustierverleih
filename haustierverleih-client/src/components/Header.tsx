@@ -2,7 +2,7 @@ import { useUser } from "../contexts/UserContext";
 
 
 export default function Header(){
-    const {user, logout} = useUser();
+    const {currentUser, logout} = useUser();
     return (
         <header className="shadow">
             <nav>
@@ -10,10 +10,10 @@ export default function Header(){
                     <img src="/logo.png" alt="Das Logo des Haustierverleihs" /> 
                 </a>
                 <ul className="navigation">
-                    {user ?
+                    {currentUser ?
                         <>
                             <li>
-                                <div>Moin {user.username} !</div>
+                                <div>Moin {currentUser.username} !</div>
                             </li>
                             <li>
                                 <a className="button" href="/me/edit">Profil bearbeiten</a>
@@ -21,7 +21,7 @@ export default function Header(){
                             <li>
                                 <a className="button" href="/mypets">Meine Tiere</a>
                             </li>
-                            { user.isAdmin &&
+                            { currentUser.isAdmin &&
                             <li>
                                 <a className="button" href="/admin">Admin Bereich</a>
                             </li>
