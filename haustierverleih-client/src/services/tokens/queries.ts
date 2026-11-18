@@ -10,4 +10,9 @@ export const tokensQueries = {
             mutationFn: actions.login<User>,
             onSuccess: (response)=> localStorage.setItem("currentUser", JSON.stringify(response.data)),
         }),
+    delete: () =>
+        mutationOptions({
+            mutationFn: actions.logout,
+            onSuccess: ()=>localStorage.removeItem("currentUser"),
+        }),
 };
