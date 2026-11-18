@@ -1,8 +1,6 @@
 import logging
 import os
 from logging.handlers import RotatingFileHandler
-
-import jwt
 from flask import Flask, request
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -29,10 +27,8 @@ def create_app(config_class=Config):
         The JWT is saved in a cookie. To use HTTPTokenAuth,
         the token has to be in a Bearer beader.
         """
-        token = request.cookies.get("jwt_token")
+        token = request.cookies.get("refresh_token")
         if token:
-            data = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
-            print(data)
             request.environ["HTTP_AUTHORIZATION"] = f"Bearer {token}"
 
     from app.api import bp as api_bp
