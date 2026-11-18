@@ -1,29 +1,28 @@
-import React, { useState, useCallback } from 'react';
-import { useApi } from './ApiProvider';
-import { type User } from '../Schemas';
+import React, { useCallback } from 'react';
 import { UserContext } from './UserContext';
+import { useMutation } from '@tanstack/react-query';
+import { tokensQueries } from '../services/tokens/queries';
 
 
 export default function UserProvider({ children }: React.PropsWithChildren<{}>) {
-  const currentUser = localStorage.getItem("currentUser");
-  const [user, setUser] = useState<User | null | undefined>(currentUser?JSON.parse(currentUser):null);
-  const api = useApi();
+  	const currentUser = () => {
+		const user = localStorage.getItem("currentUser") 
+		if (user) return JSON.parse(user);
+		return null;
+	};
+	const newToken = useMutation(tokensQueries.new());
 
-  const login = useCallback(async (username: string, password: string) => {
-    const response = await api.login<User>(username, password);
-    if (response && response.status === 200) {
-      setUser(response.data);
-      localStorage.setItem("currentUser", JSON.stringify(response.data));
-    }
-  }, [api]);
-
+	const login = useCallback(async (username: string, password: string) => {
+		newToken.mutate({username:username, password:password});
+	}, []);
+/*
   const logout = useCallback(async () => {
     setUser(null);
     localStorage.removeItem("currentUser");
-  }, [api]);
+  }, [api]);*/
 
   return (
-    <UserContext value={{ user, setUser, login, logout }}>
+    <UserContext value={{ currentUser, login }}>
       {children}
     </UserContext>
   );

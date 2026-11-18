@@ -3,7 +3,6 @@ import Footer from "./components/Footer";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import IndexPage from "./pages/main/IndexPage";
 import FlashProvider from "./contexts/FlashProvider";
-import ApiProvider from "./contexts/ApiProvider";
 import PetManagementPage from "./pages/main/PetManagementPage";
 import EditPetPage from "./pages/main/EditPetPage";
 import NewPetPage from "./pages/main/NewPetPage";
@@ -18,13 +17,16 @@ import PrivateRoute from "./components/PrivateRoute";
 import UserProvider from "./contexts/UserProvider";
 import { Container } from "react-bootstrap";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient()
 
 function App() {
   return (
     <Container className="content">
       <BrowserRouter>
         <FlashProvider>
-          <ApiProvider>
+          <QueryClientProvider client={queryClient}>
             <UserProvider>
               <Header />
               <Routes>
@@ -53,7 +55,7 @@ function App() {
               </Routes>
               <Footer/>
             </UserProvider>
-          </ApiProvider>
+          </QueryClientProvider>
         </FlashProvider>
       </BrowserRouter>
     </Container>

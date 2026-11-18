@@ -1,23 +1,10 @@
-import { useEffect, useState } from "react";
 import PetCard from "../../components/PetCard";
-import { useApi } from "../../contexts/ApiProvider";
-import type { Pet } from "../../Schemas";
+import { useQuery } from "@tanstack/react-query";
+import { petsQueries } from "../../services/pets/queries";
+
 
 export default function IndexPage(){
-    const api = useApi();
-    const [pets, setPets] = useState<Pet[] | null | undefined>();
-
-    useEffect(()=>{
-        (async () => {
-            const response = await api.get<Pet[]>("/pets");
-            if (response.status == 200 && response.data) {
-                setPets(response.data)
-            } else {
-                setPets(null);
-            };
-        })();
-    }, [api]);
-
+    const { data:pets, error, isFetching } = useQuery(petsQueries.list())
     return (
         <>
             <a href="/">        
@@ -25,11 +12,11 @@ export default function IndexPage(){
             </a> 
             <h1>Willkommen beim Haustierverleih!</h1> 
             <ul className="content-list">
-                {pets === undefined ?
+                {isFetching || pets === undefined?
                     <p>Bitte warten...</p>
                     :
                     <> 
-                    {pets === null ?
+                    {pets === null || error?
                         <p>Es können keine Haustiere gefunden werden.</p>
                         :
                         <>
