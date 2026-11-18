@@ -33,9 +33,9 @@ def verify_token(token):
         return
 
 
-@bp.post("/login")
+@bp.post("/tokens")
 @basic_auth.login_required
-def login():
+def create_tokens():
     user = basic_auth.current_user()
     if not user:
         abort(500)
@@ -57,5 +57,12 @@ def login():
             "isAdmin": user.role_id == 2,
         }
     )
-    response.set_cookie("jwt_token", token)
+    response.set_cookie("refresh_token", token)
+    return response
+
+@bp.delete("/tokens")
+@token_auth.login_required
+def delete_refresh_token():
+    response = make_response()
+    response.delete_cookie(key="refresh_token")
     return response
