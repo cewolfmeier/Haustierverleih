@@ -39,7 +39,7 @@ def app():
             ),
         ]
         for testuser in testusers:
-            testuser.set_password("test") 
+            testuser.set_password("test")
         db.session.add_all(testusers)
         db.session.add_all(
             [
@@ -50,8 +50,20 @@ def app():
         db.session.commit()
         db.session.add_all(
             [
-                Pets(pet_id=1, animal_type_id=1, name="bello", description="Loves to play in mudd", owner_id=1),
-                Pets(pet_id=2, animal_type_id=2, name="blubber", description="easy to keep, likes to swim belly up", owner_id=1),
+                Pets(
+                    pet_id=1,
+                    animal_type_id=1,
+                    name="bello",
+                    description="Loves to play in mudd",
+                    owner_id=1,
+                ),
+                Pets(
+                    pet_id=2,
+                    animal_type_id=2,
+                    name="blubber",
+                    description="easy to keep, likes to swim belly up",
+                    owner_id=1,
+                ),
             ]
         )
         db.session.commit()
