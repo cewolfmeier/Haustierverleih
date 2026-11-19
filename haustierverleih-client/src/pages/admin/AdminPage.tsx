@@ -1,33 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AnimalTypeRow from "../../components/admin/AnimalTypeRow";
 import UserRow from "../../components/admin/UserRow";
-import { useApi } from "../../contexts/ApiProvider";
 import type { AnimalType, User } from "../../Schemas";
 
 
 export default function AdminPage(){
-    const api = useApi();
     const [animalTypes, setAnimalTypes] = useState<AnimalType[] | null | undefined>();
     const [users, setUsers] = useState<User[] | null | undefined>();
-
-    useEffect(()=>{
-        (async () => {
-            const response = await api.get<AnimalType[]>("/animaltypes");
-            if (response.status === 200 && response.data) {
-                setAnimalTypes(response.data)
-            } else {
-                setAnimalTypes(null);
-            };
-        })();
-        (async () => {
-            const response = await api.get<User[]>("/users");
-            if (response.status === 200 && response.data) {
-                setUsers(response.data)
-            } else {
-                setUsers(null);
-            };
-        })();
-    }, [api]);
 
     return(
         <>

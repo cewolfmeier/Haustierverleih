@@ -7,6 +7,6 @@ export const petsQueries = {
     list: () => 
         queryOptions({
             queryKey: [...petsQueries.all(), "list"] as const,
-            queryFn: () => actions.getAll<Pet[]>("/pets")
+            queryFn: () => actions.getAll("/pets")
         }),
 }

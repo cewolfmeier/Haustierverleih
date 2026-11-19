@@ -1,6 +1,6 @@
 import axios from "axios";
 
-type Response<TRES> = {
+export type Response<TRES> = {
   statusText: string;
   status: number;
   data: TRES | null;
@@ -26,7 +26,7 @@ export const api = axios.create({
 });
 
 export const actions = {
-    getAll : async<TRES>(path:string): Promise<Response<TRES>> => {
+    getAll : async(path:string) => {
         const {data} = await api.get(path);
         return data
     },

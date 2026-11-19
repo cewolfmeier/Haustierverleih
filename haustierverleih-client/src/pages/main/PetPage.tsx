@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { useApi } from "../../contexts/ApiProvider";
 import type { Pet } from "../../Schemas";
 
 interface PetPageProps {
@@ -11,19 +10,7 @@ interface PetPageProps {
 
 export default function PetPage({currentUser}:PetPageProps){
     const { petId } = useParams<{ petId: string }>();
-    const api = useApi();
     const [pet, setPet] = useState<Pet | null | undefined>();
-
-    useEffect(()=>{
-        (async () => {
-            const response = await api.get<Pet>("/pets/"+petId);
-            if (response.status === 200 && response.data) {
-                setPet(response.data)
-            } else {
-                setPet(null);
-            };
-        })();
-    }, [api]);
 
     return(
         <>

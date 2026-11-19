@@ -1,18 +1,21 @@
-import type { User, Role } from "../../Schemas";
+import { useParams } from "react-router-dom";
+import { useUser } from "../../contexts/UserContext";
+import { useQuery } from "@tanstack/react-query";
+import { usersQueries } from "../../services/users/queries";
+import { rolesQueries } from "../../services/roles/types";
 
-interface EditUserPageProps{
-    user:User,
-    currentUser:User,
-    roles:Role[],
-}
-
-export default function EditUserPage({user, currentUser, roles}:EditUserPageProps){
-    const admin = {
-        roleId: 1,
-        role: "admin"
-    }
+export default function EditUserPage(){
+    const { userId } = useParams<{ userId: string }>();
+    const { currentUser } = useUser();
+    const { data:user, error, isFetching } = useQuery(usersQueries.byId(userId? userId:currentUser? currentUser.userId: 0));
+    const { data:roles } = useQuery(rolesQueries.list());
+    
     return(
         <>
+            { user === undefined || isFetching?
+                <p>Wird geladen...</p>
+            :
+            <>
             <h1>Benutzer { user.username } bearbeiten</h1>
             <div className="detail shadow">
                 <form action="{{url_htmlFor('admin.post_edit_classNameName', classNameName_id=classNameName['classNameName_id'])}}" method="put">
@@ -27,7 +30,7 @@ export default function EditUserPage({user, currentUser, roles}:EditUserPageProp
                         </>
                         :
                         <>
-                        {currentUser.roleId === admin.roleId &&
+                        {currentUser?.isAdmin &&
                             <>
                                 <label htmlFor="roles">Benutzerrechte</label>
                                 <select name="roles" id="roles" required>
@@ -41,6 +44,8 @@ export default function EditUserPage({user, currentUser, roles}:EditUserPageProp
                     <input className="button-htmlForm" type="submit" value="Speichern" />
                 </form>
             </div>
+            </>
+            }
         </>
     );
 };

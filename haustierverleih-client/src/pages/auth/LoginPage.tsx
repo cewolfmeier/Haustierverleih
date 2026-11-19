@@ -1,6 +1,6 @@
 import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useUser } from "../../contexts/UserContext";
 
 export default function LoginPage(){
@@ -8,8 +8,10 @@ export default function LoginPage(){
     const navigate = useNavigate()
     const usernameFieldRef = useRef<HTMLInputElement>(null);
     const passwordFieldRef = useRef<HTMLInputElement>(null);
-
-    if (currentUser()) navigate("/");
+    
+    useEffect(()=>{
+        if (currentUser) navigate("/");
+    });
 
     const onSubmit = async (event: React.SubmitEvent) => {
         if (!usernameFieldRef.current || !passwordFieldRef.current) return;

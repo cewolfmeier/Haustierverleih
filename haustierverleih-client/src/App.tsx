@@ -1,6 +1,6 @@
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import {BrowserRouter, Routes, Route} from "react-router-dom";
+import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 import IndexPage from "./pages/main/IndexPage";
 import FlashProvider from "./contexts/FlashProvider";
 import PetManagementPage from "./pages/main/PetManagementPage";
@@ -41,6 +41,7 @@ function App() {
                     <Route path="/mypets/:petId/edit" element={<EditPetPage />} />
                     <Route path="/mypets/new" element={<NewPetPage />} />
                     <Route path="/mypets/:petId" element={<PetPage />} />
+                    <Route path="*" element={<Navigate to="/"/>}/>
                   </Routes>
                   <ProtectedRoute>
                     <Routes>

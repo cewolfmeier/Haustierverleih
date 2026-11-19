@@ -1,24 +1,11 @@
-import { useEffect, useState } from "react";
-import { useApi } from "../../contexts/ApiProvider";
+import { useState } from "react";
 import type { AnimalType } from "../../Schemas";
 import { useParams } from "react-router-dom";
 
 
 export default function EditAnimalTypePage(){
     const { animalTypeId } = useParams<{ animalTypeId: string }>();
-    const api = useApi();
     const [animalType, setAnimalType] = useState<AnimalType | null | undefined>();
-
-    useEffect(()=>{
-        (async () => {
-            const response = await api.get<AnimalType>("/animaltypes/"+animalTypeId);
-            if (response.status === 200 && response.data) {
-                setAnimalType(response.data)
-            } else {
-                setAnimalType(null);
-            };
-        })();
-    }, [api]);
 
     return(
         <>

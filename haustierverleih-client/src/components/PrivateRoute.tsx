@@ -1,13 +1,12 @@
 import type { PropsWithChildren } from 'react';
 import { useUser } from '../contexts/UserContext';
 
-export default function PrivateRoute({ children }: PropsWithChildren<{}>) {
+export default function PrivateRoute({ children }: PropsWithChildren) {
 	const { currentUser } = useUser();
-	const user = currentUser();
 
-	if (user === undefined) {
+	if (currentUser === undefined) {
 		return null;
-	} else if (user) {
+	} else if (currentUser) {
 		return <>{children}</>;
 	};
 };

@@ -1,19 +1,17 @@
 import { Form } from "react-bootstrap";
-import { useApi } from "../../contexts/ApiProvider";
 import { useRef } from "react";
 import type { AnimalType, NewAnimalType } from "../../Schemas";
 
 export default function NewAnimalTypePage(){
-    const api = useApi();
     const animalTypeField = useRef<HTMLInputElement>(null);
 
     const onSubmit = async (event: React.SubmitEvent) => {
         event.preventDefault(); //Note: prevents a reload of the page so Formdata doesn't get lost
-        await api.post<NewAnimalType, AnimalType>("/animaltypes", 
+        /*await api.post<NewAnimalType, AnimalType>("/animaltypes", 
             {
                 animalType: animalTypeField.current ? animalTypeField.current.value : "",
             }
-        );
+        );*/
     }
 
     return(

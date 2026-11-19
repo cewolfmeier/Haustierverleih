@@ -1,31 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PetRow from "../../components/PetRow";
-import { useApi } from "../../contexts/ApiProvider";
 import type { Pet } from "../../Schemas";
 
 export default function PetManagementPage(){
-    const api = useApi();
     const [ownedPets, setOwnedPets] = useState<Pet[] | null | undefined>();
     const [borrowedPets, setBorrowedPets] = useState<Pet[] | null | undefined>();
 
-    useEffect(()=>{
-        (async () => {
-            const response = await api.get<Pet[]>("/me/pets");
-            if (response.status == 200 && response.data) {
-                setOwnedPets(response.data)
-            } else {
-                setOwnedPets(null);
-            };
-        })();
-        (async () => {
-            const response = await api.get<Pet[]>("/me/pets");
-            if (response.status == 200 && response.data) {
-                setBorrowedPets(response.data)
-            } else {
-                setBorrowedPets(null);
-            };
-        })();
-    }, [api]);
 
     return(
         <>

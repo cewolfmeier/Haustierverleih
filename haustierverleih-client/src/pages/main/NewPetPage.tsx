@@ -1,22 +1,9 @@
-import { useEffect, useState } from "react";
-import { useApi } from "../../contexts/ApiProvider";
+import { useState } from "react";
 import type { AnimalType, NewPet, Pet } from "../../Schemas";
 import { Form } from "react-bootstrap";
 
 export default function NewPetPage(){
-    const api = useApi();
     const [animalTypes, setAnimalTypes] = useState<AnimalType[] | null | undefined>();
-
-    useEffect(()=>{
-        (async () => {
-            const response = await api.get<AnimalType[]>("/animaltypes");
-            if (response.status === 200 && response.data) {
-                setAnimalTypes(response.data)
-            } else {
-                setAnimalTypes(null);
-            };
-        })();
-    }, [api]);
 
     const onSubmit = async (event: React.SubmitEvent) => {
         event.preventDefault(); //Note: prevents a reload of the page so Formdata doesn't get lost

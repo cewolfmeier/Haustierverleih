@@ -1,12 +1,10 @@
 import React, { useRef } from "react";
 import { Form } from "react-bootstrap";
 import type { NewUser, User } from "../../Schemas";
-import { useApi } from "../../contexts/ApiProvider";
 import { useNavigate } from "react-router-dom";
 
 
 export default function RegisterPage(){
-    const api = useApi();
     const navigate = useNavigate()
     const usernameField = useRef<HTMLInputElement>(null);
     const passwordField = useRef<HTMLInputElement>(null);
@@ -15,6 +13,7 @@ export default function RegisterPage(){
     const onSubmit = async (event: React.SubmitEvent) => {
         event.preventDefault(); //Note: prevents a reload of the page so Formdata doesn't get lost
         if (passwordField.current?.value !== passwordRepeatField.current?.value) return;
+        /*
         const response = await api.post<NewUser, User>("/users", 
             {
                 username: usernameField.current ? usernameField.current.value : "",
@@ -24,6 +23,7 @@ export default function RegisterPage(){
         if (response.status == 201) {
             navigate("/login")
         };
+        */
     }
 
     return(  
