@@ -11,37 +11,38 @@ from .schemas import AnimalTypeSchema
 
 animal_type_schema = AnimalTypeSchema()
 animal_types_schema = AnimalTypeSchema(many=True)
+ResourceModel = AnimalTypes
 
 
 @bp.get("animaltypes/<int:id>")  # type: ignore
 @response(animal_type_schema)
 @other_responses({404: "Animal type not found"})
-def get_by_id(id):
+def get_animal_type_by_id(id):
     """Returns an AnimalTypes object requested by id"""
-    return db.get_or_404(AnimalTypes, id)
+    return db.get_or_404(ResourceModel, id)
 
 
 @bp.get("/animaltypes")  # type: ignore
 @response(animal_types_schema)
-def get_collection():
+def get_animal_type_collection():
     """Return a collection of AnimalTypes objects if present"""
-    return db.session.scalars(sa.select(AnimalTypes)).all()
+    return db.session.scalars(sa.select(ResourceModel)).all()
 
 
 @bp.post("/animaltypes")  # type: ignore
 @body(animal_type_schema)
 @response(animal_type_schema, 201)
 @other_responses({400: "Invalid request body"})
-def create(args):
+def create_animal_type(args):
     """Creates and saves a new AnimalType Object"""
     if db.session.scalar(
-        sa.select(AnimalTypes).where(AnimalTypes.animal_type == args.get("animal_type"))
+        sa.select(ResourceModel).where(ResourceModel.animal_type == args.get("animal_type"))
     ):
         abort(400)
-    animal_type = AnimalTypes(**args)
-    db.session.add(animal_type)
+    resource = ResourceModel(**args)
+    db.session.add(resource)
     db.session.commit()
-    return animal_type
+    return resource
 
 
 # Same route for put and patch, because currently only one property can be changed
@@ -49,21 +50,21 @@ def create(args):
 @body(animal_type_schema)
 @response(animal_type_schema, 200)
 @other_responses({400: "Invalid request body", 404: "Animal type not found"})
-def update(args, id):
-    animal_type = db.get_or_404(AnimalTypes, id)
+def update_animal_type(args, id):
+    resource = db.get_or_404(ResourceModel, id)
     if db.session.scalar(
-        sa.select(AnimalTypes).where(AnimalTypes.animal_type == args.get("animal_type"))
+        sa.select(ResourceModel).where(ResourceModel.animal_type == args.get("animal_type"))
     ):
         abort(400)
-    animal_type_schema.load(request.json, instance=animal_type)
+    animal_type_schema.load(request.json, instance=resource)
     db.session.commit()
-    return animal_type
+    return resource
 
 
 @bp.delete("/animaltypes/<int:id>")  # type: ignore
 @response(EmptySchema, 204)
 @other_responses({404: "Animal type not found"})
-def delete(id):
-    db.get_or_404(AnimalTypes, id)
-    db.session.execute(sa.delete(AnimalTypes).where(AnimalTypes.animal_type_id == id))
+def delete_animal_type(id):
+    db.get_or_404(ResourceModel, id)
+    db.session.execute(sa.delete(ResourceModel).where(ResourceModel.animal_type_id == id))
     db.session.commit()
