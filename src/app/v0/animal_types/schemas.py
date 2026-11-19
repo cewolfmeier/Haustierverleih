@@ -1,6 +1,8 @@
-from app.models import AnimalTypes
 from app import ma
+from app.models import AnimalTypes
+
 from ..schemas import CamelCaseSchema
+
 
 class AnimalTypeSchema(ma.SQLAlchemySchema, CamelCaseSchema):
     class Meta:
