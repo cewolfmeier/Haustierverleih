@@ -6,6 +6,8 @@ load_dotenv(os.path.join(basedir, '.env'))
 default_user_upload_dir = os.path.join(basedir, 'app/static/images/user_uploads')
 
 class Config:
+    APIFAIRY_TITLE="Haustierverleih API"
+    APIFAIRY_VERSION="0.0.0"
     DATABASE_USER=os.environ.get('DATABASE_USER')
     DATABASE_PASSWORD=os.environ.get('DATABASE_PASSWORD')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
