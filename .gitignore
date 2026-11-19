@@ -6,4 +6,4 @@ user_uploads
 boot.sh
 docker-compose.yml
 logs
-/instance
+:memory
