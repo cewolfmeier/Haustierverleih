@@ -1,5 +1,5 @@
 from app.models import AnimalTypes
-from app import marshmallow as ma
+from app import ma
 
 class AnimalTypeSchema(ma.SQLAlchemySchema):
     class Meta:
