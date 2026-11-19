@@ -36,7 +36,9 @@ def get_animal_type_collection():
 def create_animal_type(args):
     """Creates and saves a new AnimalType Object"""
     if db.session.scalar(
-        sa.select(ResourceModel).where(ResourceModel.animal_type == args.get("animal_type"))
+        sa.select(ResourceModel).where(
+            ResourceModel.animal_type == args.get("animal_type")
+        )
     ):
         abort(400)
     resource = ResourceModel(**args)
@@ -53,7 +55,9 @@ def create_animal_type(args):
 def update_animal_type(args, id):
     resource = db.get_or_404(ResourceModel, id)
     if db.session.scalar(
-        sa.select(ResourceModel).where(ResourceModel.animal_type == args.get("animal_type"))
+        sa.select(ResourceModel).where(
+            ResourceModel.animal_type == args.get("animal_type")
+        )
     ):
         abort(400)
     single_schema.load(request.json, instance=resource)
@@ -66,5 +70,7 @@ def update_animal_type(args, id):
 @other_responses({404: "Animal type not found"})
 def delete_animal_type(id):
     db.get_or_404(ResourceModel, id)
-    db.session.execute(sa.delete(ResourceModel).where(ResourceModel.animal_type_id == id))
+    db.session.execute(
+        sa.delete(ResourceModel).where(ResourceModel.animal_type_id == id)
+    )
     db.session.commit()

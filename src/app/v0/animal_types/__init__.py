@@ -1,5 +1,3 @@
 from . import routes
 
-__all__ = [
-    "routes"
-]
+__all__ = ["routes"]

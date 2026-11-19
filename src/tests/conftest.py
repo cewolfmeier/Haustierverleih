@@ -3,7 +3,7 @@ import base64
 import pytest
 
 from app import create_app, db
-from app.models import AnimalTypes, Roles, Users, Pets
+from app.models import AnimalTypes, Pets, Roles, Users
 from config import Config
 
 

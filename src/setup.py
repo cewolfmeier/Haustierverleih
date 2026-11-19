@@ -1,4 +1,5 @@
 """Setup script for new installations"""
+
 import secrets
 
 from flask import Flask

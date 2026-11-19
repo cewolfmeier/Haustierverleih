@@ -14,6 +14,7 @@ collection_schema = PetSchema(many=True)
 update_schema = PetSchema(partial=True)
 ResourceModel = Pets
 
+
 @bp.get("pets/<int:id>")  # type: ignore
 @response(single_schema)
 @other_responses({404: "Pet not found"})
