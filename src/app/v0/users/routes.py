@@ -4,8 +4,6 @@ from app.v0 import bp
 from app import db
 from app.models import Users
 
-
-
 @bp.get("/users")
 def get_users_collection() -> list[dict]:
     """Returns a collection of users"""
