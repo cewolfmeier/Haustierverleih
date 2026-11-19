@@ -2,8 +2,9 @@ import sqlalchemy as sa
 from flask import current_app
 
 from app import db
-from app.v0 import bp
 from app.models import Pets
+from app.v0 import bp
+
 
 # ---- DECORATORS AND GLOBAL FUNCTIONS ---- #
 # This function was taken from the official Flask documentation

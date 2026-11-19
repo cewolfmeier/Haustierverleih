@@ -1,4 +1,5 @@
-from marshmallow import Schema, fields
+from app import ma
+
 
 # Helper from https://marshmallow.readthedocs.io/en/3.x-line/examples/inflection.html
 def camelcase(s):
@@ -6,10 +7,14 @@ def camelcase(s):
     return next(parts) + "".join(i.title() for i in parts)
 
 
-class CamelCaseSchema(Schema):
+class CamelCaseSchema(ma.Schema):
     """Schema that uses camel-case for its external representation
     and snake-case for its internal representation.
     """
 
     def on_bind_field(self, field_name, field_obj):
         field_obj.data_key = camelcase(field_obj.data_key or field_name)
+
+
+class EmptySchema(ma.Schema):
+    pass

@@ -3,7 +3,7 @@ import base64
 import pytest
 
 from app import create_app, db
-from app.models import Roles, Users, AnimalTypes
+from app.models import AnimalTypes, Roles, Users
 from config import Config
 
 
@@ -35,14 +35,8 @@ def app():
         db.session.add_all(
             [
                 testuser,
-                AnimalTypes(
-                    animal_type_id=1,
-                    animal_type="dog"
-                ),
-                AnimalTypes(
-                    animal_type_id=2,
-                    animal_type="fish"
-                ),
+                AnimalTypes(animal_type_id=1, animal_type="dog"),
+                AnimalTypes(animal_type_id=2, animal_type="fish"),
             ]
         )
         db.session.commit()
@@ -50,6 +44,7 @@ def app():
         yield app
 
         db.drop_all()
+
 
 @pytest.fixture
 def app_minimal():
@@ -86,6 +81,7 @@ def app_minimal():
 @pytest.fixture
 def client(app):
     return app.test_client()
+
 
 @pytest.fixture
 def client_minimal(app_minimal):

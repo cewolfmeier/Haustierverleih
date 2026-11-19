@@ -1,8 +1,9 @@
 import sqlalchemy as sa
 
-from app.v0 import bp
 from app import db
 from app.models import Users
+from app.v0 import bp
+
 
 @bp.get("/users")
 def get_users_collection() -> list[dict]:

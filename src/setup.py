@@ -1,17 +1,18 @@
 """Setup script for new installations"""
-
-#!/usr/bin/env python3
-from app.models import Roles, Users
 import secrets
+
 from flask import Flask
-from config import Config
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+
+from app.models import Roles, Users
+from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
 
 def create_password():
     password = secrets.token_hex()
@@ -31,9 +32,7 @@ def setup_data():
         db.session.commit()
         print("Roles created successfully!")
 
-        root_user = Users(
-            username="root", role_id=1
-        )
+        root_user = Users(username="root", role_id=1)
         root_user.set_password(create_password())
 
         db.session.add(root_user)
