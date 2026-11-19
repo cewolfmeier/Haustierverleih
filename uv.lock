@@ -241,6 +241,7 @@ dependencies = [
     { name = "flask-migrate" },
     { name = "flask-sqlalchemy" },
     { name = "mariadb" },
+    { name = "marshmallow-sqlalchemy" },
     { name = "python-dotenv" },
 ]
 
@@ -259,6 +260,7 @@ requires-dist = [
     { name = "flask-migrate", specifier = ">=4.1.0" },
     { name = "flask-sqlalchemy", specifier = ">=3.1.1" },
     { name = "mariadb", specifier = ">=1.1.14" },
+    { name = "marshmallow-sqlalchemy", specifier = ">=1.6.0" },
     { name = "python-dotenv", specifier = ">=1.2.4" },
 ]
 
@@ -410,6 +412,19 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/0d/3e/2b75ae631789fc13191ab82bc08957af381c00fffc5fefc6248b719bc9d2/marshmallow-4.4.0.tar.gz", hash = "sha256:9e6ffa8511012ca89732324c1c253efd7b4d35632dcbdf80aa793fe01804af3e", size = 222228, upload-time = "2026-11-04T00:09:23.777Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/33/e7/07f4ba1b1053c565081a843782544e81a02302c9fe457c4a8e25196087af/marshmallow-4.4.0-py3-none-any.whl", hash = "sha256:03a882ff2eabb9a4e24b433c2949f359ef4d172a12fdc14cde10375fd55328b4", size = 53724, upload-time = "2026-11-04T00:09:22.005Z" },
+]
+
+[[package]]
+name = "marshmallow-sqlalchemy"
+version = "1.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "marshmallow" },
+    { name = "sqlalchemy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a1/6d/097b9792559b6eef8c6c130d659be0ed8c9fe65b14ad4c425f6cfbc6e90c/marshmallow_sqlalchemy-1.6.0.tar.gz", hash = "sha256:adebc7e36a7ec5662de93b00b850b50e36f4e8fe67ccf6e9e8e5ff42a78b1696", size = 50981, upload-time = "2026-10-19T17:21:14.182Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6f/ef/7bf44661d2983a6ccf34a886bd848a344726ab21a952fbfa6eb1501fe406/marshmallow_sqlalchemy-1.6.0-py3-none-any.whl", hash = "sha256:09ce8cddb9f8f2cf415261ea939542527f722943488b70a5ad69106486d259ea", size = 17715, upload-time = "2026-10-19T17:21:12.682Z" },
 ]
 
 [[package]]
