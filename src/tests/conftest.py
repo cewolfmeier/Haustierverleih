@@ -3,7 +3,7 @@ import base64
 import pytest
 
 from app import create_app, db
-from app.models import AnimalTypes, Roles, Users
+from app.models import AnimalTypes, Roles, Users, Pets
 from config import Config
 
 
@@ -37,6 +37,13 @@ def app():
                 testuser,
                 AnimalTypes(animal_type_id=1, animal_type="dog"),
                 AnimalTypes(animal_type_id=2, animal_type="fish"),
+            ]
+        )
+        db.session.commit()
+        db.session.add_all(
+            [
+                Pets(pet_id=1, animal_type_id=1, name="bello", description="Loves to play in mudd", owner_id=1),
+                Pets(pet_id=2, animal_type_id=2, name="blubber", description="easy to keep, likes to swim belly up", owner_id=1),
             ]
         )
         db.session.commit()

@@ -1,5 +1,6 @@
-from . import routes
+from . import routes, schemas
 
 __all__ = [
-    "routes"
+    "routes",
+    "schemas",
 ]
