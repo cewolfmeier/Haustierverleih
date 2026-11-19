@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from apifairy import body, other_responses, response
-from flask import abort, request
+from flask import request
 
 from app import db
 from app.models import Pets
@@ -16,15 +16,15 @@ ResourceModel = Pets
 
 @bp.get("pets/<int:id>")  # type: ignore
 @response(single_schema)
-@other_responses({404: "Animal type not found"})
-def get_by_id(id):
+@other_responses({404: "Pet not found"})
+def get_pet_by_id(id):
     """Returns a Pets object requested by id"""
     return db.get_or_404(ResourceModel, id)
 
 
 @bp.get("/pets")  # type: ignore
 @response(collection_schema)
-def get_collection():
+def get_pet_collection():
     """Return a collection of Pets objects if present"""
     return db.session.scalars(sa.select(ResourceModel)).all()
 
@@ -33,43 +33,31 @@ def get_collection():
 @body(single_schema)
 @response(single_schema, 201)
 @other_responses({400: "Invalid request body"})
-def create(args):
+def create_pet(args):
     """Creates and saves a new Pets Object"""
-    if db.session.scalar(
-        sa.select(ResourceModel).where(ResourceModel.animal_type == args.get("animal_type"))
-    ):
-        abort(400)
-    animal_type = ResourceModel(**args)
-    db.session.add(animal_type)
-    db.session.commit()
-    return animal_type
-
-
-@bp.put("/pets/<int:id>")  # type: ignore
-@body(single_schema)
-@response(single_schema, 200)
-@other_responses({400: "Invalid request body", 404: "Pet not found"})
-def update(args, id):
-    resource = db.get_or_404(ResourceModel, id)
-    if db.session.scalar(
-        sa.select(ResourceModel).where(ResourceModel.animal_type == args.get("animal_type"))
-    ):
-        abort(400)
-    update_schema.load(request.json, instance=resource)
+    resource = ResourceModel(**args)
+    db.session.add(resource)
     db.session.commit()
     return resource
 
 
-@bp.route("/pets/<int:id>")  # type: ignore
-@body(update_schema)
-@response(single_schema, 200)
+@bp.put("/pets/<int:id>")  # type: ignore
+@body(single_schema)
+@response(single_schema)
 @other_responses({400: "Invalid request body", 404: "Pet not found"})
-def update_partial(args, id):
+def update_pet(args, id):
     resource = db.get_or_404(ResourceModel, id)
-    if db.session.scalar(
-        sa.select(ResourceModel).where(ResourceModel.animal_type == args.get("animal_type"))
-    ):
-        abort(400)
+    single_schema.load(request.json, instance=resource)
+    db.session.commit()
+    return resource
+
+
+@bp.patch("/pets/<int:id>")  # type: ignore
+@body(update_schema)
+@response(single_schema)
+@other_responses({400: "Invalid request body", 404: "Pet not found"})
+def update_partial_pet(args, id):
+    resource = db.get_or_404(ResourceModel, id)
     update_schema.load(request.json, instance=resource)
     db.session.commit()
     return resource
@@ -78,7 +66,29 @@ def update_partial(args, id):
 @bp.delete("/pets/<int:id>")  # type: ignore
 @response(EmptySchema, 204)
 @other_responses({404: "Pet not found"})
-def delete(id):
+def delete_pet(id):
     db.get_or_404(ResourceModel, id)
     db.session.execute(sa.delete(ResourceModel).where(ResourceModel.pet_id == id))
     db.session.commit()
+
+
+@bp.patch("/pets/<int:id>/borrow")  # type: ignore
+@body(EmptySchema)
+@response(single_schema)
+@other_responses({400: "Invalid request body", 404: "Pet not found"})
+def borrow_pet(args, id):
+    resource = db.get_or_404(ResourceModel, id)
+    resource.borrower_id
+    db.session.commit()
+    return resource
+
+
+@bp.patch("/pets/<int:id>/return")  # type: ignore
+@body(EmptySchema)
+@response(single_schema)
+@other_responses({400: "Invalid request body", 404: "Pet not found"})
+def return_pet(args, id):
+    resource = db.get_or_404(ResourceModel, id)
+    resource.borrower_id = None
+    db.session.commit()
+    return resource

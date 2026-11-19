@@ -20,20 +20,11 @@ def test_get_by_id(client, id, status_code):
 @pytest.mark.parametrize(
     ("req_data", "resp_key", "status_code"),
     (
-        ({"animalType": "cat"}, "animalTypeId", 201),  # happy path
-        (
-            {"animalType": "cat", "animalTypeId": 99},
-            "messages",
-            400,
-        ),  # animalTypeId is not allowed in post requests
-        ({"animalType": "dog"}, "messages", 400),  # anmial_type has to be unique
-        ({"animal_type": "cat"}, "messages", 400),  # key has to be in camelCase
-        ({"animalType": 1}, "messages", 400),  # value has to be a string
-        (
-            {"myType": "lizard", "animalType": "lizard"},
-            "messages",
-            400,
-        ),  # reject unkown keys
+        ({"name": "Milo", "description":"A little cat", "animalTypeId": 1}, "petId", 201),  # happy path
+        ({"name": "Milo", "description":"A little cat", "animalTypeId": 1, "petId": 99}, "messages", 400),  # petId is not allowed
+        ({"name": "Milo", "description":"A little cat", "animal_type_id": 1}, "messages", 400),  # key has to be in camelCase
+        ({"name": 123, "description":"A little cat", "animalTypeId": 1}, "messages", 400),  # wrong value type
+        ({"name": "Milo", "description":"A little cat", "animalTypeId": 1, "myCustom": "Hello!"}, "messages", 400),  # reject unkown keys
         ({}, "messages", 400),  # reject empty bodies
     ),
 )
@@ -44,53 +35,36 @@ def test_post(client, req_data, resp_key, status_code):
 
 
 @pytest.mark.parametrize(
-    ("req_data", "resp_key", "status_code"),
+    ("id","req_data", "resp_key", "status_code"),
     (
-        ({"animalType": "cat"}, "animalType", 200),  # happy path
-        (
-            {"animalType": "cat", "animalTypeId": 99},
-            "messages",
-            400,
-        ),  # animalTypeId is not allowed in put requests
-        ({"animalType": "dog"}, "messages", 400),  # anmial_type has to be unique
-        ({"animal_type": "cat"}, "messages", 400),  # key has to be in camelCase
-        ({"animalType": 1}, "messages", 400),  # value has to be a string
-        (
-            {"myType": "lizard", "animalType": "lizard"},
-            "messages",
-            400,
-        ),  # reject unkown keys
-        ({}, "messages", 400),  # reject empty bodies
+        ("2",{"name": "Milo", "description":"A little cat", "animalTypeId": 1}, "petId", 200),  # happy path
+        ("99",{"name": "Milo", "description":"A little cat", "animalTypeId": 1}, "messages", 404),  # wrong id
+        ("2",{"name": "Milo", "description":"A little cat"}, "petId", 400),  # missing key:value
+        ("2",{"name": "Milo", "description":"A little cat", "animalTypeId": 1, "petId": 99}, "messages", 400),  # petId is not allowed 
+        ("2",{"name": "Milo", "description":"A little cat", "animal_type_id": 1}, "messages", 400),  # key has to be in camelCase
+        ("2",{"name": 123, "description":"A little cat", "animalTypeId": 1}, "messages", 400),  # wrong value type
+        ("2",{"name": "Milo", "description":"A little cat", "animalTypeId": 1, "myCustom": "Hello!"}, "messages", 400),  # reject unkown keys
+        ("2",{}, "messages", 400),  # reject empty bodies
     ),
 )
-def test_put(client, req_data, resp_key, status_code):
-    response = client.put("api/v0/pets/2", json=req_data)
+def test_put(client, id, req_data, resp_key, status_code):
+    response = client.put("api/v0/pets/"+id, json=req_data)
     assert response.status_code == status_code
 
 
-# Same like put
 @pytest.mark.parametrize(
-    ("req_data", "resp_key", "status_code"),
+    ("id", "req_data", "resp_key", "status_code"),
     (
-        ({"animalType": "cat"}, "animalType", 200),  # happy path
-        (
-            {"animalType": "cat", "animalTypeId": 99},
-            "messages",
-            400,
-        ),  # animalTypeId is not allowed in put requests
-        ({"animalType": "dog"}, "messages", 400),  # anmial_type has to be unique
-        ({"animal_type": "cat"}, "messages", 400),  # key has to be in camelCase
-        ({"animalType": 1}, "messages", 400),  # value has to be a string
-        (
-            {"myType": "lizard", "animalType": "lizard"},
-            "messages",
-            400,
-        ),  # reject unkown keys
-        ({}, "messages", 400),  # reject empty bodies
+        ("2",{"name": "Milo"}, "petId", 200),  # happy path
+        ("99",{"name": "Milo"}, "messages", 404),  # wrong id
+        ("2",{"petId": 99}, "messages", 400),  # petId is not allowed
+        ("2",{"animal_type_id": 1}, "messages", 400),  # key has to be in camelCase
+        ("2",{"name": 123}, "messages", 400),  # wrong value type
+        ("2",{"myCustom": "Hello!"}, "messages", 400),  # reject unkown keys
     ),
 )
-def test_patch(client, req_data, resp_key, status_code):
-    response = client.patch("api/v0/pets/2", json=req_data)
+def test_patch(client, id, req_data, resp_key, status_code):
+    response = client.patch("api/v0/pets/"+id, json=req_data)
     assert response.status_code == status_code
 
 
@@ -105,3 +79,28 @@ def test_delete(client, id, status_code):
     response = client.delete("api/v0/pets/" + id)
     assert response.status_code == status_code
 
+
+@pytest.mark.parametrize(
+    ("id", "req_data", "resp_key", "status_code"),
+    (
+        ("2",{}, "petId", 200),  # happy path
+        ("2",{"borrowerId": 2}, "messages", 400),  # no properties allowed
+        ("99",{}, "messages", 404),  # wrong id
+    ),
+)
+def test_borrow(client, id, req_data, resp_key, status_code):
+    response = client.patch("api/v0/pets/{}/borrow".format(id), json=req_data)
+    assert response.status_code == status_code
+
+
+@pytest.mark.parametrize(
+    ("id", "req_data", "resp_key", "status_code"),
+    (
+        ("2",{}, "petId", 200),  # happy path
+        ("2",{"borrowerId": 2}, "messages", 400),  # no properties allowed
+        ("99",{}, "messages", 404),  # wrong id
+    ),
+)
+def test_return(client, id, req_data, resp_key, status_code):
+    response = client.patch("api/v0/pets/{}/return".format(id), json=req_data)
+    assert response.status_code == status_code

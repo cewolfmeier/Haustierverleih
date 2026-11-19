@@ -26,15 +26,23 @@ def app():
             ]
         )
         db.session.commit()
-        testuser = Users(
-            user_id=1,
-            username="test",
-            role_id=1,
-        )
-        testuser.set_password("test")
+        testusers = [
+            Users(
+                user_id=1,
+                username="admin",
+                role_id=2,
+            ),
+            Users(
+                user_id=2,
+                username="test",
+                role_id=1,
+            ),
+        ]
+        for testuser in testusers:
+            testuser.set_password("test") 
+        db.session.add_all(testusers)
         db.session.add_all(
             [
-                testuser,
                 AnimalTypes(animal_type_id=1, animal_type="dog"),
                 AnimalTypes(animal_type_id=2, animal_type="fish"),
             ]
