@@ -39,6 +39,10 @@ def app():
                     animal_type_id=1,
                     animal_type="dog"
                 ),
+                AnimalTypes(
+                    animal_type_id=2,
+                    animal_type="fish"
+                ),
             ]
         )
         db.session.commit()
