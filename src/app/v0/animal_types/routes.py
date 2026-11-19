@@ -1,7 +1,4 @@
-
-from app.api.v0 import bp
-
-
+from app.v0 import bp
 
 @bp.get("/animaltypes")
 def get_animal_type_collection() -> list[dict]:

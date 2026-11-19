@@ -30,7 +30,7 @@ def create_app(config_class=Config):
     from app.admin import bp as admin_bp
     app.register_blueprint(admin_bp)
 
-    from app.api.v0 import bp as api_v0_bp
+    from app.v0 import bp as api_v0_bp
     app.register_blueprint(api_v0_bp, url_prefix="/api/v0")
 
     if not app.debug and not app.testing:
