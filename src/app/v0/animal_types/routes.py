@@ -1,39 +1,39 @@
 import sqlalchemy as sa
 from apifairy import body, other_responses, response
-from flask import abort, request
+from flask import Blueprint, abort, request
 
 from app import db
 from app.models import AnimalTypes
-from app.v0 import bp
 
 from ..schemas import EmptySchema
 from .schemas import AnimalTypeSchema
 
+animal_types = Blueprint("animal_types", __name__)
 single_schema = AnimalTypeSchema()
 collection_schema = AnimalTypeSchema(many=True)
 ResourceModel = AnimalTypes
 
 
-@bp.get("animaltypes/<int:id>")  # type: ignore
+@animal_types.get("/<int:id>")  # type: ignore
 @response(single_schema)
 @other_responses({404: "Animal type not found"})
-def get_animal_type_by_id(id):
+def get_by_id(id):
     """Returns an AnimalTypes object requested by id"""
     return db.get_or_404(ResourceModel, id)
 
 
-@bp.get("/animaltypes")  # type: ignore
+@animal_types.get("")  # type: ignore
 @response(collection_schema)
-def get_animal_type_collection():
+def get_collection():
     """Return a collection of AnimalTypes objects if present"""
     return db.session.scalars(sa.select(ResourceModel)).all()
 
 
-@bp.post("/animaltypes")  # type: ignore
+@animal_types.post("")  # type: ignore
 @body(single_schema)
 @response(single_schema, 201)
 @other_responses({400: "Invalid request body"})
-def create_animal_type(args):
+def create(args):
     """Creates and saves a new AnimalType Object"""
     if db.session.scalar(
         sa.select(ResourceModel).where(
@@ -48,11 +48,11 @@ def create_animal_type(args):
 
 
 # Same route for put and patch, because currently only one property can be changed
-@bp.route("/animaltypes/<int:id>", methods=["PUT", "PATCH"])  # type: ignore
+@animal_types.route("/<int:id>", methods=["PUT", "PATCH"])  # type: ignore
 @body(single_schema)
 @response(single_schema, 200)
 @other_responses({400: "Invalid request body", 404: "Animal type not found"})
-def update_animal_type(args, id):
+def update(args, id):
     resource = db.get_or_404(ResourceModel, id)
     if db.session.scalar(
         sa.select(ResourceModel).where(
@@ -65,10 +65,10 @@ def update_animal_type(args, id):
     return resource
 
 
-@bp.delete("/animaltypes/<int:id>")  # type: ignore
+@animal_types.delete("/<int:id>")  # type: ignore
 @response(EmptySchema, 204)
 @other_responses({404: "Animal type not found"})
-def delete_animal_type(id):
+def delete(id):
     db.get_or_404(ResourceModel, id)
     db.session.execute(
         sa.delete(ResourceModel).where(ResourceModel.animal_type_id == id)

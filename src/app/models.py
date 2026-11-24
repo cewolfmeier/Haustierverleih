@@ -1,8 +1,10 @@
 import os
+from datetime import datetime
 
+import jwt
 import sqlalchemy as sa
 import sqlalchemy.orm as so
-from flask import session
+from flask import current_app, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db
@@ -24,9 +26,11 @@ class Users(db.Model):
     user_id: so.Mapped[int] = so.mapped_column(primary_key=True)
     username: so.Mapped[str] = so.mapped_column(sa.String(255), index=True, unique=True)
     password_hash: so.Mapped[str | None] = so.mapped_column(sa.String(255))
-    role_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Roles.role_id), index=True)
+    role_id: so.Mapped[int | None] = so.mapped_column(
+        sa.ForeignKey(Roles.role_id), index=True, nullable=True
+    )
 
-    role: so.Mapped[Roles] = so.relationship(back_populates="users")
+    role: so.Mapped[Roles | None] = so.relationship(back_populates="users")
 
     owned_pets: so.WriteOnlyMapped[Pets] = so.relationship(
         back_populates="owned",
@@ -70,6 +74,17 @@ class Users(db.Model):
         if new:
             pass
 
+    def issue_token(self, exp: datetime):
+        return jwt.encode(
+            {
+                "sub": str(self.user_id),
+                "name": self.username,
+                "exp": exp,
+            },
+            current_app.config["SECRET_KEY"],
+            algorithm="HS256",
+        )
+
 
 class AnimalTypes(db.Model):
     __tablename__ = "animal_types"
@@ -96,7 +111,7 @@ class Pets(db.Model):
     owner_id: so.Mapped[int] = so.mapped_column(
         sa.ForeignKey(Users.user_id, ondelete="CASCADE"), index=True
     )
-    borrower_id: so.Mapped[int] = so.mapped_column(
+    borrower_id: so.Mapped[int | None] = so.mapped_column(
         sa.ForeignKey(Users.user_id, ondelete="SET NULL"), index=True, nullable=True
     )
 

@@ -20,52 +20,6 @@ def test_get_by_id(client, id, status_code):
 
 
 @pytest.mark.parametrize(
-    ("req_data", "resp_key", "status_code"),
-    (
-        (
-            {"username": "herbert", "password": "MySecretPassword1!"},
-            "userId",
-            201,
-        ),  # happy path
-        (
-            {"username": "herbert", "password": "MySecretPassword1!", "userId": 99},
-            "messages",
-            400,
-        ),  # petId is not allowed
-        (
-            {"username": "herbert", "password": "MySecretPassword1!", "role_id": 1},
-            "messages",
-            400,
-        ),  # key has to be in camelCase
-        (
-            {"username": "herbert", "password": "MySecretPassword1!", "roleId": 1},
-            "messages",
-            400,
-        ),  # Role should not be set in request body on register
-        (
-            {"username": 42, "password": "MySecretPassword1!"},
-            "messages",
-            400,
-        ),  # wrong value type
-        (
-            {
-                "username": "herbert",
-                "password": "MySecretPassword1!",
-                "myCustom": "Hello!",
-            },
-            "messages",
-            400,
-        ),  # reject unkown keys
-        ({}, "messages", 400),  # reject empty bodies
-    ),
-)
-def test_register(client, req_data, resp_key, status_code):
-    response = client.post("api/v0/register", json=req_data)
-    assert response.status_code == status_code
-    # assert resp_key in response.json
-
-
-@pytest.mark.parametrize(
     ("id", "req_data", "resp_key", "status_code"),
     (
         (

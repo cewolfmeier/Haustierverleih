@@ -40,9 +40,21 @@ def create_app(config_class=Config):
 
     app.register_blueprint(admin_bp)
 
-    from app.v0 import bp as api_v0_bp
+    from app.v0.auth.routes import auth as api_v0_auth
 
-    app.register_blueprint(api_v0_bp, url_prefix="/api/v0")
+    app.register_blueprint(api_v0_auth, url_prefix="/api/v0")
+
+    from app.v0.animal_types.routes import animal_types as api_v0_animal_types
+
+    app.register_blueprint(api_v0_animal_types, url_prefix="/api/v0/animaltypes")
+
+    from app.v0.pets.routes import pets as api_v0_pets
+
+    app.register_blueprint(api_v0_pets, url_prefix="/api/v0/pets")
+
+    from app.v0.users.routes import users as api_v0_users
+
+    app.register_blueprint(api_v0_users, url_prefix="/api/v0/users")
 
     if not app.debug and not app.testing:
 

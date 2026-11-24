@@ -1,5 +1,6 @@
 import base64
 
+import jwt
 import pytest
 
 from app import create_app, db
@@ -125,6 +126,17 @@ class AuthActions:
         )
         headers = {"Authorization": "Basic " + credentials}
         self._client.post("api/v0/login", headers=headers)
+
+    @property
+    def token(self):
+        return jwt.encode(
+            {
+                "sub": "1",
+                "name": "test",
+            },
+            self._client.app.config["SECRET_KEY"],
+            algorithm="HS256",
+        )
 
 
 @pytest.fixture

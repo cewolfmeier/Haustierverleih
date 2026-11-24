@@ -1,3 +1,6 @@
+from marshmallow.fields import String
+from marshmallow_sqlalchemy import auto_field
+
 from app import ma
 from app.models import Users
 
@@ -8,7 +11,7 @@ class UserSchema(ma.SQLAlchemySchema, CamelCaseSchema):
     class Meta:
         model = Users
 
-    user_id = ma.auto_field(dump_only=True)
-    username = ma.auto_field()
-    password_hash = ma.auto_field(load_only=True)
-    role_id = ma.auto_field(required=False)
+    user_id = auto_field(dump_only=True)
+    username = auto_field()
+    password = String(load_only=True)
+    role_id = auto_field(required=False)
