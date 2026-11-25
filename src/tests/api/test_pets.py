@@ -2,7 +2,7 @@ import pytest
 
 
 def test_get_collection(client, auth):
-    response = client.get("api/v0/pets", headers={"Authorization": "Bearer " + auth.token})
+    response = client.get("api/v0/pets/", headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == 200, "Happy Path, should return okay"
     assert len(response.json) > 1
 
@@ -61,7 +61,7 @@ def test_get_by_id(client, id, status_code, auth):
     ),
 )
 def test_post(client, req_data, resp_key, status_code, auth):
-    response = client.post("api/v0/pets", json=req_data, headers={"Authorization": "Bearer " + auth.token})
+    response = client.post("api/v0/pets/", json=req_data, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code
     # assert resp_key in response.json
 

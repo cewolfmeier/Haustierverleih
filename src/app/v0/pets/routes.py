@@ -25,7 +25,7 @@ def get_by_id(id):
     return db.get_or_404(ResourceModel, id)
 
 
-@pets.get("")  # type: ignore
+@pets.get("/")  # type: ignore
 @authenticate(token_auth)
 @response(collection_schema)
 def get_collection():
@@ -33,7 +33,7 @@ def get_collection():
     return db.session.scalars(sa.select(ResourceModel)).all()
 
 
-@pets.post("")  # type: ignore
+@pets.post("/")  # type: ignore
 @authenticate(token_auth)
 @body(single_schema)
 @response(single_schema, 201)

@@ -2,7 +2,7 @@ import pytest
 
 
 def test_get_collection(client, auth):
-    response = client.get("api/v0/users", headers={"Authorization": "Bearer " + auth.token})
+    response = client.get("api/v0/users/", headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == 200, "Happy Path, should return okay"
     assert len(response.json) > 1
 

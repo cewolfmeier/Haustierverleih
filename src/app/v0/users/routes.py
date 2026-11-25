@@ -17,7 +17,7 @@ ResourceModel = Users
 
 
 @users.get("/<int:id>")  # type: ignore
-@authenticate(token_auth)
+@authenticate(token_auth, role="admin")
 @response(single_schema)
 @other_responses({404: "User not found"})
 def get_by_id(id):
@@ -25,8 +25,8 @@ def get_by_id(id):
     return db.get_or_404(ResourceModel, id)
 
 
-@users.get("")  # type: ignore
-@authenticate(token_auth)
+@users.get("/")  # type: ignore
+@authenticate(token_auth, role="admin")
 @response(collection_schema)
 def get_collection():
     """Return a collection of User objects if present"""
@@ -34,7 +34,7 @@ def get_collection():
 
 
 @users.put("/<int:id>")  # type: ignore
-@authenticate(token_auth)
+@authenticate(token_auth, role="admin")
 @body(single_schema)
 @response(single_schema)
 @other_responses({400: "Invalid request body", 404: "User not found"})
@@ -46,7 +46,7 @@ def update(args, id):
 
 
 @users.patch("/<int:id>")  # type: ignore
-@authenticate(token_auth)
+@authenticate(token_auth, role="admin")
 @body(update_schema)
 @response(single_schema)
 @other_responses({400: "Invalid request body", 404: "User not found"})
@@ -58,7 +58,7 @@ def update_partial(args, id):
 
 
 @users.delete("/<int:id>")  # type: ignore
-@authenticate(token_auth)
+@authenticate(token_auth, role="admin")
 @response(EmptySchema, 204)
 @other_responses({404: "User not found"})
 def delete(id):

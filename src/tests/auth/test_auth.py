@@ -101,20 +101,69 @@ def test_login(client, headers, resp_key, status_code):
 
 
 @pytest.mark.parametrize(
-    ("resource",),
+    ("path",),
     (
-        ("/animaltypes",),
+        ("/animaltypes/",),
         ("/animaltypes/1",),
         ("/pets/1",),
-        ("/pets",),
-        ("/users",),
+        ("/pets/",),
+        ("/users/",),
         ("/users/1",),
     ),
 )
-def test_protected_get_routes(client, auth, resource):
-    response = client.get("api/v0" + resource)
+def test_protected_get_routes(client, path):
+    response = client.get("api/v0" + path)
     assert response.status_code == 401
-    response = client.get(
-        "api/v0" + resource, headers={"Authorization": "Bearer " + auth.token}
-    )
-    assert response.status_code == 200
+
+@pytest.mark.parametrize(
+    ("path",),
+    (
+        ("/animaltypes/1",),
+        ("/users/",),
+        ("/users/1",),
+    ),
+)
+def test_private_get_routes(client, auth, path):
+    response = client.get("api/v0" + path, headers={"Authorization": "Bearer " + auth.token})
+    assert response.status_code == 403
+
+@pytest.mark.parametrize(
+    ("path", "data"),
+    (
+        ("/animaltypes/", {"animalType": "cat"}),
+    ),
+)
+def test_private_post_routes(client, auth, path, data):
+    response = client.post("api/v0" + path, json=data, headers={"Authorization": "Bearer " + auth.token})
+    assert response.status_code == 403
+
+@pytest.mark.parametrize(
+    ("path", "data"),
+    (
+        ("/animaltypes/2", {"animalType": "cat"}),
+    ),
+)
+def test_private_put_routes(client, auth, path, data):
+    response = client.put("api/v0" + path, json=data, headers={"Authorization": "Bearer " + auth.token})
+    assert response.status_code == 403
+
+@pytest.mark.parametrize(
+    ("path", "data"),
+    (
+        ("/animaltypes/2", {"animalType": "cat"}),
+    ),
+)
+def test_private_patch_routes(client, auth, path, data):
+    response = client.patch("api/v0" + path, json=data, headers={"Authorization": "Bearer " + auth.token})
+    assert response.status_code == 403
+
+@pytest.mark.parametrize(
+    ("path"),
+    (
+        ("/animaltypes/1"),
+        ("/users/2"),
+    ),
+)
+def test_private_delete_routes(client, auth, path):
+    response = client.delete("api/v0" + path, headers={"Authorization": "Bearer " + auth.token})
+    assert response.status_code == 403

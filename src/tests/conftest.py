@@ -23,21 +23,21 @@ def app():
         db.create_all()
         db.session.add_all(
             [
-                Roles(role_id=1, role="User"),
-                Roles(role_id=2, role="Admin"),
+                Roles(role_id=1, role="user"), # type: ignore
+                Roles(role_id=2, role="admin"), # type: ignore
             ]
         )
         db.session.commit()
         testusers = [
             Users(
-                user_id=1,
-                username="admin",
-                role_id=2,
+                user_id=1, # type: ignore
+                username="admin", # type: ignore
+                role_id=2, # type: ignore
             ),
             Users(
-                user_id=2,
-                username="test",
-                role_id=1,
+                user_id=2, # type: ignore
+                username="test", # type: ignore
+                role_id=1, # type: ignore
             ),
         ]
         for testuser in testusers:
@@ -45,26 +45,26 @@ def app():
         db.session.add_all(testusers)
         db.session.add_all(
             [
-                AnimalTypes(animal_type_id=1, animal_type="dog"),
-                AnimalTypes(animal_type_id=2, animal_type="fish"),
+                AnimalTypes(animal_type_id=1, animal_type="dog"), # type: ignore
+                AnimalTypes(animal_type_id=2, animal_type="fish"), # type: ignore
             ]
         )
         db.session.commit()
         db.session.add_all(
             [
                 Pets(
-                    pet_id=1,
-                    animal_type_id=1,
-                    name="bello",
-                    description="Loves to play in mudd",
-                    owner_id=1,
+                    pet_id=1, # type: ignore
+                    animal_type_id=1, # type: ignore
+                    name="bello", # type: ignore
+                    description="Loves to play in mudd", # type: ignore
+                    owner_id=1, # type: ignore
                 ),
                 Pets(
-                    pet_id=2,
-                    animal_type_id=2,
-                    name="blubber",
-                    description="easy to keep, likes to swim belly up",
-                    owner_id=1,
+                    pet_id=2, # type: ignore
+                    animal_type_id=2, # type: ignore
+                    name="blubber", # type: ignore
+                    description="easy to keep, likes to swim belly up", # type: ignore
+                    owner_id=1, # type: ignore
                 ),
             ]
         )
@@ -84,15 +84,15 @@ def app_minimal():
         db.create_all()
         db.session.add_all(
             [
-                Roles(role_id=1, role="User"),
-                Roles(role_id=2, role="Admin"),
+                Roles(role_id=1, role="User"), # type: ignore
+                Roles(role_id=2, role="Admin"), # type: ignore
             ]
         )
         db.session.commit()
         testuser = Users(
-            user_id=1,
-            username="test",
-            role_id=1,
+            user_id=1, # type: ignore
+            username="test", # type: ignore
+            role_id=1, # type: ignore
         )
         testuser.set_password("test")
         db.session.add_all(
@@ -132,8 +132,19 @@ class AuthActions:
     def token(self):
         return jwt.encode(
             {
-                "sub": "1",
+                "sub": "2",
                 "name": "test",
+            },
+            TestConfig.SECRET_KEY,
+            algorithm="HS256",
+        )
+
+    @property
+    def admin_token(self):
+        return jwt.encode(
+            {
+                "sub": "1",
+                "name": "admin",
             },
             TestConfig.SECRET_KEY,
             algorithm="HS256",

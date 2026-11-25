@@ -16,7 +16,7 @@ ResourceModel = AnimalTypes
 
 
 @animal_types.get("/<int:id>")  # type: ignore
-@authenticate(token_auth)
+@authenticate(token_auth, role="admin")
 @response(single_schema)
 @other_responses({404: "Animal type not found"})
 def get_by_id(id):
@@ -24,7 +24,7 @@ def get_by_id(id):
     return db.get_or_404(ResourceModel, id)
 
 
-@animal_types.get("")  # type: ignore
+@animal_types.get("/")  # type: ignore
 @authenticate(token_auth)
 @response(collection_schema)
 def get_collection():
@@ -32,8 +32,8 @@ def get_collection():
     return db.session.scalars(sa.select(ResourceModel)).all()
 
 
-@animal_types.post("")  # type: ignore
-@authenticate(token_auth)
+@animal_types.post("/")  # type: ignore
+@authenticate(token_auth, role="admin")
 @body(single_schema)
 @response(single_schema, 201)
 @other_responses({400: "Invalid request body"})
@@ -53,7 +53,7 @@ def create(args):
 
 # Same route for put and patch, because currently only one property can be changed
 @animal_types.route("/<int:id>", methods=["PUT", "PATCH"])  # type: ignore
-@authenticate(token_auth)
+@authenticate(token_auth, role="admin")
 @body(single_schema)
 @response(single_schema, 200)
 @other_responses({400: "Invalid request body", 404: "Animal type not found"})
@@ -71,7 +71,7 @@ def update(args, id):
 
 
 @animal_types.delete("/<int:id>")  # type: ignore
-@authenticate(token_auth)
+@authenticate(token_auth, role="admin")
 @response(EmptySchema, 204)
 @other_responses({404: "Animal type not found"})
 def delete(id):

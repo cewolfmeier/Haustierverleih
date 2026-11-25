@@ -33,3 +33,7 @@ def verify_token(token):
         return user if user else None
     except jwt.PyJWTError:
         return False
+
+@token_auth.get_user_roles
+def get_user_roles(user:Users):
+    return user.role.role if user.role else ""
