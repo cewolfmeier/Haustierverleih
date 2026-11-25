@@ -1,20 +1,20 @@
 import pytest
 
 
-def test_get_animal_types(client):
-    response = client.get("api/v0/animaltypes")
+def test_get_animal_types(client, auth):
+    response = client.get("api/v0/animaltypes", headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == 200, "Happy Path, should return okay"
     assert len(response.json) > 1
 
 
-def test_get_animal_type_by_id(client):
-    response = client.get("api/v0/animaltypes/1")
+def test_get_animal_type_by_id(client, auth):
+    response = client.get("api/v0/animaltypes/1", headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == 200, "Happy Path, should return okay"
     assert "animalType" in response.json, "JSON body is not empty, key is in camelCase"
 
 
-def test_get_non_prestent_animal_type(client):
-    response = client.get("api/v0/animaltypes/99")
+def test_get_non_prestent_animal_type(client, auth):
+    response = client.get("api/v0/animaltypes/99", headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == 404, "Not present, throw 404 Error"
 
 
@@ -38,8 +38,8 @@ def test_get_non_prestent_animal_type(client):
         ({}, "messages", 400),  # reject empty bodies
     ),
 )
-def test_post(client, req_data, resp_key, status_code):
-    response = client.post("api/v0/animaltypes", json=req_data)
+def test_post(client, req_data, resp_key, status_code, auth):
+    response = client.post("api/v0/animaltypes", json=req_data, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code
     # assert resp_key in response.json
 
@@ -64,9 +64,9 @@ def test_post(client, req_data, resp_key, status_code):
         ({}, "messages", 400),  # reject empty bodies
     ),
 )
-def test_put(client, req_data, resp_key, status_code):
+def test_put(client, req_data, resp_key, status_code, auth):
     """Try to change the animal type 'fish'"""
-    response = client.put("api/v0/animaltypes/2", json=req_data)
+    response = client.put("api/v0/animaltypes/2", json=req_data, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code
 
 
@@ -91,9 +91,9 @@ def test_put(client, req_data, resp_key, status_code):
         ({}, "messages", 400),  # reject empty bodies
     ),
 )
-def test_patch(client, req_data, resp_key, status_code):
+def test_patch(client, req_data, resp_key, status_code, auth):
     """Try to change the animal type 'fish'"""
-    response = client.patch("api/v0/animaltypes/2", json=req_data)
+    response = client.patch("api/v0/animaltypes/2", json=req_data, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code
 
 
@@ -104,6 +104,6 @@ def test_patch(client, req_data, resp_key, status_code):
         ("99", 404),  # throw not found error
     ),
 )
-def test_delete(client, id, status_code):
-    response = client.delete("api/v0/animaltypes/" + id)
+def test_delete(client, id, status_code, auth):
+    response = client.delete("api/v0/animaltypes/" + id, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code

@@ -114,7 +114,7 @@ def test_login(client, headers, resp_key, status_code):
 def test_protected_get_routes(client, auth, resource):
     response = client.get("api/v0" + resource)
     assert response.status_code == 401
-    response = auth.client.get(
+    response = client.get(
         "api/v0" + resource, headers={"Authorization": "Bearer " + auth.token}
     )
     assert response.status_code == 200

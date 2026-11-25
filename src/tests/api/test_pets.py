@@ -1,8 +1,8 @@
 import pytest
 
 
-def test_get_collection(client):
-    response = client.get("api/v0/pets")
+def test_get_collection(client, auth):
+    response = client.get("api/v0/pets", headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == 200, "Happy Path, should return okay"
     assert len(response.json) > 1
 
@@ -14,8 +14,8 @@ def test_get_collection(client):
         ("99", 404),  # throw not found error
     ),
 )
-def test_get_by_id(client, id, status_code):
-    response = client.get("api/v0/pets/" + id)
+def test_get_by_id(client, id, status_code, auth):
+    response = client.get("api/v0/pets/" + id, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code
 
 
@@ -60,8 +60,8 @@ def test_get_by_id(client, id, status_code):
         ({}, "messages", 400),  # reject empty bodies
     ),
 )
-def test_post(client, req_data, resp_key, status_code):
-    response = client.post("api/v0/pets", json=req_data)
+def test_post(client, req_data, resp_key, status_code, auth):
+    response = client.post("api/v0/pets", json=req_data, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code
     # assert resp_key in response.json
 
@@ -124,8 +124,8 @@ def test_post(client, req_data, resp_key, status_code):
         ("2", {}, "messages", 400),  # reject empty bodies
     ),
 )
-def test_put(client, id, req_data, resp_key, status_code):
-    response = client.put("api/v0/pets/" + id, json=req_data)
+def test_put(client, id, req_data, resp_key, status_code, auth):
+    response = client.put("api/v0/pets/" + id, json=req_data, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code
 
 
@@ -140,8 +140,8 @@ def test_put(client, id, req_data, resp_key, status_code):
         ("2", {"myCustom": "Hello!"}, "messages", 400),  # reject unkown keys
     ),
 )
-def test_patch(client, id, req_data, resp_key, status_code):
-    response = client.patch("api/v0/pets/" + id, json=req_data)
+def test_patch(client, id, req_data, resp_key, status_code, auth):
+    response = client.patch("api/v0/pets/" + id, json=req_data, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code
 
 
@@ -152,8 +152,8 @@ def test_patch(client, id, req_data, resp_key, status_code):
         ("99", 404),  # throw not found error
     ),
 )
-def test_delete(client, id, status_code):
-    response = client.delete("api/v0/pets/" + id)
+def test_delete(client, id, status_code, auth):
+    response = client.delete("api/v0/pets/" + id, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code
 
 
@@ -165,8 +165,8 @@ def test_delete(client, id, status_code):
         ("99", {}, "messages", 404),  # wrong id
     ),
 )
-def test_borrow(client, id, req_data, resp_key, status_code):
-    response = client.patch(f"api/v0/pets/{id}/borrow", json=req_data)
+def test_borrow(client, id, req_data, resp_key, status_code, auth):
+    response = client.patch(f"api/v0/pets/{id}/borrow", json=req_data, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code
 
 
@@ -178,6 +178,6 @@ def test_borrow(client, id, req_data, resp_key, status_code):
         ("99", {}, "messages", 404),  # wrong id
     ),
 )
-def test_return(client, id, req_data, resp_key, status_code):
-    response = client.patch(f"api/v0/pets/{id}/return", json=req_data)
+def test_return(client, id, req_data, resp_key, status_code, auth):
+    response = client.patch(f"api/v0/pets/{id}/return", json=req_data, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code

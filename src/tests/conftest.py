@@ -11,6 +11,7 @@ from config import Config
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory"
+    SECRET_KEY= "MySuperSecretTestKey"
 
 
 @pytest.fixture
@@ -134,7 +135,7 @@ class AuthActions:
                 "sub": "1",
                 "name": "test",
             },
-            self._client.app.config["SECRET_KEY"],
+            TestConfig.SECRET_KEY,
             algorithm="HS256",
         )
 

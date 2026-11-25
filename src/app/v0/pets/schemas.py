@@ -1,4 +1,5 @@
 from marshmallow_sqlalchemy import auto_field
+from marshmallow.fields import Integer
 
 from app import ma
 from app.models import Pets
@@ -15,5 +16,5 @@ class PetSchema(ma.SQLAlchemySchema, CamelCaseSchema):
     description = auto_field()
     image = auto_field(required=False)
     animal_type_id = auto_field()
-    owner_id = Integer(required=False)
-    borrower_id = auto_field()
+    owner_id = auto_field(dump_only=True)
+    borrower_id = auto_field(dump_only=True)

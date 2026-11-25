@@ -1,6 +1,7 @@
 import sqlalchemy as sa
-from apifairy import body, other_responses, response
-from flask import Blueprint, request
+from apifairy import body, other_responses, response, authenticate
+from flask import Blueprint, request, abort
+from ..auth.auth import token_auth
 
 from app import db
 from app.models import Pets
@@ -16,6 +17,7 @@ ResourceModel = Pets
 
 
 @pets.get("/<int:id>")  # type: ignore
+@authenticate(token_auth)
 @response(single_schema)
 @other_responses({404: "Pet not found"})
 def get_by_id(id):
@@ -24,6 +26,7 @@ def get_by_id(id):
 
 
 @pets.get("")  # type: ignore
+@authenticate(token_auth)
 @response(collection_schema)
 def get_collection():
     """Return a collection of Pets objects if present"""
@@ -31,18 +34,24 @@ def get_collection():
 
 
 @pets.post("")  # type: ignore
+@authenticate(token_auth)
 @body(single_schema)
 @response(single_schema, 201)
 @other_responses({400: "Invalid request body"})
 def create(args):
     """Creates and saves a new Pets Object"""
-    resource = ResourceModel(**args)
-    db.session.add(resource)
-    db.session.commit()
-    return resource
+    user = token_auth.current_user()
+    if user:
+        args["owner_id"] = user.user_id
+        resource = ResourceModel(**args)
+        db.session.add(resource)
+        db.session.commit()
+        return resource
+    abort(401)
 
 
 @pets.put("/<int:id>")  # type: ignore
+@authenticate(token_auth)
 @body(single_schema)
 @response(single_schema)
 @other_responses({400: "Invalid request body", 404: "Pet not found"})
@@ -54,6 +63,7 @@ def update(args, id):
 
 
 @pets.patch("/<int:id>")  # type: ignore
+@authenticate(token_auth)
 @body(update_schema)
 @response(single_schema)
 @other_responses({400: "Invalid request body", 404: "Pet not found"})
@@ -65,6 +75,7 @@ def update_partial(args, id):
 
 
 @pets.delete("/<int:id>")  # type: ignore
+@authenticate(token_auth)
 @response(EmptySchema, 204)
 @other_responses({404: "Pet not found"})
 def delete(id):
@@ -74,6 +85,7 @@ def delete(id):
 
 
 @pets.patch("/<int:id>/borrow")  # type: ignore
+@authenticate(token_auth)
 @body(EmptySchema)
 @response(single_schema)
 @other_responses({400: "Invalid request body", 404: "Pet not found"})
@@ -85,6 +97,7 @@ def borrow(args, id):
 
 
 @pets.patch("/<int:id>/return")  # type: ignore
+@authenticate(token_auth)
 @body(EmptySchema)
 @response(single_schema)
 @other_responses({400: "Invalid request body", 404: "Pet not found"})

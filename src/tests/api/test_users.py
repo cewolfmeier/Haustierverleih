@@ -1,8 +1,8 @@
 import pytest
 
 
-def test_get_collection(client):
-    response = client.get("api/v0/users")
+def test_get_collection(client, auth):
+    response = client.get("api/v0/users", headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == 200, "Happy Path, should return okay"
     assert len(response.json) > 1
 
@@ -14,8 +14,8 @@ def test_get_collection(client):
         ("99", 404),  # throw not found error
     ),
 )
-def test_get_by_id(client, id, status_code):
-    response = client.get("api/v0/users/" + id)
+def test_get_by_id(client, id, status_code, auth):
+    response = client.get("api/v0/users/" + id, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code
 
 
@@ -66,8 +66,8 @@ def test_get_by_id(client, id, status_code):
         ("2", {}, "messages", 400),  # reject empty bodies
     ),
 )
-def test_put(client, id, req_data, resp_key, status_code):
-    response = client.put("api/v0/users/" + id, json=req_data)
+def test_put(client, id, req_data, resp_key, status_code,auth ):
+    response = client.put("api/v0/users/" + id, json=req_data, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code
 
 
@@ -87,8 +87,8 @@ def test_put(client, id, req_data, resp_key, status_code):
         ("2", {"myCustom": "Hello!"}, "messages", 400),  # reject unkown keys
     ),
 )
-def test_patch(client, id, req_data, resp_key, status_code):
-    response = client.patch("api/v0/users/" + id, json=req_data)
+def test_patch(client, id, req_data, resp_key, status_code, auth):
+    response = client.patch("api/v0/users/" + id, json=req_data, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code
 
 
@@ -99,6 +99,6 @@ def test_patch(client, id, req_data, resp_key, status_code):
         ("99", 404),  # throw not found error
     ),
 )
-def test_delete(client, id, status_code):
-    response = client.delete("api/v0/users/" + id)
+def test_delete(client, id, status_code,auth):
+    response = client.delete("api/v0/users/" + id, headers={"Authorization": "Bearer " + auth.token})
     assert response.status_code == status_code

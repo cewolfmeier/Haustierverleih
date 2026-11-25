@@ -1,6 +1,7 @@
 import sqlalchemy as sa
-from apifairy import body, other_responses, response
+from apifairy import body, other_responses, response, authenticate
 from flask import Blueprint, abort, request
+from ..auth.auth import token_auth
 
 from app import db
 from app.models import AnimalTypes
@@ -15,6 +16,7 @@ ResourceModel = AnimalTypes
 
 
 @animal_types.get("/<int:id>")  # type: ignore
+@authenticate(token_auth)
 @response(single_schema)
 @other_responses({404: "Animal type not found"})
 def get_by_id(id):
@@ -23,6 +25,7 @@ def get_by_id(id):
 
 
 @animal_types.get("")  # type: ignore
+@authenticate(token_auth)
 @response(collection_schema)
 def get_collection():
     """Return a collection of AnimalTypes objects if present"""
@@ -30,6 +33,7 @@ def get_collection():
 
 
 @animal_types.post("")  # type: ignore
+@authenticate(token_auth)
 @body(single_schema)
 @response(single_schema, 201)
 @other_responses({400: "Invalid request body"})
@@ -49,6 +53,7 @@ def create(args):
 
 # Same route for put and patch, because currently only one property can be changed
 @animal_types.route("/<int:id>", methods=["PUT", "PATCH"])  # type: ignore
+@authenticate(token_auth)
 @body(single_schema)
 @response(single_schema, 200)
 @other_responses({400: "Invalid request body", 404: "Animal type not found"})
@@ -66,6 +71,7 @@ def update(args, id):
 
 
 @animal_types.delete("/<int:id>")  # type: ignore
+@authenticate(token_auth)
 @response(EmptySchema, 204)
 @other_responses({404: "Animal type not found"})
 def delete(id):
