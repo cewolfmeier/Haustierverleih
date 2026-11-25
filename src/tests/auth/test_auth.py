@@ -109,6 +109,7 @@ def test_login(client, headers, resp_key, status_code):
         ("/pets/",),
         ("/users/",),
         ("/users/1",),
+        ("/me/",),
     ),
 )
 def test_protected_get_routes(client, path):

@@ -56,6 +56,10 @@ def create_app(config_class=Config):
 
     app.register_blueprint(api_v0_users, url_prefix="/api/v0/users")
 
+    from app.v0.me.routes import me as api_v0_me
+
+    app.register_blueprint(api_v0_me, url_prefix="/api/v0/me")
+
     if not app.debug and not app.testing:
 
         if not os.path.exists("logs"):
