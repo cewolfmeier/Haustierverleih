@@ -36,3 +36,7 @@ dev = [
 
 [tool.uv.build-backend]
 module-name = "app"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
