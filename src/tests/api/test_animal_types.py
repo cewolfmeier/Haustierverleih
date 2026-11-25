@@ -100,10 +100,11 @@ def test_patch(client, req_data, resp_key, status_code, auth):
 @pytest.mark.parametrize(
     ("id", "status_code"),
     (
-        ("1", 204),  # happy path
+        ("3", 204),  # happy path
         ("99", 404),  # throw not found error
+        ("1", 409),  # Element can't be deleted, because a pet is still tied to it.
     ),
 )
 def test_delete(client, id, status_code, auth):
-    response = client.delete("api/v0/animaltypes/" + id, headers={"Authorization": "Bearer " + auth.token})
+    response = client.delete("api/v0/animaltypes/" + id, headers={"Authorization": "Bearer " + auth.admin_token})
     assert response.status_code == status_code

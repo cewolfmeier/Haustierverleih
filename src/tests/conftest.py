@@ -47,6 +47,7 @@ def app():
             [
                 AnimalTypes(animal_type_id=1, animal_type="dog"), # type: ignore
                 AnimalTypes(animal_type_id=2, animal_type="fish"), # type: ignore
+                AnimalTypes(animal_type_id=3, animal_type="mouse"), # type: ignore
             ]
         )
         db.session.commit()

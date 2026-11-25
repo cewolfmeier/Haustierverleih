@@ -161,7 +161,7 @@ def test_private_patch_routes(client, auth, path, data):
 @pytest.mark.parametrize(
     ("path"),
     (
-        ("/animaltypes/1"),
+        ("/animaltypes/3"),
         ("/users/2"),
     ),
 )
