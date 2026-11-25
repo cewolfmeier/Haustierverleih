@@ -1,7 +1,7 @@
 import os
 import uuid
 from functools import wraps
-
+from warnings import deprecated
 import sqlalchemy as sa
 from flask import (
     abort,
@@ -22,6 +22,7 @@ from app.models import AnimalTypes, Pets
 
 # ---- DECORATORS AND GLOBAL FUNCTIONS ---- #
 # This function was taken from the official Flask documentation
+@deprecated("use code provided in v0 instead.")
 def allowed_file(filename):
     return (
         "." in filename
@@ -31,6 +32,7 @@ def allowed_file(filename):
 
 
 # This decorator was taken from the official Flask documentation
+@deprecated("use code provided in v0 instead.")
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -40,7 +42,7 @@ def login_required(f):
 
     return decorated_function
 
-
+@deprecated("use code provided in v0 instead.")
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -53,6 +55,7 @@ def admin_required(f):
 
 # ---- ROUTES ---- #
 # --- MAIN --- #
+@deprecated("use code provided in v0 instead.")
 @bp.route("/")
 @bp.route("/index")
 @login_required
@@ -66,7 +69,7 @@ def index():
         current_user=session["current_user"],
     )
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.route("/pet/<int:pet_id>")
 @login_required
 def pet(pet_id):
@@ -78,7 +81,7 @@ def pet(pet_id):
         "pet.html", title=pet, pet=pet, current_user=session["current_user"]
     )
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.get("/pet/<int:pet_id>/edit")
 @login_required
 def get_edit_pet(pet_id):
@@ -94,7 +97,7 @@ def get_edit_pet(pet_id):
         current_user=session["current_user"],
     )
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.post("/pet/<int:pet_id>/edit")
 @login_required
 def post_edit_pet(pet_id):
@@ -139,7 +142,7 @@ def post_edit_pet(pet_id):
         return redirect(url_for("main.pet", pet_id=pet_id))
     return redirect(url_for("main.get_pet_edit", pet_id=pet_id))
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.get("/pet/<int:pet_id>/delete")
 @login_required
 def get_delete_pet(pet_id):
@@ -156,7 +159,7 @@ def get_delete_pet(pet_id):
         "name": pet.name,
     }
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.post("/pet/<int:pet_id>/delete")
 @login_required
 def post_delete_pet(pet_id):
@@ -174,7 +177,7 @@ def post_delete_pet(pet_id):
     flash("Das Haustier wurde erfolgreich gelöscht.", "success")
     return redirect(url_for("main.pet_management"))
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.route("/pet/<int:pet_id>/borrow")
 @login_required
 def borrow_pet(pet_id):
@@ -194,7 +197,7 @@ def borrow_pet(pet_id):
     flash("Du leihst jetzt dieses Haustier aus.", "success")
     return redirect(url_for("main.pet", pet_id=pet_id))
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.route("/pet/<int:pet_id>/return")
 @login_required
 def return_pet(pet_id):
@@ -211,7 +214,7 @@ def return_pet(pet_id):
     flash("Du hast das Haustier erfolgreich zurückgegeben.", "success")
     return redirect(url_for("main.pet", pet_id=pet_id))
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.route("/pet-management")
 @login_required
 def pet_management():
@@ -234,7 +237,7 @@ def pet_management():
         current_user=session["current_user"],
     )
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.get("/pet/new")
 @login_required
 def get_new_pet():
@@ -246,7 +249,7 @@ def get_new_pet():
         current_user=session["current_user"],
     )
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.post("/pet/new")
 @login_required
 def post_new_pet():

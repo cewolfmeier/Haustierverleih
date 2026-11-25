@@ -1,5 +1,5 @@
 from functools import wraps
-
+from warnings import deprecated
 import sqlalchemy as sa
 from flask import abort, flash, redirect, render_template, request, session, url_for
 
@@ -9,6 +9,7 @@ from app.models import Roles, Users
 
 
 # This decorator was taken from the official Flask documentation
+@deprecated("use code provided in v0 instead.")
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -18,7 +19,7 @@ def login_required(f):
 
     return decorated_function
 
-
+@deprecated("use code provided in v0 instead.")
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -31,6 +32,7 @@ def admin_required(f):
 
 # ---- ROUTES ---- #
 # --- AUTHENTICATION --- #
+@deprecated("use code provided in v0 instead.")
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     """Login-Seite"""
@@ -53,7 +55,7 @@ def login():
             return redirect(url_for("main.index"))
     return render_template("auth/login.html", current_user=None)
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.route("/register", methods=["GET", "POST"])
 def register():
     """Seite zur Account-Erstellung"""
@@ -87,7 +89,7 @@ def register():
                 )
     return render_template("auth/register.html", current_user=None)
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.route("/logout")
 @login_required
 def logout():

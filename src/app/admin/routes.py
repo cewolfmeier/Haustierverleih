@@ -1,5 +1,5 @@
 from functools import wraps
-
+from warnings import deprecated
 import sqlalchemy as sa
 from flask import (
     abort,
@@ -19,6 +19,7 @@ from app.models import AnimalTypes, Pets, Roles, Users
 
 # ---- DECORATORS AND GLOBAL FUNCTIONS ---- #
 # This decorator was taken from the official Flask documentation
+@deprecated("use code provided in v0 instead.")
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -28,7 +29,7 @@ def login_required(f):
 
     return decorated_function
 
-
+@deprecated("use code provided in v0 instead.")
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -40,6 +41,7 @@ def admin_required(f):
 
 
 # ---- ROUTES ---- #
+@deprecated("use code provided in v0 instead.")
 @bp.route("/admin")
 @login_required
 @admin_required
@@ -56,6 +58,7 @@ def admin():
 
 
 # --- USER ADMINISTRATION --- #
+@deprecated("use code provided in v0 instead.")
 @bp.get("/admin/user/<int:user_id>/edit")
 @login_required
 def get_edit_user(user_id):
@@ -75,7 +78,7 @@ def get_edit_user(user_id):
         current_user=session["current_user"],
     )
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.post("/admin/user/<int:user_id>/edit")
 @login_required
 def post_edit_user(user_id):
@@ -110,7 +113,7 @@ def post_edit_user(user_id):
     flash("Der Benutzer wurde erfolgreich aktualisiert.", "success")
     return redirect(url_for("admin.admin"))
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.route("/admin/user/<int:user_id>/delete")
 @login_required
 @admin_required
@@ -133,6 +136,7 @@ def delete_user(user_id):
 
 
 # --- ANIMAL TYPE ADMINISTRATION --- #
+@deprecated("use code provided in v0 instead.")
 @bp.get("/admin/animal_type/new")
 @login_required
 @admin_required
@@ -142,7 +146,7 @@ def get_new_animal_type():
         current_user=session["current_user"],
     )
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.post("/admin/animal_type/new")
 @login_required
 @admin_required
@@ -159,7 +163,7 @@ def post_new_animal_type():
         return redirect(url_for("admin.admin"))
     return redirect(url_for("admin.get_new_animal_type"))
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.get("/admin/animal_type/<int:animal_type_id>/edit")
 @login_required
 @admin_required
@@ -174,7 +178,7 @@ def get_edit_animal_type(animal_type_id):
         current_user=session["current_user"],
     )
 
-
+@deprecated("use code provided in v0 instead.")
 @bp.post("/admin/animal_type/<int:animal_type_id>/edit")
 @login_required
 @admin_required
