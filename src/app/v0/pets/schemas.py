@@ -1,5 +1,4 @@
 from marshmallow_sqlalchemy import auto_field
-from marshmallow.fields import Integer
 
 from app import ma
 from app.models import Pets

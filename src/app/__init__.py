@@ -79,6 +79,3 @@ def create_app(config_class=Config):
         app.logger.info("Haustierverleih startup")
 
     return app
-
-
-from app import models

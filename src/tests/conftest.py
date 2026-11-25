@@ -11,7 +11,7 @@ from config import Config
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory"
-    SECRET_KEY= "MySuperSecretTestKey"
+    SECRET_KEY = "MySuperSecretTestKey"
 
 
 @pytest.fixture
@@ -23,21 +23,21 @@ def app():
         db.create_all()
         db.session.add_all(
             [
-                Roles(role_id=1, role="user"), # type: ignore
-                Roles(role_id=2, role="admin"), # type: ignore
+                Roles(role_id=1, role="user"),  # type: ignore
+                Roles(role_id=2, role="admin"),  # type: ignore
             ]
         )
         db.session.commit()
         testusers = [
             Users(
-                user_id=1, # type: ignore
-                username="admin", # type: ignore
-                role_id=2, # type: ignore
+                user_id=1,  # type: ignore
+                username="admin",  # type: ignore
+                role_id=2,  # type: ignore
             ),
             Users(
-                user_id=2, # type: ignore
-                username="test", # type: ignore
-                role_id=1, # type: ignore
+                user_id=2,  # type: ignore
+                username="test",  # type: ignore
+                role_id=1,  # type: ignore
             ),
         ]
         for testuser in testusers:
@@ -45,27 +45,27 @@ def app():
         db.session.add_all(testusers)
         db.session.add_all(
             [
-                AnimalTypes(animal_type_id=1, animal_type="dog"), # type: ignore
-                AnimalTypes(animal_type_id=2, animal_type="fish"), # type: ignore
-                AnimalTypes(animal_type_id=3, animal_type="mouse"), # type: ignore
+                AnimalTypes(animal_type_id=1, animal_type="dog"),  # type: ignore
+                AnimalTypes(animal_type_id=2, animal_type="fish"),  # type: ignore
+                AnimalTypes(animal_type_id=3, animal_type="mouse"),  # type: ignore
             ]
         )
         db.session.commit()
         db.session.add_all(
             [
                 Pets(
-                    pet_id=1, # type: ignore
-                    animal_type_id=1, # type: ignore
-                    name="bello", # type: ignore
-                    description="Loves to play in mudd", # type: ignore
-                    owner_id=1, # type: ignore
+                    pet_id=1,  # type: ignore
+                    animal_type_id=1,  # type: ignore
+                    name="bello",  # type: ignore
+                    description="Loves to play in mudd",  # type: ignore
+                    owner_id=1,  # type: ignore
                 ),
                 Pets(
-                    pet_id=2, # type: ignore
-                    animal_type_id=2, # type: ignore
-                    name="blubber", # type: ignore
-                    description="easy to keep, likes to swim belly up", # type: ignore
-                    owner_id=1, # type: ignore
+                    pet_id=2,  # type: ignore
+                    animal_type_id=2,  # type: ignore
+                    name="blubber",  # type: ignore
+                    description="easy to keep, likes to swim belly up",  # type: ignore
+                    owner_id=1,  # type: ignore
                 ),
             ]
         )
@@ -85,15 +85,15 @@ def app_minimal():
         db.create_all()
         db.session.add_all(
             [
-                Roles(role_id=1, role="User"), # type: ignore
-                Roles(role_id=2, role="Admin"), # type: ignore
+                Roles(role_id=1, role="User"),  # type: ignore
+                Roles(role_id=2, role="Admin"),  # type: ignore
             ]
         )
         db.session.commit()
         testuser = Users(
-            user_id=1, # type: ignore
-            username="test", # type: ignore
-            role_id=1, # type: ignore
+            user_id=1,  # type: ignore
+            username="test",  # type: ignore
+            role_id=1,  # type: ignore
         )
         testuser.set_password("test")
         db.session.add_all(

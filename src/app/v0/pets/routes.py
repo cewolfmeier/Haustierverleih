@@ -1,11 +1,11 @@
 import sqlalchemy as sa
-from apifairy import body, other_responses, response, authenticate
-from flask import Blueprint, request, abort
-from ..auth.auth import token_auth
+from apifairy import authenticate, body, other_responses, response
+from flask import Blueprint, abort, request
 
 from app import db
 from app.models import Pets
 
+from ..auth.auth import token_auth
 from ..schemas import EmptySchema
 from .schemas import PetSchema
 

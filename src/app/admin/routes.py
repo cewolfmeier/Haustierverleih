@@ -1,5 +1,6 @@
 from functools import wraps
 from warnings import deprecated
+
 import sqlalchemy as sa
 from flask import (
     abort,
@@ -28,6 +29,7 @@ def login_required(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
 
 @deprecated("use code provided in v0 instead.")
 def admin_required(f):
@@ -78,6 +80,7 @@ def get_edit_user(user_id):
         current_user=session["current_user"],
     )
 
+
 @deprecated("use code provided in v0 instead.")
 @bp.post("/admin/user/<int:user_id>/edit")
 @login_required
@@ -113,6 +116,7 @@ def post_edit_user(user_id):
     flash("Der Benutzer wurde erfolgreich aktualisiert.", "success")
     return redirect(url_for("admin.admin"))
 
+
 @deprecated("use code provided in v0 instead.")
 @bp.route("/admin/user/<int:user_id>/delete")
 @login_required
@@ -146,6 +150,7 @@ def get_new_animal_type():
         current_user=session["current_user"],
     )
 
+
 @deprecated("use code provided in v0 instead.")
 @bp.post("/admin/animal_type/new")
 @login_required
@@ -163,6 +168,7 @@ def post_new_animal_type():
         return redirect(url_for("admin.admin"))
     return redirect(url_for("admin.get_new_animal_type"))
 
+
 @deprecated("use code provided in v0 instead.")
 @bp.get("/admin/animal_type/<int:animal_type_id>/edit")
 @login_required
@@ -177,6 +183,7 @@ def get_edit_animal_type(animal_type_id):
         animal_type=animal_type,
         current_user=session["current_user"],
     )
+
 
 @deprecated("use code provided in v0 instead.")
 @bp.post("/admin/animal_type/<int:animal_type_id>/edit")

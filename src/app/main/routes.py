@@ -2,6 +2,7 @@ import os
 import uuid
 from functools import wraps
 from warnings import deprecated
+
 import sqlalchemy as sa
 from flask import (
     abort,
@@ -42,6 +43,7 @@ def login_required(f):
 
     return decorated_function
 
+
 @deprecated("use code provided in v0 instead.")
 def admin_required(f):
     @wraps(f)
@@ -69,6 +71,7 @@ def index():
         current_user=session["current_user"],
     )
 
+
 @deprecated("use code provided in v0 instead.")
 @bp.route("/pet/<int:pet_id>")
 @login_required
@@ -80,6 +83,7 @@ def pet(pet_id):
     return render_template(
         "pet.html", title=pet, pet=pet, current_user=session["current_user"]
     )
+
 
 @deprecated("use code provided in v0 instead.")
 @bp.get("/pet/<int:pet_id>/edit")
@@ -96,6 +100,7 @@ def get_edit_pet(pet_id):
         animal_types=animal_types,
         current_user=session["current_user"],
     )
+
 
 @deprecated("use code provided in v0 instead.")
 @bp.post("/pet/<int:pet_id>/edit")
@@ -142,6 +147,7 @@ def post_edit_pet(pet_id):
         return redirect(url_for("main.pet", pet_id=pet_id))
     return redirect(url_for("main.get_pet_edit", pet_id=pet_id))
 
+
 @deprecated("use code provided in v0 instead.")
 @bp.get("/pet/<int:pet_id>/delete")
 @login_required
@@ -158,6 +164,7 @@ def get_delete_pet(pet_id):
         "petId": pet.pet_id,
         "name": pet.name,
     }
+
 
 @deprecated("use code provided in v0 instead.")
 @bp.post("/pet/<int:pet_id>/delete")
@@ -176,6 +183,7 @@ def post_delete_pet(pet_id):
     db.session.commit()
     flash("Das Haustier wurde erfolgreich gelöscht.", "success")
     return redirect(url_for("main.pet_management"))
+
 
 @deprecated("use code provided in v0 instead.")
 @bp.route("/pet/<int:pet_id>/borrow")
@@ -197,6 +205,7 @@ def borrow_pet(pet_id):
     flash("Du leihst jetzt dieses Haustier aus.", "success")
     return redirect(url_for("main.pet", pet_id=pet_id))
 
+
 @deprecated("use code provided in v0 instead.")
 @bp.route("/pet/<int:pet_id>/return")
 @login_required
@@ -213,6 +222,7 @@ def return_pet(pet_id):
     db.session.commit()
     flash("Du hast das Haustier erfolgreich zurückgegeben.", "success")
     return redirect(url_for("main.pet", pet_id=pet_id))
+
 
 @deprecated("use code provided in v0 instead.")
 @bp.route("/pet-management")
@@ -237,6 +247,7 @@ def pet_management():
         current_user=session["current_user"],
     )
 
+
 @deprecated("use code provided in v0 instead.")
 @bp.get("/pet/new")
 @login_required
@@ -248,6 +259,7 @@ def get_new_pet():
         animal_types=animal_types,
         current_user=session["current_user"],
     )
+
 
 @deprecated("use code provided in v0 instead.")
 @bp.post("/pet/new")

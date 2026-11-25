@@ -2,7 +2,9 @@ import pytest
 
 
 def test_get_collection(client, auth):
-    response = client.get("api/v0/pets/", headers={"Authorization": "Bearer " + auth.token})
+    response = client.get(
+        "api/v0/pets/", headers={"Authorization": "Bearer " + auth.token}
+    )
     assert response.status_code == 200, "Happy Path, should return okay"
     assert len(response.json) > 1
 
@@ -15,7 +17,9 @@ def test_get_collection(client, auth):
     ),
 )
 def test_get_by_id(client, id, status_code, auth):
-    response = client.get("api/v0/pets/" + id, headers={"Authorization": "Bearer " + auth.token})
+    response = client.get(
+        "api/v0/pets/" + id, headers={"Authorization": "Bearer " + auth.token}
+    )
     assert response.status_code == status_code
 
 
@@ -61,7 +65,9 @@ def test_get_by_id(client, id, status_code, auth):
     ),
 )
 def test_post(client, req_data, resp_key, status_code, auth):
-    response = client.post("api/v0/pets/", json=req_data, headers={"Authorization": "Bearer " + auth.token})
+    response = client.post(
+        "api/v0/pets/", json=req_data, headers={"Authorization": "Bearer " + auth.token}
+    )
     assert response.status_code == status_code
     # assert resp_key in response.json
 
@@ -125,7 +131,11 @@ def test_post(client, req_data, resp_key, status_code, auth):
     ),
 )
 def test_put(client, id, req_data, resp_key, status_code, auth):
-    response = client.put("api/v0/pets/" + id, json=req_data, headers={"Authorization": "Bearer " + auth.token})
+    response = client.put(
+        "api/v0/pets/" + id,
+        json=req_data,
+        headers={"Authorization": "Bearer " + auth.token},
+    )
     assert response.status_code == status_code
 
 
@@ -141,7 +151,11 @@ def test_put(client, id, req_data, resp_key, status_code, auth):
     ),
 )
 def test_patch(client, id, req_data, resp_key, status_code, auth):
-    response = client.patch("api/v0/pets/" + id, json=req_data, headers={"Authorization": "Bearer " + auth.token})
+    response = client.patch(
+        "api/v0/pets/" + id,
+        json=req_data,
+        headers={"Authorization": "Bearer " + auth.token},
+    )
     assert response.status_code == status_code
 
 
@@ -153,7 +167,9 @@ def test_patch(client, id, req_data, resp_key, status_code, auth):
     ),
 )
 def test_delete(client, id, status_code, auth):
-    response = client.delete("api/v0/pets/" + id, headers={"Authorization": "Bearer " + auth.token})
+    response = client.delete(
+        "api/v0/pets/" + id, headers={"Authorization": "Bearer " + auth.token}
+    )
     assert response.status_code == status_code
 
 
@@ -166,7 +182,11 @@ def test_delete(client, id, status_code, auth):
     ),
 )
 def test_borrow(client, id, req_data, resp_key, status_code, auth):
-    response = client.patch(f"api/v0/pets/{id}/borrow", json=req_data, headers={"Authorization": "Bearer " + auth.token})
+    response = client.patch(
+        f"api/v0/pets/{id}/borrow",
+        json=req_data,
+        headers={"Authorization": "Bearer " + auth.token},
+    )
     assert response.status_code == status_code
 
 
@@ -179,5 +199,9 @@ def test_borrow(client, id, req_data, resp_key, status_code, auth):
     ),
 )
 def test_return(client, id, req_data, resp_key, status_code, auth):
-    response = client.patch(f"api/v0/pets/{id}/return", json=req_data, headers={"Authorization": "Bearer " + auth.token})
+    response = client.patch(
+        f"api/v0/pets/{id}/return",
+        json=req_data,
+        headers={"Authorization": "Bearer " + auth.token},
+    )
     assert response.status_code == status_code

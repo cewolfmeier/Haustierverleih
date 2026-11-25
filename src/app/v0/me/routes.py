@@ -1,10 +1,7 @@
-import sqlalchemy as sa
-from apifairy import body, other_responses, response, authenticate
-from flask import Blueprint, request, abort
+from apifairy import authenticate, response
+from flask import Blueprint
+
 from ..auth.auth import token_auth
-
-from app import db
-
 from ..users.schemas import UserSchema
 
 me = Blueprint("me", __name__)

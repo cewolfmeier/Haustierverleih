@@ -1,11 +1,11 @@
 import sqlalchemy as sa
-from apifairy import body, other_responses, response, authenticate
+from apifairy import authenticate, body, other_responses, response
 from flask import Blueprint, abort, request
-from ..auth.auth import token_auth
 
 from app import db
 from app.models import AnimalTypes, Pets
 
+from ..auth.auth import token_auth
 from ..schemas import EmptySchema
 from .schemas import AnimalTypeSchema
 
@@ -73,10 +73,12 @@ def update(args, id):
 @animal_types.delete("/<int:id>")  # type: ignore
 @authenticate(token_auth, role="admin")
 @response(EmptySchema, 204)
-@other_responses({404: "Animal type not found", 409: "A Pet still uses this animal type"})
+@other_responses(
+    {404: "Animal type not found", 409: "A Pet still uses this animal type"}
+)
 def delete(id):
     db.get_or_404(ResourceModel, id)
-    if db.session.scalar(sa.select(Pets).where(Pets.animal_type_id== id)):
+    if db.session.scalar(sa.select(Pets).where(Pets.animal_type_id == id)):
         abort(409)
     db.session.execute(
         sa.delete(ResourceModel).where(ResourceModel.animal_type_id == id)

@@ -1,5 +1,6 @@
 from functools import wraps
 from warnings import deprecated
+
 import sqlalchemy as sa
 from flask import abort, flash, redirect, render_template, request, session, url_for
 
@@ -18,6 +19,7 @@ def login_required(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
 
 @deprecated("use code provided in v0 instead.")
 def admin_required(f):
@@ -55,6 +57,7 @@ def login():
             return redirect(url_for("main.index"))
     return render_template("auth/login.html", current_user=None)
 
+
 @deprecated("use code provided in v0 instead.")
 @bp.route("/register", methods=["GET", "POST"])
 def register():
@@ -88,6 +91,7 @@ def register():
                     "error",
                 )
     return render_template("auth/register.html", current_user=None)
+
 
 @deprecated("use code provided in v0 instead.")
 @bp.route("/logout")
