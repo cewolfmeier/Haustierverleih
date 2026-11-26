@@ -13,7 +13,7 @@ def test_get_animal_types(client, auth):
     ("req_id", "resp_key", "status_code"),
     (
         ("1", "animalTypeId", 200),
-        ("99", "msg", 404),
+        ("99", "messages", 404),
     ),
 )
 def test_get_animal_type_by_id(client, auth, req_id, resp_key, status_code):
@@ -31,12 +31,12 @@ def test_get_animal_type_by_id(client, auth, req_id, resp_key, status_code):
         ({"animalType": "cat"}, "animalTypeId", 201),
         (
             {"animalType": "cat", "animalTypeId": 99},  # animalTypeId is not allowed
-            "msg",
+            "messages",
             400,
         ),
-        ({"animalType": "dog"}, "msg", 400),  # anmial_type has to be unique
-        ({"animal_type": "cat"}, "msg", 400),  # key has to be in camelCase
-        ({"animalType": 1}, "msg", 400),  # value has to be a string
+        ({"animalType": "dog"}, "messages", 400),  # anmial_type has to be unique
+        ({"animal_type": "cat"}, "messages", 400),  # key has to be in camelCase
+        ({"animalType": 1}, "messages", 400),  # value has to be a string
     ),
 )
 def test_post(client, auth, req_data, resp_key, status_code):
@@ -55,12 +55,12 @@ def test_post(client, auth, req_data, resp_key, status_code):
         ({"animalType": "cat"}, "animalType", 200),
         (
             {"animalType": "cat", "animalTypeId": 99},  # animalTypeId is not allowed
-            "msg",
+            "messages",
             400,
         ),
-        ({"animalType": "dog"}, "msg", 400),  # anmial_type has to be unique
-        ({"animal_type": "cat"}, "msg", 400),  # key has to be in camelCase
-        ({"animalType": 1}, "msg", 400),  # value has to be a string
+        ({"animalType": "dog"}, "messages", 400),  # anmial_type has to be unique
+        ({"animal_type": "cat"}, "messages", 400),  # key has to be in camelCase
+        ({"animalType": 1}, "messages", 400),  # value has to be a string
     ),
 )
 def test_put(client, auth, req_data, resp_key, status_code):
@@ -78,8 +78,8 @@ def test_put(client, auth, req_data, resp_key, status_code):
     ("req_id", "resp_key", "status_code"),
     (
         ("3", None, 204),
-        ("99", "msg", 404),
-        ("1", "msg", 409),  # should not delete element when a pet is still tied to it
+        ("99", "messages", 404),
+        ("1", "messages", 409),  # should not delete element when a pet is still tied to it
     ),
 )
 def test_delete(client, auth, req_id, resp_key, status_code):
@@ -88,4 +88,5 @@ def test_delete(client, auth, req_id, resp_key, status_code):
         headers={"Authorization": "Bearer " + auth.admin_token},
     )
     assert response.status_code == status_code
-    assert resp_key in response.json
+    if resp_key:
+        assert resp_key in response.json

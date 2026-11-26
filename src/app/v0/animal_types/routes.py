@@ -84,3 +84,4 @@ def delete(id):
         sa.delete(ResourceModel).where(ResourceModel.animal_type_id == id)
     )
     db.session.commit()
+    return {}
