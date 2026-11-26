@@ -1,9 +1,11 @@
 from flask import jsonify
+from marshmallow import ValidationError
 
 from app import db
 from app.errors import bp
 
 
+@bp.app_errorhandler(ValidationError)
 @bp.app_errorhandler(400)
 def bad_request(error):
     # return render_template("errors/400.html"), 400

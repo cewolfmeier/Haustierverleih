@@ -47,11 +47,13 @@ class Users(db.Model):
     def __repr__(self):
         return self.username.capitalize()
 
-    def set_password(self, password):
+    def set_password(self, password: str):
         self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+    def check_password(self, password: str):
+        return check_password_hash(
+            self.password_hash if self.password_hash else "", password
+        )
 
     def login(self):
         username = self.username.capitalize()

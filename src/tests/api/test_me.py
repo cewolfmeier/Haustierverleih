@@ -12,31 +12,32 @@ def test_get_me(client, auth):
     ("req_data", "resp_key", "status_code"),
     (
         (
-            {"passwordOld": "test", "passwordNew": "MySecretPassword1!"},
+            {"passwordOld": "test", "password": "MySecretPassword1!"},
             None,
             200,
         ),
         (
-            {"passwordOld": "toast", "passwordNew": "MySecretPassword1!"},
-            "msg",
+            {"passwordOld": "toast", "password": "MySecretPassword1!"},
+            "messages",
             400,  # Thou shalt reject wrong old passwords
         ),
         (
-            {"passwordNew": "MySecretPassword1!"},
-            "msg",
+            {"password": "MySecretPassword1!"},
+            "messages",
             400,  # Thou shalt reject missing key:value pairs
         ),
-        ({}, "msg", 400),  # reject empty bodies
+        ({}, "messages", 400),  # reject empty bodies
     ),
 )
 def test_update_password(client, auth, req_data, resp_key, status_code):
-    response = client.put(
-        "api/v0/me/",
+    response = client.patch(
+        "api/v0/me/password",
         json=req_data,
-        headers={"Authorization": "Bearer " + auth.admin_token},
+        headers={"Authorization": "Bearer " + auth.token},
     )
     assert response.status_code == status_code
-    assert resp_key in response.json
+    if resp_key:
+        assert resp_key in response.json
 
 
 @pytest.mark.parametrize(
@@ -44,32 +45,32 @@ def test_update_password(client, auth, req_data, resp_key, status_code):
     (
         (
             {"username": "herta"},
-            None,
+            "userId",
             200,
         ),
         (
             {"username": "test"},
-            None,
+            "userId",
             200,
         ),  # Thou shalt accept users current username
         (
             {"username": "admin"},
-            "msg",
+            "messages",
             400,
         ),  # Thou shalt reject taken usernames
         (
             {"username": ""},
-            "msg",
+            "messages",
             400,
         ),  # Thou shalt reject empty strings
-        ({}, "msg", 400),  # reject empty bodies
+        ({}, "messages", 400),  # reject empty bodies
     ),
 )
 def test_update_username(client, auth, req_data, resp_key, status_code):
-    response = client.put(
-        "api/v0/me/",
+    response = client.patch(
+        "api/v0/me/username",
         json=req_data,
-        headers={"Authorization": "Bearer " + auth.admin_token},
+        headers={"Authorization": "Bearer " + auth.token},
     )
     assert response.status_code == status_code
     assert resp_key in response.json
@@ -80,4 +81,3 @@ def test_delete_me(client, auth):
         "api/v0/me/", headers={"Authorization": "Bearer " + auth.token}
     )
     assert response.status_code == 204
-    assert response.headers
