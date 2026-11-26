@@ -122,7 +122,7 @@ class Pets(db.Model):
         back_populates="owned_pets",
         foreign_keys="Pets.owner_id",
     )
-    borrowed: so.Mapped[Users] = so.relationship(
+    borrowed: so.Mapped[Users | None] = so.relationship(
         back_populates="borrowed_pets",
         foreign_keys="Pets.borrower_id",
     )

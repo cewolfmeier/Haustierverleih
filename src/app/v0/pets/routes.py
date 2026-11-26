@@ -3,7 +3,7 @@ from apifairy import authenticate, body, other_responses, response
 from flask import Blueprint, abort, request
 
 from app import db
-from app.models import Pets
+from app.models import Pets, Users
 
 from ..auth.auth import token_auth
 from ..schemas import EmptySchema
@@ -12,7 +12,6 @@ from .schemas import PetSchema
 pets = Blueprint("pets", __name__)
 single_schema = PetSchema()
 collection_schema = PetSchema(many=True)
-update_schema = PetSchema(partial=True)
 ResourceModel = Pets
 
 
@@ -54,22 +53,15 @@ def create(args):
 @authenticate(token_auth)
 @body(single_schema)
 @response(single_schema)
-@other_responses({400: "Invalid request body", 404: "Pet not found"})
+@other_responses(
+    {400: "Invalid request body", 403: "Access denied", 404: "Pet not found"}
+)
 def update(args, id):
+    user: Users | None = token_auth.current_user()
     resource = db.get_or_404(ResourceModel, id)
+    if resource.owned != user:
+        abort(403)
     single_schema.load(request.json, instance=resource)
-    db.session.commit()
-    return resource
-
-
-@pets.patch("/<int:id>")  # type: ignore
-@authenticate(token_auth)
-@body(update_schema)
-@response(single_schema)
-@other_responses({400: "Invalid request body", 404: "Pet not found"})
-def update_partial(args, id):
-    resource = db.get_or_404(ResourceModel, id)
-    update_schema.load(request.json, instance=resource)
     db.session.commit()
     return resource
 
@@ -77,32 +69,45 @@ def update_partial(args, id):
 @pets.delete("/<int:id>")  # type: ignore
 @authenticate(token_auth)
 @response(EmptySchema, 204)
-@other_responses({404: "Pet not found"})
+@other_responses({403: "Access denied", 404: "Pet not found"})
 def delete(id):
-    db.get_or_404(ResourceModel, id)
+    user: Users | None = token_auth.current_user()
+    resource = db.get_or_404(ResourceModel, id)
+    if resource.owned != user:
+        abort(403)
     db.session.execute(sa.delete(ResourceModel).where(ResourceModel.pet_id == id))
     db.session.commit()
 
 
 @pets.patch("/<int:id>/borrow")  # type: ignore
 @authenticate(token_auth)
-@body(EmptySchema)
 @response(single_schema)
-@other_responses({400: "Invalid request body", 404: "Pet not found"})
-def borrow(args, id):
+@other_responses(
+    {400: "Invalid request body", 403: "Access denied", 404: "Pet not found"}
+)
+def borrow(id):
+    user: Users | None = token_auth.current_user()
     resource = db.get_or_404(ResourceModel, id)
-    resource.borrower_id
+    if resource.owned == user:
+        abort(403)
+    if not user or resource.borrowed:
+        abort(400)
+    resource.borrowed = user
     db.session.commit()
     return resource
 
 
 @pets.patch("/<int:id>/return")  # type: ignore
 @authenticate(token_auth)
-@body(EmptySchema)
 @response(single_schema)
-@other_responses({400: "Invalid request body", 404: "Pet not found"})
-def return_pet(args, id):
+@other_responses(
+    {400: "Invalid request body", 403: "Access denied", 404: "Pet not found"}
+)
+def return_pet(id):
+    user: Users | None = token_auth.current_user()
     resource = db.get_or_404(ResourceModel, id)
-    resource.borrower_id = None
+    if resource.borrowed != user:
+        abort(403)
+    resource.borrowed = None
     db.session.commit()
     return resource

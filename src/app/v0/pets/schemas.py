@@ -17,3 +17,6 @@ class PetSchema(ma.SQLAlchemySchema, CamelCaseSchema):
     animal_type_id = auto_field()
     owner_id = auto_field(dump_only=True)
     borrower_id = auto_field(dump_only=True)
+    borrower = auto_field("borrowed", dump_only=True)
+    owner = auto_field("owned", dump_only=True)
+    animal_type = auto_field(dump_only=True)
