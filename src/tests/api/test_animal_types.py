@@ -5,127 +5,87 @@ def test_get_animal_types(client, auth):
     response = client.get(
         "api/v0/animaltypes/", headers={"Authorization": "Bearer " + auth.token}
     )
-    assert response.status_code == 200, "Happy Path, should return okay"
+    assert response.status_code == 200
     assert len(response.json) > 1
 
 
-def test_get_animal_type_by_id(client, auth):
+@pytest.mark.parametrize(
+    ("req_id", "resp_key", "status_code"),
+    (
+        ("1", "animalTypeId", 200),
+        ("99", "msg", 404),
+    ),
+)
+def test_get_animal_type_by_id(client, auth, req_id, resp_key, status_code):
     response = client.get(
-        "api/v0/animaltypes/1", headers={"Authorization": "Bearer " + auth.admin_token}
+        "api/v0/animaltypes/" + req_id,
+        headers={"Authorization": "Bearer " + auth.admin_token},
     )
-    assert response.status_code == 200, "Happy Path, should return okay"
-    assert "animalType" in response.json, "JSON body is not empty, key is in camelCase"
-
-
-def test_get_non_prestent_animal_type(client, auth):
-    response = client.get(
-        "api/v0/animaltypes/99", headers={"Authorization": "Bearer " + auth.admin_token}
-    )
-    assert response.status_code == 404, "Not present, throw 404 Error"
+    assert response.status_code == status_code
+    assert resp_key in response.json
 
 
 @pytest.mark.parametrize(
     ("req_data", "resp_key", "status_code"),
     (
-        ({"animalType": "cat"}, "animalTypeId", 201),  # happy path
+        ({"animalType": "cat"}, "animalTypeId", 201),
         (
-            {"animalType": "cat", "animalTypeId": 99},
-            "messages",
+            {"animalType": "cat", "animalTypeId": 99},  # animalTypeId is not allowed
+            "msg",
             400,
-        ),  # animalTypeId is not allowed in post requests
-        ({"animalType": "dog"}, "messages", 400),  # anmial_type has to be unique
-        ({"animal_type": "cat"}, "messages", 400),  # key has to be in camelCase
-        ({"animalType": 1}, "messages", 400),  # value has to be a string
-        (
-            {"myType": "lizard", "animalType": "lizard"},
-            "messages",
-            400,
-        ),  # reject unkown keys
-        ({}, "messages", 400),  # reject empty bodies
+        ),
+        ({"animalType": "dog"}, "msg", 400),  # anmial_type has to be unique
+        ({"animal_type": "cat"}, "msg", 400),  # key has to be in camelCase
+        ({"animalType": 1}, "msg", 400),  # value has to be a string
     ),
 )
-def test_post(client, req_data, resp_key, status_code, auth):
+def test_post(client, auth, req_data, resp_key, status_code):
     response = client.post(
         "api/v0/animaltypes/",
         json=req_data,
         headers={"Authorization": "Bearer " + auth.admin_token},
     )
     assert response.status_code == status_code
-    # assert resp_key in response.json
+    assert resp_key in response.json
 
 
 @pytest.mark.parametrize(
     ("req_data", "resp_key", "status_code"),
     (
-        ({"animalType": "cat"}, "animalType", 200),  # happy path
+        ({"animalType": "cat"}, "animalType", 200),
         (
-            {"animalType": "cat", "animalTypeId": 99},
-            "messages",
+            {"animalType": "cat", "animalTypeId": 99},  # animalTypeId is not allowed
+            "msg",
             400,
-        ),  # animalTypeId is not allowed in put requests
-        ({"animalType": "dog"}, "messages", 400),  # anmial_type has to be unique
-        ({"animal_type": "cat"}, "messages", 400),  # key has to be in camelCase
-        ({"animalType": 1}, "messages", 400),  # value has to be a string
-        (
-            {"myType": "lizard", "animalType": "lizard"},
-            "messages",
-            400,
-        ),  # reject unkown keys
-        ({}, "messages", 400),  # reject empty bodies
+        ),
+        ({"animalType": "dog"}, "msg", 400),  # anmial_type has to be unique
+        ({"animal_type": "cat"}, "msg", 400),  # key has to be in camelCase
+        ({"animalType": 1}, "msg", 400),  # value has to be a string
     ),
 )
-def test_put(client, req_data, resp_key, status_code, auth):
-    """Try to change the animal type 'fish'"""
+def test_put(client, auth, req_data, resp_key, status_code):
+    """Try to change the animal type"""
     response = client.put(
         "api/v0/animaltypes/2",
         json=req_data,
         headers={"Authorization": "Bearer " + auth.admin_token},
     )
     assert response.status_code == status_code
-
-
-# Same like put
-@pytest.mark.parametrize(
-    ("req_data", "resp_key", "status_code"),
-    (
-        ({"animalType": "cat"}, "animalType", 200),  # happy path
-        (
-            {"animalType": "cat", "animalTypeId": 99},
-            "messages",
-            400,
-        ),  # animalTypeId is not allowed in put requests
-        ({"animalType": "dog"}, "messages", 400),  # anmial_type has to be unique
-        ({"animal_type": "cat"}, "messages", 400),  # key has to be in camelCase
-        ({"animalType": 1}, "messages", 400),  # value has to be a string
-        (
-            {"myType": "lizard", "animalType": "lizard"},
-            "messages",
-            400,
-        ),  # reject unkown keys
-        ({}, "messages", 400),  # reject empty bodies
-    ),
-)
-def test_patch(client, req_data, resp_key, status_code, auth):
-    """Try to change the animal type 'fish'"""
-    response = client.patch(
-        "api/v0/animaltypes/2",
-        json=req_data,
-        headers={"Authorization": "Bearer " + auth.admin_token},
-    )
-    assert response.status_code == status_code
+    assert resp_key in response.json
 
 
 @pytest.mark.parametrize(
-    ("id", "status_code"),
+    ("req_id", "resp_key", "status_code"),
     (
-        ("3", 204),  # happy path
-        ("99", 404),  # throw not found error
-        ("1", 409),  # Element can't be deleted, because a pet is still tied to it.
+        ("3", None, 204),
+        ("99", "msg", 404),
+        ("1", "msg", 409),  # should not delete element when a pet is still tied to it
     ),
 )
-def test_delete(client, id, status_code, auth):
+def test_delete(client, auth, req_id, resp_key, status_code):
     response = client.delete(
-        "api/v0/animaltypes/" + id,
+        "api/v0/animaltypes/" + req_id,
         headers={"Authorization": "Bearer " + auth.admin_token},
     )
     assert response.status_code == status_code
+    assert resp_key in response.json

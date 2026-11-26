@@ -59,6 +59,7 @@ def app():
                     name="bello",  # type: ignore
                     description="Loves to play in mudd",  # type: ignore
                     owner_id=1,  # type: ignore
+                    borrower_id=2,  # type: ignore
                 ),
                 Pets(
                     pet_id=2,  # type: ignore
@@ -66,6 +67,21 @@ def app():
                     name="blubber",  # type: ignore
                     description="easy to keep, likes to swim belly up",  # type: ignore
                     owner_id=1,  # type: ignore
+                ),
+                Pets(
+                    pet_id=3,  # type: ignore
+                    animal_type_id=1,  # type: ignore
+                    name="mia",  # type: ignore
+                    description="she's a good girl",  # type: ignore
+                    owner_id=2,  # type: ignore
+                ),
+                Pets(
+                    pet_id=4,  # type: ignore
+                    animal_type_id=1,  # type: ignore
+                    name="ranger",  # type: ignore
+                    description="a bit grumpy",  # type: ignore
+                    owner_id=2,  # type: ignore
+                    borrower_id=1,  # type: ignore
                 ),
             ]
         )

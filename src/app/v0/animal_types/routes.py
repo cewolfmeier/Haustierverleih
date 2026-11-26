@@ -52,7 +52,7 @@ def create(args):
 
 
 # Same route for put and patch, because currently only one property can be changed
-@animal_types.route("/<int:id>", methods=["PUT", "PATCH"])  # type: ignore
+@animal_types.put("/<int:id>")  # type: ignore
 @authenticate(token_auth, role="admin")
 @body(single_schema)
 @response(single_schema, 200)

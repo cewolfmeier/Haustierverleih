@@ -10,27 +10,27 @@ import pytest
             {"username": "herbert", "password": "MySecretPassword1!"},
             "userId",
             201,
-        ),  # happy path
+        ),
         (
             {"username": "herbert", "password": "MySecretPassword1!", "userId": 99},
             "messages",
             400,
-        ),  # petId is not allowed
+        ),
         (
             {"username": "herbert", "password": "MySecretPassword1!", "role_id": 1},
             "messages",
             400,
-        ),  # key has to be in camelCase
+        ),
         (
             {"username": "herbert", "password": "MySecretPassword1!", "roleId": 1},
             "messages",
             400,
-        ),  # Role should not be set in request body on register
+        ),
         (
             {"username": 42, "password": "MySecretPassword1!"},
             "messages",
             400,
-        ),  # wrong value type
+        ),
         (
             {
                 "username": "herbert",
@@ -39,14 +39,14 @@ import pytest
             },
             "messages",
             400,
-        ),  # reject unkown keys
-        ({}, "messages", 400),  # reject empty bodies
+        ),
+        ({}, "messages", 400),
     ),
 )
 def test_register(client, req_data, resp_key, status_code):
     response = client.post("api/v0/register", json=req_data)
     assert response.status_code == status_code
-    # assert resp_key in response.json
+    assert resp_key in response.json
 
 
 @pytest.mark.parametrize(
@@ -59,7 +59,7 @@ def test_register(client, req_data, resp_key, status_code):
             },
             "accessToken",
             200,
-        ),  # happy path
+        ),
         (
             {
                 "Authorization": "Basic "
@@ -67,7 +67,7 @@ def test_register(client, req_data, resp_key, status_code):
             },
             "msg",
             401,
-        ),  # wrong username
+        ),
         (
             {
                 "Authorization": "Basic "
@@ -75,28 +75,45 @@ def test_register(client, req_data, resp_key, status_code):
             },
             "msg",
             401,
-        ),  # wrong password
+        ),
         (
             {"Authorization": "Basic " + base64.b64encode(b":").decode("utf-8")},
             "msg",
             401,
-        ),  # missing credentials
+        ),
         (
             {"Authorization": ""},
             "msg",
             401,
-        ),  # missing value
+        ),
         (
             {},
             "msg",
             401,
-        ),  # empty header
+        ),
     ),
 )
 def test_login(client, headers, resp_key, status_code):
     response = client.post("api/v0/login", headers=headers)
     assert response.status_code == status_code
-    # assert resp_key in response.json
+    assert resp_key in response.json
+    assert "Set-Cookie" in response.headers
+
+
+def test_logout(client, auth):
+    response = client.delete(
+        "api/v0/logout", headers={"Authorization": "Bearer " + auth.token}
+    )
+    assert response.status_code == 204
+    assert response.headers
+
+
+def test_token_rotation(client):
+    client.post("api/v0/login")  # set refresh cookie
+    response = client.put("api/v0/tokens")
+    assert response.status_code == 200
+    assert "access_token" in response.json
+    assert "Set-Cookie" in response.headers
 
 
 @pytest.mark.parametrize(
@@ -119,6 +136,61 @@ def test_protected_get_routes(client, path):
 @pytest.mark.parametrize(
     ("path",),
     (
+        ("/animaltypes/",),
+        ("/pets/",),
+    ),
+)
+def test_protected_post_routes(client, path):
+    response = client.post("api/v0" + path)
+    assert response.status_code == 401
+
+
+@pytest.mark.parametrize(
+    ("path",),
+    (
+        ("/animaltypes/1",),
+        ("/pets/1",),
+        ("/tokens/",),
+    ),
+)
+def test_protected_put_routes(client, path):
+    response = client.put("api/v0" + path)
+    assert response.status_code == 401
+
+
+@pytest.mark.parametrize(
+    ("path",),
+    (
+        ("/pets/1/borrow",),
+        ("/pets/1/return",),
+        ("/users/1/role",),
+        ("/me/password",),
+        ("/me/username",),
+    ),
+)
+def test_protected_patch_routes(client, path):
+    response = client.patch("api/v0" + path)
+    assert response.status_code == 401
+
+
+@pytest.mark.parametrize(
+    ("path",),
+    (
+        ("/animaltypes/1",),
+        ("/pets/1",),
+        ("/users/1",),
+        ("/me/",),
+        ("/logout",),
+    ),
+)
+def test_protected_delete_routes(client, path):
+    response = client.delete("api/v0" + path)
+    assert response.status_code == 401
+
+
+@pytest.mark.parametrize(
+    ("path",),
+    (
         ("/animaltypes/1",),
         ("/users/",),
         ("/users/1",),
@@ -132,34 +204,34 @@ def test_private_get_routes(client, auth, path):
 
 
 @pytest.mark.parametrize(
-    ("path", "data"),
-    (("/animaltypes/", {"animalType": "cat"}),),
+    ("path",),
+    (("/animaltypes/",),),
 )
-def test_private_post_routes(client, auth, path, data):
+def test_private_post_routes(client, auth, path):
     response = client.post(
-        "api/v0" + path, json=data, headers={"Authorization": "Bearer " + auth.token}
+        "api/v0" + path, headers={"Authorization": "Bearer " + auth.token}
     )
     assert response.status_code == 403
 
 
 @pytest.mark.parametrize(
-    ("path", "data"),
-    (("/animaltypes/2", {"animalType": "cat"}),),
+    ("path",),
+    (("/animaltypes/2",),),
 )
-def test_private_put_routes(client, auth, path, data):
+def test_private_put_routes(client, auth, path):
     response = client.put(
-        "api/v0" + path, json=data, headers={"Authorization": "Bearer " + auth.token}
+        "api/v0" + path, headers={"Authorization": "Bearer " + auth.token}
     )
     assert response.status_code == 403
 
 
 @pytest.mark.parametrize(
-    ("path", "data"),
-    (("/animaltypes/2", {"animalType": "cat"}),),
+    ("path",),
+    (("/users/1/role",),),
 )
-def test_private_patch_routes(client, auth, path, data):
+def test_private_patch_routes(client, auth, path):
     response = client.patch(
-        "api/v0" + path, json=data, headers={"Authorization": "Bearer " + auth.token}
+        "api/v0" + path, headers={"Authorization": "Bearer " + auth.token}
     )
     assert response.status_code == 403
 

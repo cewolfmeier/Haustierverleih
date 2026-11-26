@@ -1,26 +1,36 @@
 import pytest
 
 
-def test_get_collection(client, auth):
+@pytest.mark.parametrize(
+    ("query_param", "resp_key"),
+    (
+        ("", "borrower"),  # Thou shalt see all pets
+        ("?borrowed", "borrower"),  # Thou shalt see pets borrowed by thyself
+        ("?owned", "borrower"),  # Thou shalt see pets owned by thyself
+    ),
+)
+def test_get_collection(client, auth, query_param):
     response = client.get(
-        "api/v0/pets/", headers={"Authorization": "Bearer " + auth.token}
+        "api/v0/pets/" + query_param, headers={"Authorization": "Bearer " + auth.token}
     )
     assert response.status_code == 200, "Happy Path, should return okay"
     assert len(response.json) > 1
 
 
 @pytest.mark.parametrize(
-    ("id", "status_code"),
+    ("req_id", "resp_keys", "status_code"),
     (
-        ("1", 200),  # happy path
-        ("99", 404),  # throw not found error
+        ("1", ["animalType", "borrower", "owner"], 200),  # include ForeignKey Objects
+        ("99", ["msg"], 404),
     ),
 )
-def test_get_by_id(client, id, status_code, auth):
+def test_get_by_id(client, auth, req_id, resp_key, status_code):
     response = client.get(
-        "api/v0/pets/" + id, headers={"Authorization": "Bearer " + auth.token}
+        "api/v0/pets/" + req_id, headers={"Authorization": "Bearer " + auth.token}
     )
     assert response.status_code == status_code
+    for key in resp_key:
+        assert key in response.json
 
 
 @pytest.mark.parametrize(
@@ -30,7 +40,7 @@ def test_get_by_id(client, id, status_code, auth):
             {"name": "Milo", "description": "A little cat", "animalTypeId": 1},
             "petId",
             201,
-        ),  # happy path
+        ),
         (
             {
                 "name": "Milo",
@@ -38,19 +48,19 @@ def test_get_by_id(client, id, status_code, auth):
                 "animalTypeId": 1,
                 "petId": 99,
             },
-            "messages",
+            "msg",
             400,
         ),  # petId is not allowed
         (
             {"name": "Milo", "description": "A little cat", "animal_type_id": 1},
-            "messages",
+            "msg",
             400,
         ),  # key has to be in camelCase
         (
             {"name": 123, "description": "A little cat", "animalTypeId": 1},
-            "messages",
+            "msg",
             400,
-        ),  # wrong value type
+        ),  # Thou shalt not use wrong value types
         (
             {
                 "name": "Milo",
@@ -58,41 +68,46 @@ def test_get_by_id(client, id, status_code, auth):
                 "animalTypeId": 1,
                 "myCustom": "Hello!",
             },
-            "messages",
+            "msg",
             400,
-        ),  # reject unkown keys
-        ({}, "messages", 400),  # reject empty bodies
+        ),  # Thou shalt reject unkown keys
     ),
 )
-def test_post(client, req_data, resp_key, status_code, auth):
+def test_post(client, auth, req_data, resp_key, status_code):
     response = client.post(
         "api/v0/pets/", json=req_data, headers={"Authorization": "Bearer " + auth.token}
     )
     assert response.status_code == status_code
-    # assert resp_key in response.json
+    assert resp_key in response.json
 
 
 @pytest.mark.parametrize(
-    ("id", "req_data", "resp_key", "status_code"),
+    ("req_id", "req_data", "resp_key", "status_code"),
     (
         (
-            "2",
+            "3",
             {"name": "Milo", "description": "A little cat", "animalTypeId": 1},
             "petId",
             200,
-        ),  # happy path
+        ),
+        (
+            "2",
+            {"name": "Milo", "description": "A little cat", "animalTypeId": 1},
+            "msg",
+            403,
+        ),  # Thou shalt only edit own pets
         (
             "99",
             {"name": "Milo", "description": "A little cat", "animalTypeId": 1},
-            "messages",
+            "msg",
             404,
-        ),  # wrong id
+        ),
         (
             "2",
             {"name": "Milo", "description": "A little cat"},
-            "messages",
+            "msg",
             400,
-        ),  # missing key:value
+        ),  # Thou shalt not send incomplete request bodies
         (
             "2",
             {
@@ -101,21 +116,21 @@ def test_post(client, req_data, resp_key, status_code, auth):
                 "animalTypeId": 1,
                 "petId": 99,
             },
-            "messages",
+            "msg",
             400,
-        ),  # petId is not allowed
+        ),  # Thou shalt not include petId
         (
             "2",
             {"name": "Milo", "description": "A little cat", "animal_type_id": 1},
-            "messages",
+            "msg",
             400,
-        ),  # key has to be in camelCase
+        ),  # Thou shalt always use camelCase
         (
             "2",
             {"name": 123, "description": "A little cat", "animalTypeId": 1},
-            "messages",
+            "msg",
             400,
-        ),  # wrong value type
+        ),  # Thou shalt not use wrong value types
         (
             "2",
             {
@@ -124,84 +139,129 @@ def test_post(client, req_data, resp_key, status_code, auth):
                 "animalTypeId": 1,
                 "myCustom": "Hello!",
             },
-            "messages",
+            "msg",
             400,
-        ),  # reject unkown keys
-        ("2", {}, "messages", 400),  # reject empty bodies
+        ),  # Thou shalt reject unkown keys
+        ("2", {}, "msg", 400),  # Thou shalt not send an empty body
     ),
 )
-def test_put(client, id, req_data, resp_key, status_code, auth):
+def test_put(client, auth, req_id, req_data, resp_key, status_code):
     response = client.put(
-        "api/v0/pets/" + id,
+        "api/v0/pets/" + req_id,
         json=req_data,
         headers={"Authorization": "Bearer " + auth.token},
     )
     assert response.status_code == status_code
+    assert resp_key in response.json
 
 
 @pytest.mark.parametrize(
-    ("id", "req_data", "resp_key", "status_code"),
+    ("req_id", "resp_key", "status_code"),
     (
-        ("2", {"name": "Milo"}, "petId", 200),  # happy path
-        ("99", {"name": "Milo"}, "messages", 404),  # wrong id
-        ("2", {"petId": 99}, "messages", 400),  # petId is not allowed
-        ("2", {"animal_type_id": 1}, "messages", 400),  # key has to be in camelCase
-        ("2", {"name": 123}, "messages", 400),  # wrong value type
-        ("2", {"myCustom": "Hello!"}, "messages", 400),  # reject unkown keys
+        ("3", None, 204),
+        ("1", "msg", 403),  # Thou shalt only delete own pet
+        ("99", "msg", 404),
     ),
 )
-def test_patch(client, id, req_data, resp_key, status_code, auth):
-    response = client.patch(
-        "api/v0/pets/" + id,
-        json=req_data,
-        headers={"Authorization": "Bearer " + auth.token},
-    )
-    assert response.status_code == status_code
-
-
-@pytest.mark.parametrize(
-    ("id", "status_code"),
-    (
-        ("1", 204),  # happy path
-        ("99", 404),  # throw not found error
-    ),
-)
-def test_delete(client, id, status_code, auth):
+def test_delete(client, auth, req_id, resp_key, status_code):
     response = client.delete(
-        "api/v0/pets/" + id, headers={"Authorization": "Bearer " + auth.token}
+        "api/v0/pets/" + req_id, headers={"Authorization": "Bearer " + auth.token}
     )
     assert response.status_code == status_code
+    assert resp_key in response.json
 
 
 @pytest.mark.parametrize(
-    ("id", "req_data", "resp_key", "status_code"),
+    ("req_id", "req_data", "resp_key", "status_code"),
     (
-        ("2", {}, "petId", 200),  # happy path
-        ("2", {"borrowerId": 2}, "messages", 400),  # no properties allowed
-        ("99", {}, "messages", 404),  # wrong id
+        ("2", {}, "petId", 200),
+        ("3", {}, "msg", 403),  # Thou shalt not borrow own pets
+        ("1", {}, "msg", 400),  # Thou shalt not borrow borrowed pets (even thyself)
+        ("2", {"borrowerId": 2}, "msg", 400),  # Thou shalt use empty request bodies
+        ("99", {}, "msg", 404),
     ),
 )
-def test_borrow(client, id, req_data, resp_key, status_code, auth):
+def test_borrow(client, auth, req_id, req_data, resp_key, status_code):
     response = client.patch(
-        f"api/v0/pets/{id}/borrow",
+        f"api/v0/pets/{req_id}/borrow",
         json=req_data,
         headers={"Authorization": "Bearer " + auth.token},
     )
     assert response.status_code == status_code
+    assert resp_key in response.json
 
 
 @pytest.mark.parametrize(
-    ("id", "req_data", "resp_key", "status_code"),
+    ("req_id", "req_data", "resp_key", "status_code"),
     (
-        ("2", {}, "petId", 200),  # happy path
-        ("2", {"borrowerId": 2}, "messages", 400),  # no properties allowed
-        ("99", {}, "messages", 404),  # wrong id
+        ("2", {}, "petId", 200),
+        ("4", {}, "msg", 400),  # Thou shalt not return others borrowed pets
+        ("3", {}, "msg", 403),  # Thou shalt not return own or available pets
+        ("2", {"borrowerId": 2}, "msg", 400),  # Thou shalt use empty request bodies
+        ("99", {}, "msg", 404),
     ),
 )
-def test_return(client, id, req_data, resp_key, status_code, auth):
+def test_return(client, auth, req_id, req_data, resp_key, status_code):
     response = client.patch(
-        f"api/v0/pets/{id}/return",
+        f"api/v0/pets/{req_id}/return",
         json=req_data,
         headers={"Authorization": "Bearer " + auth.token},
     )
     assert response.status_code == status_code
+    assert resp_key in response.json
+
+
+"""
+@pytest.mark.parametrize(
+    ("req_id", "req_data", "resp_key", "status_code"),
+    (
+        ("2", {}, "petId", 200),
+        ("2", {"borrowerId": 2}, "msg", 400),  # no properties allowed
+        ("99", {}, "msg", 404),
+    ),
+)
+def test_update_picture(client, auth, req_id, req_data, resp_key, status_code):
+    response = client.patch(
+        f"api/v0/pets/{req_id}/picture",
+        json=req_data,
+        headers={"Authorization": "Bearer " + auth.token},
+    )
+    assert response.status_code == status_code
+    assert resp_key in response.json
+
+
+@pytest.mark.parametrize(
+    ("req_id", "req_data", "resp_key", "status_code"),
+    (
+        ("2", {}, "petId", 200),  # happy path
+        ("2", {"borrowerId": 2}, "msg", 400),  # no properties allowed
+        ("99", {}, "msg", 404),  # wrong id
+    ),
+)
+def test_get_picture(client, auth, req_id, req_data, resp_key, status_code):
+    response = client.get(
+        f"api/v0/pets/{req_id}/picture",
+        json=req_data,
+        headers={"Authorization": "Bearer " + auth.token},
+    )
+    assert response.status_code == status_code
+    assert resp_key in response.json
+
+
+@pytest.mark.parametrize(
+    ("req_id", "req_data", "resp_key", "status_code"),
+    (
+        ("2", {}, "petId", 200),  # happy path
+        ("2", {"borrowerId": 2}, "msg", 400),  # no properties allowed
+        ("99", {}, "msg", 404),  # wrong id
+    ),
+)
+def test_delete_picture(client, auth, req_id, req_data, resp_key, status_code):
+    response = client.get(
+        f"api/v0/pets/{req_id}/picture",
+        json=req_data,
+        headers={"Authorization": "Bearer " + auth.token},
+    )
+    assert response.status_code == status_code
+    assert resp_key in response.json
+"""

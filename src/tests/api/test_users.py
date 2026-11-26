@@ -10,109 +10,58 @@ def test_get_collection(client, auth):
 
 
 @pytest.mark.parametrize(
-    ("id", "status_code"),
+    ("req_id", "resp_key", "status_code"),
     (
-        ("1", 200),  # happy path
-        ("99", 404),  # throw not found error
+        ("1", "role", 200),  # include Roles Object
+        ("99", "msg", 404),
     ),
 )
-def test_get_by_id(client, id, status_code, auth):
+def test_get_by_id(client, auth, req_id, resp_key, status_code):
     response = client.get(
-        "api/v0/users/" + id, headers={"Authorization": "Bearer " + auth.admin_token}
-    )
-    assert response.status_code == status_code
-
-
-@pytest.mark.parametrize(
-    ("id", "req_data", "resp_key", "status_code"),
-    (
-        (
-            "2",
-            {"username": "herbert", "password": "MySecretPassword1!"},
-            "userId",
-            200,
-        ),  # happy path
-        (
-            "99",
-            {"username": "herbert", "password": "MySecretPassword1!"},
-            "messages",
-            404,
-        ),  # wrong id
-        ("2", {"password": "MySecretPassword1!"}, "messages", 400),  # missing key:value
-        (
-            "2",
-            {"username": "herbert", "password": "MySecretPassword1!", "userId": 99},
-            "messages",
-            400,
-        ),  # userId is not allowed
-        (
-            "2",
-            {"username": "herbert", "password": "MySecretPassword1!", "role_id": 1},
-            "messages",
-            400,
-        ),  # key has to be in camelCase
-        (
-            "2",
-            {"username": 42, "password": "MySecretPassword1!"},
-            "messages",
-            400,
-        ),  # wrong value type
-        (
-            "2",
-            {
-                "username": "herbert",
-                "password": "MySecretPassword1!",
-                "myCustom": "Hello!",
-            },
-            "messages",
-            400,
-        ),  # reject unkown keys
-        ("2", {}, "messages", 400),  # reject empty bodies
-    ),
-)
-def test_put(client, id, req_data, resp_key, status_code, auth):
-    response = client.put(
-        "api/v0/users/" + id,
-        json=req_data,
+        "api/v0/users/" + req_id,
         headers={"Authorization": "Bearer " + auth.admin_token},
     )
     assert response.status_code == status_code
+    assert resp_key in response.json
 
 
 @pytest.mark.parametrize(
-    ("id", "req_data", "resp_key", "status_code"),
+    ("req_id", "req_data", "resp_key", "status_code"),
     (
-        ("2", {"username": "herbert"}, "userId", 200),  # happy path
-        ("99", {"username": "herbert"}, "messages", 404),  # wrong id
+        ("2", {"roleId": 1}, "userId", 200),
+        ("99", {"roleId": 1}, "msg", 404),
         (
             "2",
-            {"username": "herbert", "userId": 99},
-            "messages",
+            {"roleId": 1, "userId": 99},
+            "msg",
             400,
         ),  # userId is not allowed
-        ("2", {"role_id": 1}, "messages", 400),  # key has to be in camelCase
-        ("2", {"username": 42}, "messages", 400),  # wrong value type
-        ("2", {"myCustom": "Hello!"}, "messages", 400),  # reject unkown keys
+        ("2", {"role_id": 1}, "msg", 400),  # key has to be in camelCase
+        ("2", {"roleId": "1"}, "msg", 400),  # wrong value type
+        ("2", {"roleId": 99}, "msg", 400),  # reject out of bound value
     ),
 )
-def test_patch(client, id, req_data, resp_key, status_code, auth):
+def test_patch(client, auth, req_id, req_data, resp_key, status_code):
     response = client.patch(
-        "api/v0/users/" + id,
+        f"api/v0/users/{req_id}/roles",
         json=req_data,
         headers={"Authorization": "Bearer " + auth.admin_token},
     )
     assert response.status_code == status_code
+    assert resp_key in response.json
 
 
 @pytest.mark.parametrize(
-    ("id", "status_code"),
+    ("req_id", "resp_key", "status_code"),
     (
-        ("1", 204),  # happy path
-        ("99", 404),  # throw not found error
+        ("1", None, 204),
+        ("99", "msg", 404),
     ),
 )
-def test_delete(client, id, status_code, auth):
+def test_delete(client, auth, req_id, resp_key, status_code):
     response = client.delete(
-        "api/v0/users/" + id, headers={"Authorization": "Bearer " + auth.admin_token}
+        "api/v0/users/" + req_id,
+        headers={"Authorization": "Bearer " + auth.admin_token},
     )
     assert response.status_code == status_code
+    assert resp_key in response.json
