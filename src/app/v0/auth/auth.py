@@ -21,6 +21,14 @@ def verify_password(username: str, password: str) -> Users | None:
         return user
 
 
+@basic_auth.error_handler
+def basic_auth_error(status):
+    msg = {"messages": ""}
+    if status == 401:
+        msg["messages"] = "invalid credentials"
+    return msg, status
+
+
 @token_auth.verify_token
 def verify_token(token):
     try:
@@ -38,3 +46,13 @@ def verify_token(token):
 @token_auth.get_user_roles
 def get_user_roles(user: Users):
     return user.role.role if user.role else ""
+
+
+@token_auth.error_handler
+def token_auth_error(status):
+    msg = {"messages": ""}
+    if status == 401:
+        msg["messages"] = "invalid token"
+    elif status == 403:
+        msg["messages"] = "access denied"
+    return msg, status

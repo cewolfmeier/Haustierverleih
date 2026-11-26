@@ -1,14 +1,16 @@
 from datetime import UTC, datetime, timedelta
 
+import jwt
 from apifairy import authenticate, body, other_responses, response
-from flask import Blueprint, abort, url_for
+from flask import Blueprint, abort, after_this_request, current_app, request, url_for
 from werkzeug.http import dump_cookie
 
 from app import db
 from app.models import Users
 
+from ..schemas import EmptySchema
 from ..users.schemas import UserSchema
-from .auth import basic_auth
+from .auth import basic_auth, token_auth
 from .schemas import TokenSchema
 
 new_user_schema = UserSchema(only=("username", "password"))
@@ -27,9 +29,9 @@ token_schema = TokenSchema()
 def register(new_user):
     """Creates and saves a new User Object"""
     user = Users(
-        username=new_user.get("username"),  # type: ignore
+        username=new_user.username,  # type: ignore
     )
-    user.set_password(new_user.get("password"))
+    user.set_password(request.json.get("password"))
     db.session.add(user)
     db.session.commit()
     return user
@@ -47,7 +49,7 @@ def login():
     refresh_token_exp = datetime.now(UTC) + timedelta(days=7)
 
     return (
-        user.issue_token(datetime.now(UTC) + timedelta(hours=1)),
+        {"access_token": user.issue_token(datetime.now(UTC) + timedelta(hours=1))},
         200,
         {
             "Set-Cookie": dump_cookie(
@@ -59,3 +61,52 @@ def login():
             )
         },
     )
+
+
+@auth.put("/tokens")  # type: ignore
+@response(TokenSchema, status_code=200)
+@other_responses({401: "Invalid Token"})
+def rotate_tokens():
+    """login"""
+    # ToDo: Manage refresh token in db
+    try:
+        claims = jwt.decode(
+            (request.cookies.get("refresh_token") or ""),
+            key=current_app.config["SECRET_KEY"],
+            algorithms=[
+                "HS256",
+            ],
+        )
+        user = db.get_or_404(Users, claims.get("sub"))
+        refresh_token_exp = datetime.now(UTC) + timedelta(days=7)
+        return (
+            {"access_token": user.issue_token(datetime.now(UTC) + timedelta(hours=1))},
+            200,
+            {
+                "Set-Cookie": dump_cookie(
+                    "refresh_token",
+                    user.issue_token(refresh_token_exp),
+                    path=url_for("auth.login"),
+                    expires=refresh_token_exp,
+                    httponly=True,
+                )
+            },
+        )
+    except jwt.PyJWTError:
+        abort(401)
+
+
+@auth.delete("/logout")  # type: ignore
+@authenticate(token_auth)
+@response(EmptySchema)
+def delete():
+    """Invalidates the refresh_token"""
+
+    # ToDo: Manage refresh token in db
+    # refresh_token = request.cookies.get("refresh_token")
+    @after_this_request
+    def clear_refresh_token_cookie(response):
+        response.delete_cookie("refresh_token", path=url_for("auth.login"))
+        return response
+
+    return {}, 204

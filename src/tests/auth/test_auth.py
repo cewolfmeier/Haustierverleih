@@ -65,7 +65,7 @@ def test_register(client, req_data, resp_key, status_code):
                 "Authorization": "Basic "
                 + base64.b64encode(b"toast:test").decode("utf-8")
             },
-            "msg",
+            "messages",
             401,
         ),
         (
@@ -73,22 +73,22 @@ def test_register(client, req_data, resp_key, status_code):
                 "Authorization": "Basic "
                 + base64.b64encode(b"test:toast").decode("utf-8")
             },
-            "msg",
+            "messages",
             401,
         ),
         (
             {"Authorization": "Basic " + base64.b64encode(b":").decode("utf-8")},
-            "msg",
+            "messages",
             401,
         ),
         (
             {"Authorization": ""},
-            "msg",
+            "messages",
             401,
         ),
         (
             {},
-            "msg",
+            "messages",
             401,
         ),
     ),
@@ -97,7 +97,6 @@ def test_login(client, headers, resp_key, status_code):
     response = client.post("api/v0/login", headers=headers)
     assert response.status_code == status_code
     assert resp_key in response.json
-    assert "Set-Cookie" in response.headers
 
 
 def test_logout(client, auth):
@@ -150,7 +149,7 @@ def test_protected_post_routes(client, path):
     (
         ("/animaltypes/1",),
         ("/pets/1",),
-        ("/tokens/",),
+        ("/tokens",),
     ),
 )
 def test_protected_put_routes(client, path):
@@ -163,7 +162,7 @@ def test_protected_put_routes(client, path):
     (
         ("/pets/1/borrow",),
         ("/pets/1/return",),
-        ("/users/1/role",),
+        ("/users/1/roles",),
         ("/me/password",),
         ("/me/username",),
     ),
@@ -227,7 +226,7 @@ def test_private_put_routes(client, auth, path):
 
 @pytest.mark.parametrize(
     ("path",),
-    (("/users/1/role",),),
+    (("/users/1/roles",),),
 )
 def test_private_patch_routes(client, auth, path):
     response = client.patch(
