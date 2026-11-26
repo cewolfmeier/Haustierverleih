@@ -3,7 +3,7 @@ from apifairy import authenticate, body, other_responses, response
 from flask import Blueprint, request
 
 from app import db
-from app.models import Users
+from app.models import Roles, Users
 
 from ..auth.auth import token_auth
 from ..schemas import EmptySchema
@@ -12,7 +12,7 @@ from .schemas import UserSchema
 users = Blueprint("users", __name__)
 single_schema = UserSchema()
 collection_schema = UserSchema(many=True)
-update_schema = UserSchema(partial=True)
+update_schema = UserSchema(only=("role_id",))
 ResourceModel = Users
 
 
@@ -45,13 +45,14 @@ def update(args, id):
     return resource
 
 
-@users.patch("/<int:id>")  # type: ignore
+@users.patch("/<int:id>/roles")  # type: ignore
 @authenticate(token_auth, role="admin")
 @body(update_schema)
 @response(single_schema)
 @other_responses({400: "Invalid request body", 404: "User not found"})
 def update_partial(args, id):
     resource = db.get_or_404(ResourceModel, id)
+    db.get_or_404(Roles, args.role_id)
     update_schema.load(request.json, instance=resource)
     db.session.commit()
     return resource

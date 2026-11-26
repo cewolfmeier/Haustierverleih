@@ -19,6 +19,7 @@ class UserSchema(ma.SQLAlchemySchema, CamelCaseSchema):
     password = String(load_only=True, required=True)
     password_old = String(load_only=True, required=True)
     role_id = auto_field(required=False)
+    role = auto_field()
 
     @validates("username")
     def validate_username(self, value, **kwargs) -> ValidationError | None:
