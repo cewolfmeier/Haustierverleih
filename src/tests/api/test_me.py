@@ -26,7 +26,7 @@ def test_get_me(client, auth):
             "msg",
             400,  # Thou shalt reject missing key:value pairs
         ),
-        ("2", {}, "msg", 400),  # reject empty bodies
+        ({}, "msg", 400),  # reject empty bodies
     ),
 )
 def test_update_password(client, auth, req_data, resp_key, status_code):
@@ -40,7 +40,7 @@ def test_update_password(client, auth, req_data, resp_key, status_code):
 
 
 @pytest.mark.parametrize(
-    ("req_id", "req_data", "resp_key", "status_code"),
+    ("req_data", "resp_key", "status_code"),
     (
         (
             {"username": "herta"},
@@ -62,12 +62,12 @@ def test_update_password(client, auth, req_data, resp_key, status_code):
             "msg",
             400,
         ),  # Thou shalt reject empty strings
-        ("2", {}, "msg", 400),  # reject empty bodies
+        ({}, "msg", 400),  # reject empty bodies
     ),
 )
-def test_update_username(client, auth, req_id, req_data, resp_key, status_code):
+def test_update_username(client, auth, req_data, resp_key, status_code):
     response = client.put(
-        "api/v0/me/" + req_id,
+        "api/v0/me/",
         json=req_data,
         headers={"Authorization": "Bearer " + auth.admin_token},
     )

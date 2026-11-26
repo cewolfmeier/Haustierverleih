@@ -9,7 +9,7 @@ import pytest
         ("?owned", "borrower"),  # Thou shalt see pets owned by thyself
     ),
 )
-def test_get_collection(client, auth, query_param):
+def test_get_collection(client, auth, query_param, resp_key):
     response = client.get(
         "api/v0/pets/" + query_param, headers={"Authorization": "Bearer " + auth.token}
     )
@@ -24,12 +24,12 @@ def test_get_collection(client, auth, query_param):
         ("99", ["msg"], 404),
     ),
 )
-def test_get_by_id(client, auth, req_id, resp_key, status_code):
+def test_get_by_id(client, auth, req_id, resp_keys, status_code):
     response = client.get(
         "api/v0/pets/" + req_id, headers={"Authorization": "Bearer " + auth.token}
     )
     assert response.status_code == status_code
-    for key in resp_key:
+    for key in resp_keys:
         assert key in response.json
 
 
@@ -209,7 +209,6 @@ def test_return(client, auth, req_id, req_data, resp_key, status_code):
     )
     assert response.status_code == status_code
     assert resp_key in response.json
-
 
 """
 @pytest.mark.parametrize(
