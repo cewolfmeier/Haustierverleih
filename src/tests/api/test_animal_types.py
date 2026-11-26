@@ -79,7 +79,11 @@ def test_put(client, auth, req_data, resp_key, status_code):
     (
         ("3", None, 204),
         ("99", "messages", 404),
-        ("1", "messages", 409),  # should not delete element when a pet is still tied to it
+        (
+            "1",
+            "messages",
+            409,
+        ),  # should not delete element when a pet is still tied to it
     ),
 )
 def test_delete(client, auth, req_id, resp_key, status_code):
